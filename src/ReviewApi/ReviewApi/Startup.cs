@@ -21,6 +21,7 @@ namespace ReviewApi
         {
             AddDbContext(services);
             services.AddControllers();
+            services.AddCors();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
