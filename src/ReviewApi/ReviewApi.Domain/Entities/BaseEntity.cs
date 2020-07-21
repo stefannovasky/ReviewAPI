@@ -1,6 +1,6 @@
 ﻿namespace ReviewApi.Domain.Entities
 {
-    internal class BaseEntity
+    public class BaseEntity
     {
         public int Id { get; protected set; }
         public bool Deleted { get; protected set; }
