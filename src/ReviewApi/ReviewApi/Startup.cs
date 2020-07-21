@@ -31,6 +31,18 @@ namespace ReviewApi
                 app.UseDeveloperExceptionPage();
             }
 
+            using (IServiceScope serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                MainContext context = serviceScope
+                    .ServiceProvider
+                    .GetRequiredService<MainContext>();
+
+                if (context.Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+                {
+                    context.Database.Migrate();
+                }
+            }
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
@@ -45,7 +57,7 @@ namespace ReviewApi
 
         private void AddDbContext(IServiceCollection services)
         {
-            services.AddDbContext<MainContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<MainContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SqlServerConnection")));
         }
     }
 }
