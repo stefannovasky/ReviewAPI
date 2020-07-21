@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ReviewApi.Infra.Context;
 
 namespace ReviewApi
 {
@@ -17,6 +19,7 @@ namespace ReviewApi
 
         public void ConfigureServices(IServiceCollection services)
         {
+            AddDbContext(services);
             services.AddControllers();
         }
 
@@ -39,6 +42,11 @@ namespace ReviewApi
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private void AddDbContext(IServiceCollection services)
+        {
+            services.AddDbContext<MainContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
         }
     }
 }
