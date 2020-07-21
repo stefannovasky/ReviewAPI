@@ -63,5 +63,16 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Equal(userPassword, user.Password);
             Assert.False(user.Deleted);
         }
+
+        [Fact]
+        public void ShouldUpdatePassword()
+        {
+            string password = "password";
+            User user = new User();
+
+            user.UpdatePassword(password);
+
+            Assert.Equal(password, user.Password);
+        }
     }
 }
