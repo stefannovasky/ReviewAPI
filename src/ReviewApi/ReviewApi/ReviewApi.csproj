@@ -8,5 +8,13 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ReviewApi.Infra\ReviewApi.Infra.csproj" />
+  </ItemGroup>
+
 
 </Project>
