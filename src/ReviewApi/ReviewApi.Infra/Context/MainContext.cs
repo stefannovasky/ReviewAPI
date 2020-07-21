@@ -27,7 +27,7 @@ namespace ReviewApi.Infra.Context
             {
                 optionsBuilder
                     .UseLazyLoadingProxies()
-                    .UseSqlServer("DefaultConnection");
+                    .UseSqlServer("SqlServerConnection");
             }
         }
     }
