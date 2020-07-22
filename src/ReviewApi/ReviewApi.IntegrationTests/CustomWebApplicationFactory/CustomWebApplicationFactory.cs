@@ -7,12 +7,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ReviewApi.Infra.Context;
+using Xunit;
 
 namespace ReviewApi.IntegrationTests.CustomWebApplicationFactory
 {
+    [Collection("Sequential")]
     public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
     {
-        private MainContext _database;
+        private MainContext _db;
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -40,12 +42,12 @@ namespace ReviewApi.IntegrationTests.CustomWebApplicationFactory
                 using (var scope = serviceProvider.CreateScope())
                 {
                     IServiceProvider scopedServices = scope.ServiceProvider;
-                    _database = scopedServices.GetRequiredService<MainContext>();
+                    _db = scopedServices.GetRequiredService<MainContext>();
                     ILogger logger = scopedServices
                         .GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
 
-                    _database.Database.EnsureDeleted();
-                    _database.Database.EnsureCreated();
+                    _db.Database.EnsureDeleted();
+                    _db.Database.EnsureCreated();
                 }
             });
         }
