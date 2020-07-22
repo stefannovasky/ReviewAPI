@@ -19,6 +19,18 @@ namespace ReviewApi.Infra.Repositories
             _dbSet = _dbContext.Set<T>();
         }
 
+        public async Task<bool> AlreadyExists(int id)
+        {
+            try
+            {
+                return await Query().AnyAsync(entity => !entity.Deleted && entity.Id == id);
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+        }
+
         public async Task Create(T entity)
         {
             try

@@ -8,6 +8,7 @@ namespace ReviewApi.Domain.Interfaces.Repositories
         Task<T> GetById(int id);
         Task Create(T entity);
         void Update(T entity);
+        Task<bool> AlreadyExists(int id);
         Task Save();
     }
 }
