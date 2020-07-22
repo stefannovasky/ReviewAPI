@@ -19,7 +19,7 @@ namespace ReviewApi.Infra.Repositories
             _dbSet = _dbContext.Set<T>();
         }
 
-        public async Task<bool> AlreadyExists(int id)
+        public async Task<bool> AlreadyExists(Guid id)
         {
             try
             {
@@ -43,7 +43,7 @@ namespace ReviewApi.Infra.Repositories
             }
         }
 
-        public async Task<T> GetById(int id)
+        public async Task<T> GetById(Guid id)
         {
             try
             {
