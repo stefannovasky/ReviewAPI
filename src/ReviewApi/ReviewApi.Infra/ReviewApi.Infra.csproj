@@ -18,4 +18,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ReviewApi.Domain\ReviewApi.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

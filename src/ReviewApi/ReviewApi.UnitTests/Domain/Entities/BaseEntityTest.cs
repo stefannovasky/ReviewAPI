@@ -1,4 +1,5 @@
-﻿using ReviewApi.Domain.Entities;
+﻿using System;
+using ReviewApi.Domain.Entities;
 using Xunit;
 
 namespace ReviewApi.UnitTests.Domain.Entities
@@ -10,14 +11,14 @@ namespace ReviewApi.UnitTests.Domain.Entities
         {
             BaseEntity baseEntity = new BaseEntity();
 
-            Assert.Equal(0, baseEntity.Id);
+            Assert.Equal(Guid.Empty, baseEntity.Id);
             Assert.False(baseEntity.Deleted);
         }
 
         [Fact]
         public void ShouldConstructBaseEntityWithIdConstructor()
         {
-            int id = 1;
+            Guid id = Guid.Empty;
             BaseEntity baseEntity = new BaseEntity(id);
 
             Assert.Equal(id, baseEntity.Id);

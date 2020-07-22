@@ -1,4 +1,6 @@
-﻿namespace ReviewApi.Domain.Entities
+﻿using System;
+
+namespace ReviewApi.Domain.Entities
 {
     public class User : BaseEntity
     {
@@ -11,7 +13,7 @@
 
         }
 
-        public User(int id) : base(id)
+        public User(Guid id) : base(id)
         {
 
         }
@@ -23,7 +25,7 @@
             Password = password;
         }
 
-        public User(int id, string name, string email, string password) : base(id)
+        public User(Guid id, string name, string email, string password) : base(id)
         {
             Name = name;
             Email = email;

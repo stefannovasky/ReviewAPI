@@ -1,4 +1,5 @@
-﻿using ReviewApi.Domain.Entities;
+﻿using System;
+using ReviewApi.Domain.Entities;
 using Xunit;
 
 namespace ReviewApi.UnitTests.Domain.Entities
@@ -14,17 +15,17 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Null(user.Email);
             Assert.Null(user.Password);
             Assert.False(user.Deleted);
-            Assert.Equal(0, user.Id);
+            Assert.Equal(Guid.Empty.ToString(), user.Id.ToString());
         }
 
         [Fact]
         public void ShouldConstructUserWithOnlyIdConstructor()
         {
-            int userId = 1; 
+            Guid id = Guid.NewGuid();
 
-            User user = new User(userId);
+            User user = new User(id);
 
-            Assert.Equal(userId, user.Id);
+            Assert.Equal(id, user.Id);
             Assert.Null(user.Name);
             Assert.Null(user.Email);
             Assert.Null(user.Password);
@@ -40,7 +41,7 @@ namespace ReviewApi.UnitTests.Domain.Entities
 
             User user = new User(userName, userEmail, userPassword);
 
-            Assert.Equal(0, user.Id);
+            Assert.Equal(Guid.Empty, user.Id);
             Assert.Equal(userName, user.Name);
             Assert.Equal(userEmail, user.Email);
             Assert.Equal(userPassword, user.Password);
@@ -50,14 +51,14 @@ namespace ReviewApi.UnitTests.Domain.Entities
         [Fact]
         public void ShouldConstructUserWithIdNameEmailAndPasswordConstructor()
         {
-            int userId = 1;
+            Guid id = Guid.NewGuid();
             string userName = "user name";
             string userEmail = "user@mail.com";
             string userPassword = "userPassword";
 
-            User user = new User(userId, userName, userEmail, userPassword);
+            User user = new User(id, userName, userEmail, userPassword);
 
-            Assert.Equal(1, user.Id);
+            Assert.Equal(id, user.Id);
             Assert.Equal(userName, user.Name);
             Assert.Equal(userEmail, user.Email);
             Assert.Equal(userPassword, user.Password);
