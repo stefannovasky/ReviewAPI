@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ReviewApi.Application\ReviewApi.Application.csproj" />
     <ProjectReference Include="..\ReviewApi.Infra\ReviewApi.Infra.csproj" />
+    <ProjectReference Include="..\ReviewApi.Workers\ReviewApi.Workers.csproj" />
   </ItemGroup>
 
 
