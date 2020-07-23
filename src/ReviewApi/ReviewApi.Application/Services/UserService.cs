@@ -13,12 +13,14 @@ namespace ReviewApi.Application.Services
         private readonly IUserRepository _userRepository;
         private readonly IConfirmationCodeUtils _confirmationCodeUtils;
         private readonly IHashUtils _hashUtils;
+        private readonly IEmailUtils _emailUtils;
 
-        public UserService(IUserRepository userRepository, IConfirmationCodeUtils confirmationCodeUtils, IHashUtils hashUtils)
+        public UserService(IUserRepository userRepository, IConfirmationCodeUtils confirmationCodeUtils, IHashUtils hashUtils, IEmailUtils emailUtils)
         {
             _userRepository = userRepository;
             _confirmationCodeUtils = confirmationCodeUtils;
             _hashUtils = hashUtils;
+            _emailUtils = emailUtils; 
         }
 
         public async Task Create(CreateUserRequestModel model)
@@ -28,10 +30,14 @@ namespace ReviewApi.Application.Services
             {
                 throw new AlreadyExistsException("user");
             }
+
             user.UpdateConfirmationCode(_confirmationCodeUtils.GenerateConfirmationCode());
             user.UpdatePassword(_hashUtils.GenerateHash(user.Password));
+
             await _userRepository.Create(user);
             await _userRepository.Save();
+
+            await _emailUtils.SendEmail(user.Email, "Confirmation", user.ConfirmationCode);
         }
     }
 }

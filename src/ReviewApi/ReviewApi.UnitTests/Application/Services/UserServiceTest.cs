@@ -18,6 +18,7 @@ namespace ReviewApi.UnitTests.Application.Services
         private readonly IUserService _userService;
         private readonly IConfirmationCodeUtils _confirmationCodeUtilsMock;
         private readonly IHashUtils _hashUtilsMock;
+        private readonly IEmailUtils _emailUtilsMock; 
         private readonly IUserRepository _userRepositoryMock;
 
         public UserServiceTest()
@@ -25,7 +26,8 @@ namespace ReviewApi.UnitTests.Application.Services
             _userRepositoryMock = NSubstitute.Substitute.For<IUserRepository>();
             _confirmationCodeUtilsMock = NSubstitute.Substitute.For<IConfirmationCodeUtils>();
             _hashUtilsMock = NSubstitute.Substitute.For<IHashUtils>();
-            _userService = new UserService(_userRepositoryMock, _confirmationCodeUtilsMock, _hashUtilsMock);
+            _emailUtilsMock = NSubstitute.Substitute.For<IEmailUtils>();
+            _userService = new UserService(_userRepositoryMock, _confirmationCodeUtilsMock, _hashUtilsMock, _emailUtilsMock);
         }
 
         [Fact]
@@ -52,6 +54,7 @@ namespace ReviewApi.UnitTests.Application.Services
 
             _confirmationCodeUtilsMock.Received(1).GenerateConfirmationCode();
             _hashUtilsMock.Received(1).GenerateHash(Arg.Is<string>(text => text == model.Password));
+            await _emailUtilsMock.Received(1).SendEmail(Arg.Is<string>(email => email == model.Email), Arg.Any<string>(), Arg.Any<string>());
             await _userRepositoryMock.Received(1).Create(Arg.Is<User>(user => user.Email == model.Email));
             await _userRepositoryMock.Received(1).Save();
         }
