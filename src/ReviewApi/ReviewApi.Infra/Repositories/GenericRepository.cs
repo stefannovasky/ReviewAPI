@@ -10,8 +10,8 @@ namespace ReviewApi.Infra.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     {
-        private readonly MainContext _dbContext;
-        private readonly DbSet<T> _dbSet;
+        protected readonly MainContext _dbContext;
+        protected readonly DbSet<T> _dbSet;
 
         public GenericRepository(MainContext dbContext)
         {
