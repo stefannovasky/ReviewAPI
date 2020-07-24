@@ -6,5 +6,6 @@ namespace ReviewApi.Application.Interfaces
     public interface IUserService
     {
         Task Create(CreateUserRequestModel model);
+        Task ConfirmUser(ConfirmUserRequestModel model);
     }
 }
