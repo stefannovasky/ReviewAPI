@@ -64,7 +64,7 @@ namespace ReviewApi.Application.Services
             await _userRepository.Create(user);
             await _userRepository.Save();
 
-            await _emailUtils.SendEmail(user.Email, "Confirmation", user.ConfirmationCode);
+            await _emailUtils.SendEmail(user.Email, "Confirmation", $"Please confirm your account using this code {user.ConfirmationCode}");
         }
     }
 }
