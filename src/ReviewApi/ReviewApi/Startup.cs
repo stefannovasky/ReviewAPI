@@ -40,6 +40,7 @@ namespace ReviewApi
             services.AddTransient<IHashUtils, HashUtils>();
             services.AddTransient<IEmailUtils, EmailUtils>();
             services.AddTransient<IJsonUtils, JsonUtils>();
+            services.AddTransient<IJwtTokenUtils>(service => new JwtTokenUtils(Configuration.GetValue<string>("Secret")));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
