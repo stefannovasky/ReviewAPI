@@ -31,8 +31,15 @@ namespace ReviewApi.Application.Services
             await new CreateUserValidator().ValidateRequestModelAndThrow(model);
 
             User user = new User(model.Name, model.Email, model.Password);
-            if (await _userRepository.AlreadyExists(user.Email))
+            User userInDatabase = await _userRepository.GetByEmail(user.Email);
+
+            bool userExists = userInDatabase != null;
+            if (userExists)
             {
+                if (!userInDatabase.Confirmed)
+                {
+                    throw new UserNotConfirmedException();
+                }
                 throw new AlreadyExistsException("user");
             }
 
