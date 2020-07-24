@@ -9,7 +9,7 @@ namespace ReviewApi.Controllers.Extensions
     {
         public static IActionResult HandleException(this ControllerBase controller, Exception exception)
         {
-            if (exception is AlreadyExistsException)
+            if (exception is AlreadyExistsException || exception is FluentValidation.ValidationException)
             {
                 return controller.BadRequest(new { Error = new { Message = exception.Message } });
             }
