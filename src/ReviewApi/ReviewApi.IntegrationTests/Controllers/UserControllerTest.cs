@@ -37,11 +37,17 @@ namespace ReviewApi.IntegrationTests.Controllers
             _database = new MainContext(options);
         }
 
+        private async Task InsertUserOnDatabase()
+        {
+            CreateUserRequestModel model = new CreateUserRequestModel() { Email = "user@mail.com", Name = "User Name", Password = "User Password" };
+            await _httpClient.PostAsync("../users", _createRequestHelper.CreateStringContent(model));
+        }
+
         [Fact]
         public async Task ShouldReturnCreatedAtRouteOnCallCreate()
         {
             CreateUserRequestModel model = new CreateUserRequestModel() { Email = "user@mail.com", Name = "User Name", Password = "User Password" };
-            HttpResponseMessage httpResponse = await _httpClient.PostAsync("../api/users", _createRequestHelper.CreateStringContent(model));
+            HttpResponseMessage httpResponse = await _httpClient.PostAsync("../users", _createRequestHelper.CreateStringContent(model));
 
             Assert.Equal((int)HttpStatusCode.Created, (int)httpResponse.StatusCode);
             _database.ResetDatabase();
