@@ -1,6 +1,9 @@
 ﻿using System.Threading.Tasks;
+using FluentValidation;
 using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Models.User;
+using ReviewApi.Application.Validators;
+using ReviewApi.Application.Validators.Extensions;
 using ReviewApi.Domain.Entities;
 using ReviewApi.Domain.Exceptions;
 using ReviewApi.Domain.Interfaces.Repositories;
@@ -20,11 +23,13 @@ namespace ReviewApi.Application.Services
             _userRepository = userRepository;
             _confirmationCodeUtils = confirmationCodeUtils;
             _hashUtils = hashUtils;
-            _emailUtils = emailUtils; 
+            _emailUtils = emailUtils;
         }
 
         public async Task Create(CreateUserRequestModel model)
         {
+            await new CreateUserValidator().ValidateRequestModelAndThrow(model);
+
             User user = new User(model.Name, model.Email, model.Password);
             if (await _userRepository.AlreadyExists(user.Email))
             {
