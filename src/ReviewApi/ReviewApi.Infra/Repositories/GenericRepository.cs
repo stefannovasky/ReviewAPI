@@ -10,8 +10,8 @@ namespace ReviewApi.Infra.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     {
-        private readonly MainContext _dbContext;
-        private readonly DbSet<T> _dbSet;
+        protected readonly MainContext _dbContext;
+        protected readonly DbSet<T> _dbSet;
 
         public GenericRepository(MainContext dbContext)
         {
@@ -19,11 +19,11 @@ namespace ReviewApi.Infra.Repositories
             _dbSet = _dbContext.Set<T>();
         }
 
-        public async Task<bool> AlreadyExists(int id)
+        public async Task<bool> AlreadyExists(Guid id)
         {
             try
             {
-                return await Query().AnyAsync(entity => !entity.Deleted && entity.Id == id);
+                return await Query().AnyAsync(entity => entity.Id == id);
             }
             catch (Exception exception)
             {
@@ -43,11 +43,11 @@ namespace ReviewApi.Infra.Repositories
             }
         }
 
-        public async Task<T> GetById(int id)
+        public async Task<T> GetById(Guid id)
         {
             try
             {
-                return await Query().SingleOrDefaultAsync(entity => !entity.Deleted && entity.Id == id);
+                return await Query().SingleOrDefaultAsync(entity => entity.Id == id);
             }
             catch (Exception exception)
             {

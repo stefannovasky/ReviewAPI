@@ -7,6 +7,8 @@ namespace ReviewApi.Domain.Entities
         public string Name { get; protected set; }
         public string Email { get; protected set; }
         public string Password { get; protected set; }
+        public string ConfirmationCode { get; protected set; }
+        public bool Confirmed { get; protected set; }
 
         public User()
         {
@@ -35,6 +37,16 @@ namespace ReviewApi.Domain.Entities
         public void UpdatePassword(string password)
         {
             Password = password; 
+        }
+
+        public void UpdateConfirmationCode(string confirmationCode)
+        {
+            ConfirmationCode = confirmationCode;
+        }
+
+        public void Confirm()
+        {
+            Confirmed = true; 
         }
     }
 }

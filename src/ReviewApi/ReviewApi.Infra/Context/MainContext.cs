@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ReviewApi.Infra.Mappings;
 
 namespace ReviewApi.Infra.Context
 {
@@ -17,6 +18,8 @@ namespace ReviewApi.Infra.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(MainContext).Assembly);
+
+            modelBuilder.ApplyConfiguration(new UserMapConfig());
 
             base.OnModelCreating(modelBuilder);
         }

@@ -12,7 +12,6 @@ namespace ReviewApi.UnitTests.Domain.Entities
             BaseEntity baseEntity = new BaseEntity();
 
             Assert.Equal(Guid.Empty, baseEntity.Id);
-            Assert.False(baseEntity.Deleted);
         }
 
         [Fact]
@@ -22,17 +21,6 @@ namespace ReviewApi.UnitTests.Domain.Entities
             BaseEntity baseEntity = new BaseEntity(id);
 
             Assert.Equal(id, baseEntity.Id);
-            Assert.False(baseEntity.Deleted);
-        }
-
-        [Fact]
-        public void ShouldDelete()
-        {
-            BaseEntity baseEntity = new BaseEntity();
-
-            baseEntity.SetAsDeleted();
-
-            Assert.True(baseEntity.Deleted);
         }
     }
 }

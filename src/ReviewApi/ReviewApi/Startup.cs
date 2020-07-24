@@ -4,7 +4,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ReviewApi.Application.Interfaces;
+using ReviewApi.Application.Services;
+using ReviewApi.Domain.Interfaces.Repositories;
 using ReviewApi.Infra.Context;
+using ReviewApi.Infra.Redis;
+using ReviewApi.Infra.Redis.Interfaces;
+using ReviewApi.Infra.Repositories;
+using ReviewApi.Shared.Interfaces;
+using ReviewApi.Shared.Utils;
 
 namespace ReviewApi
 {
@@ -22,6 +30,16 @@ namespace ReviewApi
             AddDbContext(services);
             services.AddControllers();
             services.AddCors();
+
+            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<IUserService, UserService>();
+
+            services.AddTransient<IRedisConnector>(service => new RedisConnector(Configuration.GetConnectionString("RedisConnection")));
+
+            services.AddTransient<IConfirmationCodeUtils, ConfirmationCodeUtils>();
+            services.AddTransient<IHashUtils, HashUtils>();
+            services.AddTransient<IEmailUtils, EmailUtils>();
+            services.AddTransient<IJsonUtils, JsonUtils>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

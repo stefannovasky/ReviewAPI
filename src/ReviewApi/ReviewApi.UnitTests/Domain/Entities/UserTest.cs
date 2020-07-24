@@ -14,7 +14,8 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Null(user.Name);
             Assert.Null(user.Email);
             Assert.Null(user.Password);
-            Assert.False(user.Deleted);
+            Assert.Null(user.ConfirmationCode);
+            Assert.False(user.Confirmed);
             Assert.Equal(Guid.Empty.ToString(), user.Id.ToString());
         }
 
@@ -29,7 +30,8 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Null(user.Name);
             Assert.Null(user.Email);
             Assert.Null(user.Password);
-            Assert.False(user.Deleted);
+            Assert.Null(user.ConfirmationCode);
+            Assert.False(user.Confirmed);
         }
 
         [Fact]
@@ -45,7 +47,8 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Equal(userName, user.Name);
             Assert.Equal(userEmail, user.Email);
             Assert.Equal(userPassword, user.Password);
-            Assert.False(user.Deleted);
+            Assert.False(user.Confirmed);
+            Assert.Null(user.ConfirmationCode);
         }
 
         [Fact]
@@ -62,7 +65,8 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Equal(userName, user.Name);
             Assert.Equal(userEmail, user.Email);
             Assert.Equal(userPassword, user.Password);
-            Assert.False(user.Deleted);
+            Assert.False(user.Confirmed);
+            Assert.Null(user.ConfirmationCode);
         }
 
         [Fact]
@@ -74,6 +78,27 @@ namespace ReviewApi.UnitTests.Domain.Entities
             user.UpdatePassword(password);
 
             Assert.Equal(password, user.Password);
+        }
+
+        [Fact]
+        public void ShouldUpdateConfirmationCode()
+        {
+            string confirmationCode = "confirmationCode";
+            User user = new User();
+
+            user.UpdateConfirmationCode(confirmationCode);
+
+            Assert.Equal(confirmationCode, user.ConfirmationCode);
+        }
+
+        [Fact]
+        public void ShouldConfirmUser()
+        {
+            User user = new User();
+
+            user.Confirm();
+
+            Assert.True(user.Confirmed);
         }
     }
 }
