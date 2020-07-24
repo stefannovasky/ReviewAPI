@@ -20,6 +20,8 @@ namespace ReviewApi.UnitTests.Application.Services
         private readonly IHashUtils _hashUtilsMock;
         private readonly IEmailUtils _emailUtilsMock; 
         private readonly IUserRepository _userRepositoryMock;
+        private readonly User _fakeNotConfirmedInsertedUser;
+        private readonly User _fakeConfirmedInsertedUser;
 
         public UserServiceTest()
         {
@@ -28,13 +30,17 @@ namespace ReviewApi.UnitTests.Application.Services
             _hashUtilsMock = NSubstitute.Substitute.For<IHashUtils>();
             _emailUtilsMock = NSubstitute.Substitute.For<IEmailUtils>();
             _userService = new UserService(_userRepositoryMock, _confirmationCodeUtilsMock, _hashUtilsMock, _emailUtilsMock);
+
+            _fakeNotConfirmedInsertedUser = new User("Fake User", "fake_user@mail.com", "fake password");
+            _fakeConfirmedInsertedUser = new User("Fake User", "fake_user@mail.com", "fake password");
+            _fakeConfirmedInsertedUser.Confirm();
         }
 
         [Fact]
-        public async Task ShouldThrowAlreadyExistsException()
+        public async Task ShouldThrowAlreadyExistsExceptionOnCreateAlreadyConfirmedUser()
         {
-            CreateUserRequestModel model = new CreateUserRequestModel() { Email = "user@mail.com", Name = "user name", Password = "user password" };
-            _userRepositoryMock.AlreadyExists(Arg.Any<string>()).Returns(true);
+            CreateUserRequestModel model = new CreateUserRequestModel() { Email = _fakeConfirmedInsertedUser.Email, Name = "user name", Password = "user password" };
+            _userRepositoryMock.GetByEmail(Arg.Any<string>()).Returns(_fakeConfirmedInsertedUser);
 
             Exception exception = await Record.ExceptionAsync(() => _userService.Create(model));
 
@@ -43,10 +49,23 @@ namespace ReviewApi.UnitTests.Application.Services
         }
 
         [Fact]
+        public async Task ShouldThrowUserNotConfirmedExceptionOnCreateAlreadyExistsUserNotConfirmed()
+        {
+            CreateUserRequestModel model = new CreateUserRequestModel() { Email = _fakeConfirmedInsertedUser.Email, Name = "user name", Password = "user password" };
+            _userRepositoryMock.GetByEmail(Arg.Any<string>()).Returns(_fakeNotConfirmedInsertedUser);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.Create(model));
+
+            Assert.IsType<UserNotConfirmedException>(exception);
+            Assert.Contains("email already registered, needs to be confirmed.", exception.Message);
+        }
+
+        [Fact]
         public async Task ShouldCreateUser()
         {
+            User notExistsUser = null;
             CreateUserRequestModel model = new CreateUserRequestModel() { Email = "user@mail.com", Name = "user name", Password = "user password" };
-            _userRepositoryMock.AlreadyExists(Arg.Any<string>()).Returns(false);
+            _userRepositoryMock.GetByEmail(Arg.Any<string>()).Returns(notExistsUser);
 
             Exception exception = await Record.ExceptionAsync(() => _userService.Create(model));
 
