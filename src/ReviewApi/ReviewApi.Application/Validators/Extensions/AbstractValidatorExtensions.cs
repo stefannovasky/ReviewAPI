@@ -19,7 +19,7 @@ namespace ReviewApi.Application.Validators.Extensions
                 validationResponse.Errors.ToList().ForEach(e => builder.AppendLine(e.ErrorMessage));
                 builder.Append(lastElement.ErrorMessage);
                 string errors = builder.ToString();
-                throw new ValidationException(errors.Replace(errors));
+                throw new ValidationException(errors);
             }
         }
     }
