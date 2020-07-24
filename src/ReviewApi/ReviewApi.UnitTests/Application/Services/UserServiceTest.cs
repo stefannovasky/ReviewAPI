@@ -77,5 +77,32 @@ namespace ReviewApi.UnitTests.Application.Services
             await _userRepositoryMock.Received(1).Create(Arg.Is<User>(user => user.Email == model.Email));
             await _userRepositoryMock.Received(1).Save();
         }
+
+        [Fact]
+        public async Task ShouldThrowResourceNotFoundOnTryConfirmNotExistsUser()
+        {
+            ConfirmUserRequestModel model = new ConfirmUserRequestModel() { Code = "AAAAAAAA" };
+            User notExistsUser = null;
+            _userRepositoryMock.GetByConfirmationCode(Arg.Any<string>()).Returns(notExistsUser);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.ConfirmUser(model));
+
+            Assert.IsType<ResourceNotFoundException>(exception);
+            Assert.Contains("user not found.", exception.Message);
+        }
+
+        [Fact]
+        public async Task ShouldConfirmUser()
+        {
+            ConfirmUserRequestModel model = new ConfirmUserRequestModel() { Code = "AAAAAAAA" };
+            User alreadyExistsUser = new User();
+            _userRepositoryMock.GetByConfirmationCode(Arg.Any<string>()).Returns(alreadyExistsUser);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.ConfirmUser(model));
+
+            Assert.Null(exception);
+            _userRepositoryMock.Received(1).Update(Arg.Any<User>());
+            await _userRepositoryMock.Received(1).Save();
+        }
     }
 }
