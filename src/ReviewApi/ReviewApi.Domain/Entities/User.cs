@@ -46,7 +46,8 @@ namespace ReviewApi.Domain.Entities
 
         public void Confirm()
         {
-            Confirmed = true; 
+            Confirmed = true;
+            ConfirmationCode = null;
         }
     }
 }
