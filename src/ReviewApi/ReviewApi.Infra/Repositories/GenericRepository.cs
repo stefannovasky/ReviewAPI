@@ -23,7 +23,7 @@ namespace ReviewApi.Infra.Repositories
         {
             try
             {
-                return await Query().AnyAsync(entity => !entity.Deleted && entity.Id == id);
+                return await Query().AnyAsync(entity => entity.Id == id);
             }
             catch (Exception exception)
             {
@@ -47,7 +47,7 @@ namespace ReviewApi.Infra.Repositories
         {
             try
             {
-                return await Query().SingleOrDefaultAsync(entity => !entity.Deleted && entity.Id == id);
+                return await Query().SingleOrDefaultAsync(entity => entity.Id == id);
             }
             catch (Exception exception)
             {

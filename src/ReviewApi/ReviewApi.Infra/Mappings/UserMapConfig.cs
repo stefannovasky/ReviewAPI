@@ -17,14 +17,15 @@ namespace ReviewApi.Infra.Mappings
                 .IsRequired()
                 .HasMaxLength(150);
 
+            builder.Property(p => p.Email)
+                .HasColumnName("email")
+                .IsRequired()
+                .HasMaxLength(255);
+
             builder.Property(p => p.Password)
                 .HasColumnName("password_hash")
                 .IsRequired()
                 .HasMaxLength(64);
-
-            builder.Property(p => p.Deleted)
-                .HasColumnName("deleted")
-                .HasDefaultValue(false);
 
             builder.Property(p => p.ConfirmationCode)
                 .HasColumnName("confirmation_code")
