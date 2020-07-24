@@ -15,7 +15,6 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Null(user.Email);
             Assert.Null(user.Password);
             Assert.Null(user.ConfirmationCode);
-            Assert.False(user.Deleted);
             Assert.False(user.Confirmed);
             Assert.Equal(Guid.Empty.ToString(), user.Id.ToString());
         }
@@ -33,7 +32,6 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Null(user.Password);
             Assert.Null(user.ConfirmationCode);
             Assert.False(user.Confirmed);
-            Assert.False(user.Deleted);
         }
 
         [Fact]
@@ -50,7 +48,6 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Equal(userEmail, user.Email);
             Assert.Equal(userPassword, user.Password);
             Assert.False(user.Confirmed);
-            Assert.False(user.Deleted);
             Assert.Null(user.ConfirmationCode);
         }
 
@@ -69,7 +66,6 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Equal(userEmail, user.Email);
             Assert.Equal(userPassword, user.Password);
             Assert.False(user.Confirmed);
-            Assert.False(user.Deleted);
             Assert.Null(user.ConfirmationCode);
         }
 
