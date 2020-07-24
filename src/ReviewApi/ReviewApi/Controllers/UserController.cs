@@ -32,6 +32,20 @@ namespace ReviewApi.Controllers
         }
 
         [HttpPost]
+        [Route("auth")]
+        public async Task<IActionResult> Authenticate(AuthenticationUserRequestModel model)
+        {
+            try
+            {
+                return Ok(await _userService.Authenticate(model));
+            }
+            catch (Exception exception)
+            {
+                return this.HandleException(exception);
+            }
+        }
+
+        [HttpPost]
         [Route("confirmation")]
         public async Task<IActionResult> Confirmation(ConfirmUserRequestModel model)
         {
