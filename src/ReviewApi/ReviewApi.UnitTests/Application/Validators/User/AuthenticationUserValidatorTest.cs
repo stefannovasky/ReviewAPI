@@ -5,20 +5,19 @@ using Xunit;
 
 namespace ReviewApi.UnitTests.Application.Validators.User
 {
-    public class CreateUserValidatorTest
+    public class AuthenticationUserValidatorTest
     {
-        private readonly CreateUserValidator _validator;
-
-        public CreateUserValidatorTest()
+        private readonly AuthenticationUserValidator _validator;
+        public AuthenticationUserValidatorTest()
         {
-            _validator = new CreateUserValidator();
+            _validator = new AuthenticationUserValidator();
         }
 
         [Theory]
         [InlineData(null)]
         public void ShouldHaveValidationErrorWithNullEmail(string email)
         {
-            CreateUserRequestModel requestModel = new CreateUserRequestModel()
+            AuthenticationUserRequestModel requestModel = new AuthenticationUserRequestModel()
             {
                 Email = email
             };
@@ -31,7 +30,7 @@ namespace ReviewApi.UnitTests.Application.Validators.User
         [InlineData(" ")]
         public void ShouldHaveValidationErrorWithEmptyEmail(string email)
         {
-            CreateUserRequestModel requestModel = new CreateUserRequestModel()
+            AuthenticationUserRequestModel requestModel = new AuthenticationUserRequestModel()
             {
                 Email = email
             };
@@ -53,7 +52,7 @@ namespace ReviewApi.UnitTests.Application.Validators.User
 
         public void ShouldHaveValidationErrorWithInvalidEmail(string email)
         {
-            CreateUserRequestModel requestModel = new CreateUserRequestModel()
+            AuthenticationUserRequestModel requestModel = new AuthenticationUserRequestModel()
             {
                 Email = email
             };
@@ -66,7 +65,7 @@ namespace ReviewApi.UnitTests.Application.Validators.User
         [InlineData("email.greater.than.244.chars.email.greater.than.244.chars.email.greater.than.244.chars.email.greater.than.244.charsemail.greater.than.244.chars.email.greater.than.244.chars.email.greater.than.244.chars..email.greater.than.244.chars..email.greater.than.244.chars@mail.com")]
         public void ShouldHaveValidationErrorGreaterThan255CharactersEmail(string email)
         {
-            CreateUserRequestModel requestModel = new CreateUserRequestModel()
+            AuthenticationUserRequestModel requestModel = new AuthenticationUserRequestModel()
             {
                 Email = email
             };
@@ -75,63 +74,12 @@ namespace ReviewApi.UnitTests.Application.Validators.User
         }
 
         [Theory]
-        [InlineData("")]
-        [InlineData(" ")]
-        public void ShouldHaveValidationErrorWithEmptyName(string name)
-        {
-            CreateUserRequestModel requestModel = new CreateUserRequestModel()
-            {
-                Name = name
-            };
-
-            _validator.ShouldHaveValidationErrorFor(r => r.Name, requestModel).WithErrorMessage("name cannot be empty.");
-        }
-
-        [Theory]
-        [InlineData(null)]
-        public void ShouldHaveValidationErrorWithNullName(string name)
-        {
-            CreateUserRequestModel requestModel = new CreateUserRequestModel()
-            {
-                Name = name
-            };
-
-            _validator.ShouldHaveValidationErrorFor(r => r.Name, requestModel).WithErrorMessage("name cannot be empty.");
-        }
-
-
-        [Theory]
-        [InlineData("aa")]
-        [InlineData("a")]
-        public void ShouldHaveValidationErrorWithLessThan3CharactersName(string name)
-        {
-            CreateUserRequestModel requestModel = new CreateUserRequestModel()
-            {
-                Name = name
-            };
-
-            _validator.ShouldHaveValidationErrorFor(r => r.Name, requestModel).WithErrorMessage("name must be greater than 2 characters.");
-        }
-
-        [Theory]
-        [InlineData("greather than 150 characters. greather than 150 characters. greather than 150 characters. greather than 150 characters. greather than 150 characters. greather than 150 characters. greather than 150 characters. greather than 150 characters. greather than 150 characters. ")]
-        public void ShouldHaveValidationErrorWithGreatherThan150CharactersName(string name)
-        {
-            CreateUserRequestModel requestModel = new CreateUserRequestModel()
-            {
-                Name = name
-            };
-
-            _validator.ShouldHaveValidationErrorFor(r => r.Name, requestModel).WithErrorMessage("name must be less than 150 characters.");
-        }
-
-        [Theory]
         [InlineData("aaaaaaa")]
         [InlineData("aa")]
         [InlineData("a")]
         public void ShouldHaveValidationErrorWithLessThan8CharactersPassword(string password)
         {
-            CreateUserRequestModel requestModel = new CreateUserRequestModel()
+            AuthenticationUserRequestModel requestModel = new AuthenticationUserRequestModel()
             {
                 Password = password
             };
@@ -143,7 +91,7 @@ namespace ReviewApi.UnitTests.Application.Validators.User
         [InlineData("greather than 60 characters greather than 60 characters greather than 60 characters greather than 60 characters greather than 60 characters ")]
         public void ShouldHaveValidationErrorWithGreaterThan60CharactersPassword(string password)
         {
-            CreateUserRequestModel requestModel = new CreateUserRequestModel()
+            AuthenticationUserRequestModel requestModel = new AuthenticationUserRequestModel()
             {
                 Password = password
             };
@@ -155,7 +103,7 @@ namespace ReviewApi.UnitTests.Application.Validators.User
         [InlineData(null)]
         public void ShouldHaveValidationErrorWithNullPassword(string password)
         {
-            CreateUserRequestModel requestModel = new CreateUserRequestModel()
+            AuthenticationUserRequestModel requestModel = new AuthenticationUserRequestModel()
             {
                 Password = password
             };
@@ -169,7 +117,7 @@ namespace ReviewApi.UnitTests.Application.Validators.User
         [InlineData("  ")]
         public void ShouldHaveValidationErrorWithEmptyPassword(string password)
         {
-            CreateUserRequestModel requestModel = new CreateUserRequestModel()
+            AuthenticationUserRequestModel requestModel = new AuthenticationUserRequestModel()
             {
                 Password = password
             };
