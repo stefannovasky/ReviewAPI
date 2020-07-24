@@ -7,7 +7,7 @@ using ReviewApi.Controllers.Extensions;
 
 namespace ReviewApi.Controllers
 {
-    [Route("api/users")]
+    [Route("users")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -24,6 +24,21 @@ namespace ReviewApi.Controllers
             {
                 await _userService.Create(model);
                 return CreatedAtRoute("", null);
+            }
+            catch (Exception exception)
+            {
+                return this.HandleException(exception);
+            }
+        }
+
+        [HttpPost]
+        [Route("confirmation")]
+        public async Task<IActionResult> Confirmation(ConfirmUserRequestModel model)
+        {
+            try
+            {
+                await _userService.ConfirmUser(model);
+                return NoContent();
             }
             catch (Exception exception)
             {
