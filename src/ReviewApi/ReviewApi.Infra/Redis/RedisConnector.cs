@@ -15,7 +15,11 @@ namespace ReviewApi.Infra.Redis
 
         public void Connect()
         {
-            Connection = ConnectionMultiplexer.Connect(_connectionString); 
+            Connection = ConnectionMultiplexer.Connect(new ConfigurationOptions()
+            {
+                ConnectTimeout = 15000, 
+                EndPoints = { _connectionString }
+            }); 
         }
     }
 }
