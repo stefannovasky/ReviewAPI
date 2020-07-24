@@ -10,7 +10,7 @@ namespace ReviewApi.Controllers.Extensions
         public static IActionResult HandleException(this ControllerBase controller, Exception exception)
         {
             if (exception is AlreadyExistsException || exception is FluentValidation.ValidationException
-            || exception is UserNotConfirmedException || exception is ResourceNotFoundException)
+            || exception is UserNotConfirmedException || exception is ResourceNotFoundException || exception is InvalidPasswordException)
             {
                 return controller.BadRequest(new { Error = new { Message = exception.Message } });
             }
