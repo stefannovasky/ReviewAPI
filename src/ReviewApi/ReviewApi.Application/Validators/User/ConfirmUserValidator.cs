@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using ReviewApi.Application.Models.User;
 
-namespace ReviewApi.Application.Validators
+namespace ReviewApi.Application.Validators.User
 {
     public class ConfirmUserValidator : AbstractValidator<ConfirmUserRequestModel>
     {
