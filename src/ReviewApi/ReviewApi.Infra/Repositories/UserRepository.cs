@@ -16,5 +16,10 @@ namespace ReviewApi.Infra.Repositories
         {
             return await _dbSet.AnyAsync(user => user.Email == email);     
         }
+
+        public async Task<User> GetByEmail(string email)
+        {
+            return await Query().SingleOrDefaultAsync(user => user.Email == email);
+        }
     }
 }
