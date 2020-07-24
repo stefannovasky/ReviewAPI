@@ -1,8 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Models.User;
 using ReviewApi.Application.Validators.Extensions;
-using ReviewApi.Application.Validators;
+using ReviewApi.Application.Validators.User;
 using ReviewApi.Domain.Entities;
 using ReviewApi.Domain.Exceptions;
 using ReviewApi.Domain.Interfaces.Repositories;
@@ -16,13 +17,37 @@ namespace ReviewApi.Application.Services
         private readonly IConfirmationCodeUtils _confirmationCodeUtils;
         private readonly IHashUtils _hashUtils;
         private readonly IEmailUtils _emailUtils;
+        private readonly IJwtTokenUtils _jwtTokenUtils;
 
-        public UserService(IUserRepository userRepository, IConfirmationCodeUtils confirmationCodeUtils, IHashUtils hashUtils, IEmailUtils emailUtils)
+        public UserService(IUserRepository userRepository, IConfirmationCodeUtils confirmationCodeUtils, IHashUtils hashUtils, IEmailUtils emailUtils, IJwtTokenUtils jwtTokenUtils)
         {
             _userRepository = userRepository;
             _confirmationCodeUtils = confirmationCodeUtils;
             _hashUtils = hashUtils;
             _emailUtils = emailUtils;
+            _jwtTokenUtils = jwtTokenUtils;
+        }
+
+        public async Task<AuthenticationUserResponseModel> Authenticate(AuthenticationUserRequestModel model)
+        {
+            await new AuthenticationUserValidator().ValidateRequestModelAndThrow(model);
+
+            User user = await _userRepository.GetByEmail(model.Email);
+            if (user == null)
+            {
+                throw new ResourceNotFoundException("account not found.");
+            }
+            if (!user.Confirmed)
+            {
+                throw new UserNotConfirmedException();
+            }
+            if (!_hashUtils.CompareHash(model.Password, user.Password))
+            {
+                throw new InvalidPasswordException(); 
+            }
+
+            UserResponseModel userResponseModel = new UserResponseModel() { Name = user.Name };
+            return new AuthenticationUserResponseModel() { User = userResponseModel, Token = _jwtTokenUtils.GenerateToken(user.Id.ToString()) };
         }
 
         public async Task ConfirmUser(ConfirmUserRequestModel model)
@@ -32,7 +57,7 @@ namespace ReviewApi.Application.Services
             User user = await _userRepository.GetByConfirmationCode(model.Code);
             if (user == null)
             {
-                throw new ResourceNotFoundException("user not found."); 
+                throw new ResourceNotFoundException("user not found.");
             }
 
             user.Confirm();

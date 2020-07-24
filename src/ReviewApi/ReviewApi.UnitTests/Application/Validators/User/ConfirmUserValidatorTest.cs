@@ -1,6 +1,6 @@
 ﻿using FluentValidation.TestHelper;
 using ReviewApi.Application.Models.User;
-using ReviewApi.Application.Validators;
+using ReviewApi.Application.Validators.User;
 using Xunit;
 
 namespace ReviewApi.UnitTests.Application.Validators.User

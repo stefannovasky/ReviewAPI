@@ -8,7 +8,6 @@ using ReviewApi.Domain.Entities;
 using ReviewApi.Domain.Exceptions;
 using ReviewApi.Domain.Interfaces.Repositories;
 using ReviewApi.Shared.Interfaces;
-using ReviewApi.Shared.Utils;
 using Xunit;
 
 namespace ReviewApi.UnitTests.Application.Services
@@ -18,8 +17,9 @@ namespace ReviewApi.UnitTests.Application.Services
         private readonly IUserService _userService;
         private readonly IConfirmationCodeUtils _confirmationCodeUtilsMock;
         private readonly IHashUtils _hashUtilsMock;
-        private readonly IEmailUtils _emailUtilsMock; 
+        private readonly IEmailUtils _emailUtilsMock;
         private readonly IUserRepository _userRepositoryMock;
+        private readonly IJwtTokenUtils _jwtTokenUtilsMock;
         private readonly User _fakeNotConfirmedInsertedUser;
         private readonly User _fakeConfirmedInsertedUser;
 
@@ -29,7 +29,8 @@ namespace ReviewApi.UnitTests.Application.Services
             _confirmationCodeUtilsMock = NSubstitute.Substitute.For<IConfirmationCodeUtils>();
             _hashUtilsMock = NSubstitute.Substitute.For<IHashUtils>();
             _emailUtilsMock = NSubstitute.Substitute.For<IEmailUtils>();
-            _userService = new UserService(_userRepositoryMock, _confirmationCodeUtilsMock, _hashUtilsMock, _emailUtilsMock);
+            _jwtTokenUtilsMock = NSubstitute.Substitute.For<IJwtTokenUtils>();
+            _userService = new UserService(_userRepositoryMock, _confirmationCodeUtilsMock, _hashUtilsMock, _emailUtilsMock, _jwtTokenUtilsMock);
 
             _fakeNotConfirmedInsertedUser = new User("Fake User", "fake_user@mail.com", "fake password");
             _fakeConfirmedInsertedUser = new User("Fake User", "fake_user@mail.com", "fake password");
@@ -103,6 +104,70 @@ namespace ReviewApi.UnitTests.Application.Services
             Assert.Null(exception);
             _userRepositoryMock.Received(1).Update(Arg.Any<User>());
             await _userRepositoryMock.Received(1).Save();
+        }
+
+        [Fact]
+        public async Task ShouldThrowResourceNotFoundExceptionOnAuthenticateNotExistsUser()
+        {
+            User notExistsUser = null;
+            AuthenticationUserRequestModel model = new AuthenticationUserRequestModel()
+            {
+                Email = "user@mail.com",
+                Password = "user password"
+            };
+            _userRepositoryMock.GetByEmail(Arg.Is<string>(email => email == model.Email)).Returns(notExistsUser);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.Authenticate(model));
+
+            Assert.IsType<ResourceNotFoundException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldThrowUserNotConfirmedExceptionOnAuthenticateNotConfirmedUser()
+        {
+            AuthenticationUserRequestModel model = new AuthenticationUserRequestModel()
+            {
+                Email = _fakeNotConfirmedInsertedUser.Email,
+                Password = "user password"
+            };
+            _userRepositoryMock.GetByEmail(Arg.Is<string>(email => email == model.Email)).Returns(_fakeNotConfirmedInsertedUser);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.Authenticate(model));
+
+            Assert.IsType<UserNotConfirmedException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldThrowInvalidPasswordExceptionOnAuthenticateUserWithIncorrectPassword()
+        {
+            AuthenticationUserRequestModel model = new AuthenticationUserRequestModel()
+            {
+                Email = _fakeConfirmedInsertedUser.Email,
+                Password = "incorrect password"
+            };
+            _userRepositoryMock.GetByEmail(Arg.Is<string>(email => email == model.Email)).Returns(_fakeConfirmedInsertedUser);
+            _hashUtilsMock.CompareHash(Arg.Any<string>(), Arg.Any<string>()).Returns(false);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.Authenticate(model));
+
+            Assert.IsType<InvalidPasswordException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldThrowAuthenticateUser()
+        {
+            AuthenticationUserRequestModel model = new AuthenticationUserRequestModel()
+            {
+                Email = _fakeConfirmedInsertedUser.Email,
+                Password = _fakeConfirmedInsertedUser.Password
+            };
+            _userRepositoryMock.GetByEmail(Arg.Is<string>(email => email == model.Email)).Returns(_fakeConfirmedInsertedUser);
+            _hashUtilsMock.CompareHash(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.Authenticate(model));
+
+            Assert.Null(exception);
+            _jwtTokenUtilsMock.Received(1).GenerateToken(Arg.Any<string>());
         }
     }
 }
