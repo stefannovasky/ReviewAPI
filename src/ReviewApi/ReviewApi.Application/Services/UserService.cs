@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
-using FluentValidation;
 using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Models.User;
-using ReviewApi.Application.Validators;
 using ReviewApi.Application.Validators.Extensions;
+using ReviewApi.Application.Validators;
 using ReviewApi.Domain.Entities;
 using ReviewApi.Domain.Exceptions;
 using ReviewApi.Domain.Interfaces.Repositories;
@@ -24,6 +23,22 @@ namespace ReviewApi.Application.Services
             _confirmationCodeUtils = confirmationCodeUtils;
             _hashUtils = hashUtils;
             _emailUtils = emailUtils;
+        }
+
+        public async Task ConfirmUser(ConfirmUserRequestModel model)
+        {
+            await new ConfirmUserValidator().ValidateRequestModelAndThrow(model);
+
+            User user = await _userRepository.GetByConfirmationCode(model.Code);
+            if (user == null)
+            {
+                throw new ResourceNotFoundException("user not found."); 
+            }
+
+            user.Confirm();
+
+            _userRepository.Update(user);
+            await _userRepository.Save();
         }
 
         public async Task Create(CreateUserRequestModel model)
