@@ -154,7 +154,7 @@ namespace ReviewApi.UnitTests.Application.Services
         }
 
         [Fact]
-        public async Task ShouldThrowAuthenticateUser()
+        public async Task ShouldAuthenticateUser()
         {
             AuthenticationUserRequestModel model = new AuthenticationUserRequestModel()
             {
