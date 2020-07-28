@@ -53,7 +53,7 @@ namespace ReviewApi.Controllers
             try
             {
                 await _userService.ConfirmUser(model);
-                return NoContent();
+                return Ok();
             }
             catch (Exception exception)
             {
