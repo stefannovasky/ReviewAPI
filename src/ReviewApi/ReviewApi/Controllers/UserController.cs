@@ -53,7 +53,7 @@ namespace ReviewApi.Controllers
             try
             {
                 await _userService.ConfirmUser(model);
-                return NoContent();
+                return Ok();
             }
             catch (Exception exception)
             {
@@ -69,6 +69,22 @@ namespace ReviewApi.Controllers
             try
             {
                 await _userService.UpdateUserName(this.GetUserIdFromToken(), model);
+                return Ok();
+            }
+            catch (Exception exception)
+            {
+                return this.HandleException(exception);
+            }
+        }
+
+        [HttpPut]
+        [Authorize]
+        [Route("password")]
+        public async Task<IActionResult> UpdatePassword(UpdatePasswordUserRequestModel model)
+        {
+            try
+            {
+                await _userService.UpdatePassword(this.GetUserIdFromToken(), model);
                 return Ok();
             }
             catch (Exception exception)

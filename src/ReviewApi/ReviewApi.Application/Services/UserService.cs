@@ -92,6 +92,26 @@ namespace ReviewApi.Application.Services
             await _emailUtils.SendEmail(user.Email, "Confirmation", $"Please confirm your account using this code {user.ConfirmationCode}");
         }
 
+        public async Task UpdatePassword(string userId, UpdatePasswordUserRequestModel model)
+        {
+            await new UpdatePasswordUserValidator().ValidateRequestModelAndThrow(model);
+
+            User user = await _userRepository.GetById(Guid.Parse(userId));
+            if (user == null)
+            {
+                throw new ResourceNotFoundException("user not found.");
+            }
+            if (!_hashUtils.CompareHash(model.OldPassword, user.Password))
+            {
+                throw new InvalidPasswordException();
+            }
+
+            user.UpdatePassword(_hashUtils.GenerateHash(model.NewPassword));
+
+            _userRepository.Update(user);
+            await _userRepository.Save();
+        }
+
         public async Task UpdateUserName(string userId, UpdateNameUserRequestModel model)
         {
             await new UpdateNameUserValidator().ValidateRequestModelAndThrow(model);
