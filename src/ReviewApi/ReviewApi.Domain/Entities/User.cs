@@ -49,5 +49,10 @@ namespace ReviewApi.Domain.Entities
             Confirmed = true;
             ConfirmationCode = null;
         }
+
+        public void UpdateName(string name)
+        {
+            Name = name;
+        }
     }
 }
