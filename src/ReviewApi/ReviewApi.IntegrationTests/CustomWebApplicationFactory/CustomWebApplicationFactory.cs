@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ReviewApi.Infra.Context;
+using ReviewApi.IntegrationTests.Initiliazers;
 using Xunit;
 
 namespace ReviewApi.IntegrationTests.CustomWebApplicationFactory
@@ -29,12 +30,12 @@ namespace ReviewApi.IntegrationTests.CustomWebApplicationFactory
                     services.Remove(serviceDescriptor);
                 }
 
-                SqliteConnection connection = new SqliteConnection("Filename=:memory:");
+                SqliteConnection connection = new SqliteConnection("Filename=TestDatabase.db");
                 connection.Open();
 
                 services.AddDbContext<MainContext>(options =>
                 {
-                    options.UseSqlite(connection);
+                    options.UseInMemoryDatabase(databaseName: "TestDatabase");
                 });
 
                 ServiceProvider serviceProvider = services.BuildServiceProvider();
@@ -47,6 +48,7 @@ namespace ReviewApi.IntegrationTests.CustomWebApplicationFactory
                         .GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
 
                     _db.Database.EnsureDeleted();
+                    new UsersDbDataInitializer(_db);
                     _db.Database.EnsureCreated();
                 }
             });
