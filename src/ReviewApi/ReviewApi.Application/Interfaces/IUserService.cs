@@ -9,5 +9,6 @@ namespace ReviewApi.Application.Interfaces
         Task ConfirmUser(ConfirmUserRequestModel model);
         Task<AuthenticationUserResponseModel> Authenticate(AuthenticationUserRequestModel model);
         Task UpdateUserName(string userId, UpdateNameUserRequestModel model);
+        Task UpdatePassword(string userId, UpdatePasswordUserRequestModel model);
     }
 }
