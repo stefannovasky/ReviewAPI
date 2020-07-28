@@ -2,9 +2,9 @@
 
 :black_square_button: Eu como usuário posso visualizar reviews 
 
-:black_square_button: Eu como usuário autenticado posso me cadastrar 
+:white_check_mark: Eu como usuário autenticado posso me cadastrar 
 
-:black_square_button: Eu como usuário autenticado posso efetuar login 
+:white_check_mark: Eu como usuário autenticado posso efetuar login 
 
 :black_square_button: Eu como usuário autenticado posso alterar o nome da minha conta 
 
