@@ -95,7 +95,7 @@ namespace ReviewApi.Application.Services
         public async Task UpdateUserName(string userId, UpdateNameUserRequestModel model)
         {
             await new UpdateNameUserValidator().ValidateRequestModelAndThrow(model);
-
+            
             User user = await _userRepository.GetById(Guid.Parse(userId));
             if (user == null)
             {
