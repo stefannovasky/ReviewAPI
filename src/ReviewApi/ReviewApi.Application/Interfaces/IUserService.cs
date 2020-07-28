@@ -8,5 +8,6 @@ namespace ReviewApi.Application.Interfaces
         Task Create(CreateUserRequestModel model);
         Task ConfirmUser(ConfirmUserRequestModel model);
         Task<AuthenticationUserResponseModel> Authenticate(AuthenticationUserRequestModel model);
+        Task UpdateUserName(string userId, UpdateNameUserRequestModel model);
     }
 }
