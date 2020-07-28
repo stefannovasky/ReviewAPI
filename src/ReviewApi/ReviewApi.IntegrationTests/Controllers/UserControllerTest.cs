@@ -11,6 +11,7 @@ using ReviewApi.Infra.Context;
 using ReviewApi.IntegrationTests.CustomWebApplicationFactory;
 using ReviewApi.IntegrationTests.Extensions;
 using ReviewApi.IntegrationTests.Helpers;
+using ReviewApi.Shared.Utils;
 using Xunit;
 
 namespace ReviewApi.IntegrationTests.Controllers
@@ -41,7 +42,7 @@ namespace ReviewApi.IntegrationTests.Controllers
         private async Task<Guid> InsertUserOnDatabase()
         {
             _database.Database.EnsureCreated();
-            User user = new User("User Name", "user@mail.com", "User Password");
+            User user = new User("User Name", "user@mail.com", new HashUtils().GenerateHash("User password"));
             await _database.Set<User>().AddAsync(user);
             user.Confirm();
             await _database.SaveChangesAsync();
@@ -68,7 +69,18 @@ namespace ReviewApi.IntegrationTests.Controllers
             HttpResponseMessage httpResponse = await _httpClient.PutAsync("../users/name", _createRequestHelper.CreateStringContent(model));
 
             Assert.Equal((int)HttpStatusCode.OK, (int)httpResponse.StatusCode);
-            _database.ResetDatabase();
+        }
+
+        [Fact]
+        public async Task ShouldReturnOkOnCallUpdateUserPassword()
+        {
+            Guid id = await InsertUserOnDatabase();
+            _httpClient.InsertAuthorizationTokenOnRequestHeader(_authorizationTokenHelper.CreateToken(id));
+            UpdatePasswordUserRequestModel model = new UpdatePasswordUserRequestModel() { NewPassword = "NEWPASSWORD", NewPasswordConfirmation = "NEWPASSWORD", OldPassword = "User password" };
+
+            HttpResponseMessage httpResponse = await _httpClient.PutAsync("../users/password", _createRequestHelper.CreateStringContent(model));
+
+            Assert.Equal((int)HttpStatusCode.OK, (int)httpResponse.StatusCode);
         }
     }
 }
