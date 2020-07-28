@@ -6,7 +6,7 @@
 
 :white_check_mark: Eu como usuário autenticado posso efetuar login 
 
-:black_square_button: Eu como usuário autenticado posso alterar o nome da minha conta 
+:white_check_mark: Eu como usuário autenticado posso alterar o nome da minha conta 
 
 :black_square_button: Eu como usuário autenticado posso alterar minha foto de perfil
 
