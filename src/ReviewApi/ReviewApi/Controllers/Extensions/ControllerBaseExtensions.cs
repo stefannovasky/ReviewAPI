@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ReviewApi.Domain.Exceptions;
@@ -16,6 +18,12 @@ namespace ReviewApi.Controllers.Extensions
             }
 
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+
+        public static string GetUserIdFromToken(this ControllerBase controller)
+        {
+            string id = controller.HttpContext.User.Claims.First(i => i.Type == ClaimTypes.NameIdentifier).Value;
+            return id;
         }
     }
 }
