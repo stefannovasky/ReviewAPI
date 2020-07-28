@@ -77,7 +77,7 @@ namespace ReviewApi
                     .ServiceProvider
                     .GetRequiredService<MainContext>();
 
-                if (context.Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+                if (context.Database.ProviderName != "Microsoft.EntityFrameworkCore.InMemory")
                 {
                     context.Database.Migrate();
                 }
