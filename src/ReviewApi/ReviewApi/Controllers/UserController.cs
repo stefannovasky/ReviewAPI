@@ -76,5 +76,21 @@ namespace ReviewApi.Controllers
                 return this.HandleException(exception);
             }
         }
+
+        [HttpPut]
+        [Authorize]
+        [Route("password")]
+        public async Task<IActionResult> UpdatePassword(UpdatePasswordUserRequestModel model)
+        {
+            try
+            {
+                await _userService.UpdatePassword(this.GetUserIdFromToken(), model);
+                return Ok();
+            }
+            catch (Exception exception)
+            {
+                return this.HandleException(exception);
+            }
+        }
     }
 }
