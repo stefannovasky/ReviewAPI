@@ -169,5 +169,34 @@ namespace ReviewApi.UnitTests.Application.Services
             Assert.Null(exception);
             _jwtTokenUtilsMock.Received(1).GenerateToken(Arg.Any<string>());
         }
+
+        [Fact]
+        public async Task ShouldThrowResourceNotFoundOnTryUpdateNotExistsUserName()
+        {
+            Guid notExistsUserGuid = Guid.NewGuid();
+            User notExistsUser = null; 
+            UpdateNameUserRequestModel model = new UpdateNameUserRequestModel() { Name = "User Name" };
+            _userRepositoryMock.GetById(Arg.Is<Guid>(id => id == notExistsUserGuid)).Returns(notExistsUser);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.UpdateUserName(notExistsUserGuid.ToString(), model));
+
+            Assert.IsType<ResourceNotFoundException>(exception); 
+        }
+
+        [Fact]
+        public async Task ShouldUpdateUserName()
+        {
+            Guid userId = Guid.NewGuid();
+            User user = new User(userId);
+            UpdateNameUserRequestModel model = new UpdateNameUserRequestModel() { Name = "User Name" };
+            _userRepositoryMock.GetById(Arg.Is<Guid>(id => id == userId)).Returns(user);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.UpdateUserName(userId.ToString(), model));
+
+            Assert.Equal(model.Name, user.Name);
+            Assert.Null(exception);
+            _userRepositoryMock.Received(1).Update(Arg.Any<User>());
+            await _userRepositoryMock.Received(1).Save();
+        }
     }
 }
