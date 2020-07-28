@@ -100,5 +100,16 @@ namespace ReviewApi.UnitTests.Domain.Entities
 
             Assert.True(user.Confirmed);
         }
+
+        [Fact]
+        public void ShouldUpdateName()
+        {
+            string userName = "User Name";
+            User user = new User();
+
+            user.UpdateName(userName);
+
+            Assert.Equal(userName, user.Name);
+        }
     }
 }
