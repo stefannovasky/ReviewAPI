@@ -25,9 +25,9 @@ namespace ReviewApi.Infra.Repositories
             {
                 return await Query().AnyAsync(entity => entity.Id == id);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
         }
 
@@ -37,9 +37,9 @@ namespace ReviewApi.Infra.Repositories
             {
                 await _dbSet.AddAsync(entity);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
         }
 
@@ -49,9 +49,9 @@ namespace ReviewApi.Infra.Repositories
             {
                 return await Query().SingleOrDefaultAsync(entity => entity.Id == id);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
         }
 
@@ -61,9 +61,9 @@ namespace ReviewApi.Infra.Repositories
             {
                 await _dbContext.SaveChangesAsync();
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
         }
 
@@ -73,9 +73,9 @@ namespace ReviewApi.Infra.Repositories
             {
                 _dbSet.Update(entity);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
         }
 

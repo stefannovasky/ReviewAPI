@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ReviewApi.Domain.Entities;
 using ReviewApi.Domain.Interfaces.Repositories;
@@ -14,17 +15,38 @@ namespace ReviewApi.Infra.Repositories
 
         public async Task<bool> AlreadyExists(string email)
         {
-            return await _dbSet.AnyAsync(user => user.Email == email);     
+            try
+            {
+                return await _dbSet.AnyAsync(user => user.Email == email);     
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public async Task<User> GetByConfirmationCode(string code)
         {
-            return await Query().SingleOrDefaultAsync(user => user.ConfirmationCode == code);
+            try
+            {
+                return await Query().SingleOrDefaultAsync(user => user.ConfirmationCode == code);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public async Task<User> GetByEmail(string email)
         {
-            return await Query().SingleOrDefaultAsync(user => user.Email == email);
+            try
+            {
+                return await Query().SingleOrDefaultAsync(user => user.Email == email);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }
