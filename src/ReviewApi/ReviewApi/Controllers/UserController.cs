@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Models.User;
@@ -53,6 +54,22 @@ namespace ReviewApi.Controllers
             {
                 await _userService.ConfirmUser(model);
                 return NoContent();
+            }
+            catch (Exception exception)
+            {
+                return this.HandleException(exception);
+            }
+        }
+
+        [HttpPut]
+        [Authorize]
+        [Route("name")]
+        public async Task<IActionResult> UpdateName(UpdateNameUserRequestModel model) 
+        {
+            try
+            {
+                await _userService.UpdateUserName(this.GetUserIdFromToken(), model);
+                return Ok();
             }
             catch (Exception exception)
             {
