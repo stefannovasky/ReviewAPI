@@ -1,10 +1,12 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using ReviewApi.Application.Models.User;
+using ReviewApi.Domain.Entities;
 using ReviewApi.Infra.Context;
 using ReviewApi.IntegrationTests.CustomWebApplicationFactory;
 using ReviewApi.IntegrationTests.Extensions;
@@ -20,29 +22,32 @@ namespace ReviewApi.IntegrationTests.Controllers
         private readonly HttpClient _httpClient;
         private readonly MainContext _database;
         private readonly CreateRequestHelper _createRequestHelper;
+        private readonly AuthorizationTokenHelper _authorizationTokenHelper;
 
         public UserControllerTest(CustomWebApplicationFactory<Startup> webApplicationFactory)
         {
             _webApplicationFactory = webApplicationFactory;
             _httpClient = _webApplicationFactory.CreateClient(new WebApplicationFactoryClientOptions());
             _createRequestHelper = new CreateRequestHelper();
-
-            SqliteConnection connection = new SqliteConnection("Filename=:memory:");
-            connection.Open();
+            _authorizationTokenHelper = new AuthorizationTokenHelper();
 
             DbContextOptions<MainContext> options = new DbContextOptionsBuilder<MainContext>()
-                .UseSqlite(connection)
+                .UseInMemoryDatabase(databaseName: "TestDatabase")
                 .Options;
 
             _database = new MainContext(options);
         }
-
-        private async Task InsertUserOnDatabase()
+        
+        private async Task<Guid> InsertUserOnDatabase()
         {
-            CreateUserRequestModel model = new CreateUserRequestModel() { Email = "user@mail.com", Name = "User Name", Password = "User Password" };
-            await _httpClient.PostAsync("../users", _createRequestHelper.CreateStringContent(model));
+            _database.Database.EnsureCreated();
+            User user = new User("User Name", "user@mail.com", "User Password");
+            await _database.Set<User>().AddAsync(user);
+            user.Confirm();
+            await _database.SaveChangesAsync();
+            return user.Id;
         }
-
+        
         [Fact]
         public async Task ShouldReturnCreatedAtRouteOnCallCreate()
         {
@@ -50,6 +55,19 @@ namespace ReviewApi.IntegrationTests.Controllers
             HttpResponseMessage httpResponse = await _httpClient.PostAsync("../users", _createRequestHelper.CreateStringContent(model));
 
             Assert.Equal((int)HttpStatusCode.Created, (int)httpResponse.StatusCode);
+            _database.ResetDatabase();
+        }
+
+        [Fact]
+        public async Task ShouldReturnOkOnCallUpdateUserName()
+        {
+            Guid id = await InsertUserOnDatabase();
+            _httpClient.InsertAuthorizationTokenOnRequestHeader(_authorizationTokenHelper.CreateToken(id));
+            UpdateNameUserRequestModel model = new UpdateNameUserRequestModel() { Name = "User Name" };
+
+            HttpResponseMessage httpResponse = await _httpClient.PutAsync("../users/name", _createRequestHelper.CreateStringContent(model));
+
+            Assert.Equal((int)HttpStatusCode.OK, (int)httpResponse.StatusCode);
             _database.ResetDatabase();
         }
     }
