@@ -254,5 +254,45 @@ namespace ReviewApi.UnitTests.Application.Services
             Assert.Null(exception);
             await _userRepositoryMock.Received(1).Save();
         }
+
+        [Fact]
+        public async Task ShouldThrowResourceNotFoundExceptionOnTryDeleteUser()
+        {
+            User notExistsUser = null;
+            DeleteUserRequestModel model = new DeleteUserRequestModel() { Password = "user password", PasswordConfirmation = "user password" };
+            _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(notExistsUser);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.Delete(Guid.NewGuid().ToString(), model));
+
+            Assert.IsType<ResourceNotFoundException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldThrowInvalidPasswordExceptionOnTryDeleteUser()
+        {
+            Guid userId = Guid.NewGuid();
+            User registeredUser = new User(userId, "user name", "email@mail.com", "password");
+            DeleteUserRequestModel model = new DeleteUserRequestModel() { Password = "user password", PasswordConfirmation = "user password" };
+            _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(registeredUser);
+            _hashUtilsMock.CompareHash(Arg.Any<string>(), Arg.Any<string>()).Returns(false);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.Delete(userId.ToString(), model));
+
+            Assert.IsType<InvalidPasswordException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldDeleteUser()
+        {
+            Guid userId = Guid.NewGuid();
+            User registeredUser = new User(userId, "user name", "email@mail.com", "password");
+            DeleteUserRequestModel model = new DeleteUserRequestModel() { Password = "user password", PasswordConfirmation = "user password" };
+            _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(registeredUser);
+            _hashUtilsMock.CompareHash(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.Delete(userId.ToString(), model));
+
+            Assert.Null(exception);
+        }
     }
 }
