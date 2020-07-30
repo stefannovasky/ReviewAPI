@@ -11,5 +11,6 @@ namespace ReviewApi.Domain.Interfaces.Repositories
         void Update(T entity);
         Task<bool> AlreadyExists(Guid id);
         Task Save();
+        void Delete(T entity);
     }
 }
