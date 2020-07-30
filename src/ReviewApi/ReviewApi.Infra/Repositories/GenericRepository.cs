@@ -8,7 +8,7 @@ using ReviewApi.Infra.Context;
 
 namespace ReviewApi.Infra.Repositories
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
+    public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity, new()
     {
         protected readonly MainContext _dbContext;
         protected readonly DbSet<T> _dbSet;
@@ -36,6 +36,19 @@ namespace ReviewApi.Infra.Repositories
             try
             {
                 await _dbSet.AddAsync(entity);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public void Delete(T entity)
+        {
+            try
+            {
+                _dbSet.Attach(entity);
+                _dbSet.Remove(entity);
             }
             catch (Exception)
             {
