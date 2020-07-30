@@ -52,7 +52,7 @@ namespace ReviewApi.IntegrationTests.Controllers
         [Fact]
         public async Task ShouldReturnCreatedAtRouteOnCallCreate()
         {
-            CreateUserRequestModel model = new CreateUserRequestModel() { Email = "user@mail.com", Name = "User Name", Password = "User Password" };
+            CreateUserRequestModel model = new CreateUserRequestModel() { Email = "useremail@mail.com", Name = "User Name", Password = "User Password" };
             HttpResponseMessage httpResponse = await _httpClient.PostAsync("../users", _createRequestHelper.CreateStringContent(model));
 
             Assert.Equal((int)HttpStatusCode.Created, (int)httpResponse.StatusCode);
@@ -81,6 +81,18 @@ namespace ReviewApi.IntegrationTests.Controllers
             HttpResponseMessage httpResponse = await _httpClient.PutAsync("../users/password", _createRequestHelper.CreateStringContent(model));
 
             Assert.Equal((int)HttpStatusCode.OK, (int)httpResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task ShouldReturnNoContentOnCallDeleteUser()
+        {
+            Guid id = await InsertUserOnDatabase();
+            _httpClient.InsertAuthorizationTokenOnRequestHeader(_authorizationTokenHelper.CreateToken(id));
+            DeleteUserRequestModel model = new DeleteUserRequestModel() { Password = "User password", PasswordConfirmation = "User password" };
+
+            HttpResponseMessage httpResponse = await _httpClient.PostAsync("../users/delete", _createRequestHelper.CreateStringContent(model));
+
+            Assert.Equal((int)HttpStatusCode.NoContent, (int)httpResponse.StatusCode);
         }
     }
 }

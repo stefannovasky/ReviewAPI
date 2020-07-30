@@ -92,5 +92,21 @@ namespace ReviewApi.Controllers
                 return this.HandleException(exception);
             }
         }
+
+        [HttpPost] 
+        [Authorize]
+        [Route("delete")]
+        public async Task<IActionResult> Delete(DeleteUserRequestModel model)
+        {
+            try
+            {
+                await _userService.Delete(this.GetUserIdFromToken(), model);
+                return NoContent();
+            }
+            catch (Exception exception)
+            {
+                return this.HandleException(exception);
+            }
+        }
     }
 }
