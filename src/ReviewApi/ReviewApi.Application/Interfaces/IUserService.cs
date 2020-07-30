@@ -10,5 +10,6 @@ namespace ReviewApi.Application.Interfaces
         Task<AuthenticationUserResponseModel> Authenticate(AuthenticationUserRequestModel model);
         Task UpdateUserName(string userId, UpdateNameUserRequestModel model);
         Task UpdatePassword(string userId, UpdatePasswordUserRequestModel model);
+        Task Delete(string userId, DeleteUserRequestModel model);
     }
 }
