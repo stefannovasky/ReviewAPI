@@ -82,5 +82,17 @@ namespace ReviewApi.IntegrationTests.Controllers
 
             Assert.Equal((int)HttpStatusCode.OK, (int)httpResponse.StatusCode);
         }
+
+        [Fact]
+        public async Task ShouldReturnNoContentOnCallDeleteUser()
+        {
+            Guid id = await InsertUserOnDatabase();
+            _httpClient.InsertAuthorizationTokenOnRequestHeader(_authorizationTokenHelper.CreateToken(id));
+            DeleteUserRequestModel model = new DeleteUserRequestModel() { Password = "User password", PasswordConfirmation = "User password" };
+
+            HttpResponseMessage httpResponse = await _httpClient.PostAsync("../users/delete", _createRequestHelper.CreateStringContent(model));
+
+            Assert.Equal((int)HttpStatusCode.NoContent, (int)httpResponse.StatusCode);
+        }
     }
 }
