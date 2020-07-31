@@ -9,6 +9,7 @@ namespace ReviewApi.Domain.Entities
         public string Password { get; protected set; }
         public string ConfirmationCode { get; protected set; }
         public bool Confirmed { get; protected set; }
+        public string ResetPasswordCode { get; protected set; }
 
         public User()
         {
@@ -53,6 +54,17 @@ namespace ReviewApi.Domain.Entities
         public void UpdateName(string name)
         {
             Name = name;
+        }
+
+        public void UpdateResetPasswordCode(string code)
+        {
+            ResetPasswordCode = code; 
+        }
+
+        public void ResetPassword(string newPasswordHash)
+        {
+            ResetPasswordCode = null;
+            Password = newPasswordHash;
         }
     }
 }
