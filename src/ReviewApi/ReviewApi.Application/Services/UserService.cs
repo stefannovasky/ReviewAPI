@@ -132,9 +132,24 @@ namespace ReviewApi.Application.Services
             await _emailUtils.SendEmail(user.Email, "Reset Password", $"Reset your password with this code: {user.ResetPasswordCode}");
         }
 
-        public Task ResetPassword()
+        public async Task ResetPassword(ResetPasswordUserRequestModel model)
         {
-            throw new NotImplementedException();
+            await new ResetPasswordUserValidator().ValidateRequestModelAndThrow(model);
+
+            User user = await _userRepository.GetByResetPasswordCode(model.Code);
+            if (user == null)
+            {
+                throw new ResourceNotFoundException("user not found."); 
+            }
+            if (!user.Confirmed)
+            {
+                throw new UserNotConfirmedException(); 
+            }
+
+            user.ResetPassword(_hashUtils.GenerateHash(model.NewPassword));
+
+            _userRepository.Update(user);
+            await _userRepository.Save(); 
         }
 
         public async Task UpdatePassword(string userId, UpdatePasswordUserRequestModel model)
