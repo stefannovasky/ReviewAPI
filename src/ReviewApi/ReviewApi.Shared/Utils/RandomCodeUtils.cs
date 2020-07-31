@@ -4,9 +4,9 @@ using ReviewApi.Shared.Interfaces;
 
 namespace ReviewApi.Shared.Utils
 {
-    public class ConfirmationCodeUtils : IConfirmationCodeUtils
+    public class RandomCodeUtils : IRandomCodeUtils
     {
-        public string GenerateConfirmationCode()
+        public string GenerateRandomCode()
         {
             int length = 8;
 
