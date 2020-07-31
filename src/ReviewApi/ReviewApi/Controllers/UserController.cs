@@ -138,5 +138,20 @@ namespace ReviewApi.Controllers
                 return this.HandleException(exception);
             }
         }
+
+        [HttpGet]
+        [Authorize]
+        [Route("profile")]
+        public async Task<IActionResult> GetProfile()
+        {
+            try
+            {
+                return Ok(await _userService.GetProfile(this.GetUserIdFromToken()));
+            }
+            catch (Exception exception)
+            {
+                return this.HandleException(exception);
+            }
+        }
     }
 }
