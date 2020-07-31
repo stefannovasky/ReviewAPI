@@ -14,15 +14,15 @@ namespace ReviewApi.Application.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly IConfirmationCodeUtils _confirmationCodeUtils;
+        private readonly IRandomCodeUtils _randomCodeUtils;
         private readonly IHashUtils _hashUtils;
         private readonly IEmailUtils _emailUtils;
         private readonly IJwtTokenUtils _jwtTokenUtils;
 
-        public UserService(IUserRepository userRepository, IConfirmationCodeUtils confirmationCodeUtils, IHashUtils hashUtils, IEmailUtils emailUtils, IJwtTokenUtils jwtTokenUtils)
+        public UserService(IUserRepository userRepository, IRandomCodeUtils randomCodeUtils, IHashUtils hashUtils, IEmailUtils emailUtils, IJwtTokenUtils jwtTokenUtils)
         {
             _userRepository = userRepository;
-            _confirmationCodeUtils = confirmationCodeUtils;
+            _randomCodeUtils = randomCodeUtils;
             _hashUtils = hashUtils;
             _emailUtils = emailUtils;
             _jwtTokenUtils = jwtTokenUtils;
@@ -83,7 +83,7 @@ namespace ReviewApi.Application.Services
                 throw new AlreadyExistsException("user");
             }
 
-            user.UpdateConfirmationCode(_confirmationCodeUtils.GenerateConfirmationCode());
+            user.UpdateConfirmationCode(_randomCodeUtils.GenerateRandomCode());
             user.UpdatePassword(_hashUtils.GenerateHash(user.Password));
 
             await _userRepository.Create(user);
@@ -108,6 +108,33 @@ namespace ReviewApi.Application.Services
 
             _userRepository.Delete(user);
             await _userRepository.Save();
+        }
+
+        public async Task ForgotPassword(ForgotPasswordUserRequestModel model)
+        {
+            await new ForgotPasswordUserValidator().ValidateRequestModelAndThrow(model);
+
+            User user = await _userRepository.GetByEmail(model.Email);
+            if (user == null)
+            {
+                throw new ResourceNotFoundException("user not found.");
+            }
+            if (!user.Confirmed)
+            {
+                throw new UserNotConfirmedException();
+            }
+
+            user.UpdateResetPasswordCode(_randomCodeUtils.GenerateRandomCode());
+
+            _userRepository.Update(user);
+            await _userRepository.Save();
+
+            await _emailUtils.SendEmail(user.Email, "Reset Password", $"Reset your password with this code: {user.ResetPasswordCode}");
+        }
+
+        public Task ResetPassword()
+        {
+            throw new NotImplementedException();
         }
 
         public async Task UpdatePassword(string userId, UpdatePasswordUserRequestModel model)
