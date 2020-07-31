@@ -15,7 +15,7 @@ namespace ReviewApi.UnitTests.Application.Services
     public class UserServiceTest
     {
         private readonly IUserService _userService;
-        private readonly IConfirmationCodeUtils _confirmationCodeUtilsMock;
+        private readonly IRandomCodeUtils _randomCodeUtils;
         private readonly IHashUtils _hashUtilsMock;
         private readonly IEmailUtils _emailUtilsMock;
         private readonly IUserRepository _userRepositoryMock;
@@ -26,11 +26,11 @@ namespace ReviewApi.UnitTests.Application.Services
         public UserServiceTest()
         {
             _userRepositoryMock = NSubstitute.Substitute.For<IUserRepository>();
-            _confirmationCodeUtilsMock = NSubstitute.Substitute.For<IConfirmationCodeUtils>();
+            _randomCodeUtils = NSubstitute.Substitute.For<IRandomCodeUtils>();
             _hashUtilsMock = NSubstitute.Substitute.For<IHashUtils>();
             _emailUtilsMock = NSubstitute.Substitute.For<IEmailUtils>();
             _jwtTokenUtilsMock = NSubstitute.Substitute.For<IJwtTokenUtils>();
-            _userService = new UserService(_userRepositoryMock, _confirmationCodeUtilsMock, _hashUtilsMock, _emailUtilsMock, _jwtTokenUtilsMock);
+            _userService = new UserService(_userRepositoryMock, _randomCodeUtils, _hashUtilsMock, _emailUtilsMock, _jwtTokenUtilsMock);
 
             _fakeNotConfirmedInsertedUser = new User("Fake User", "fake_user@mail.com", "fake password");
             _fakeConfirmedInsertedUser = new User("Fake User", "fake_user@mail.com", "fake password");
@@ -72,7 +72,7 @@ namespace ReviewApi.UnitTests.Application.Services
 
             Assert.Null(exception);
 
-            _confirmationCodeUtilsMock.Received(1).GenerateConfirmationCode();
+            _randomCodeUtils.Received(1).GenerateRandomCode();
             _hashUtilsMock.Received(1).GenerateHash(Arg.Is<string>(text => text == model.Password));
             await _emailUtilsMock.Received(1).SendEmail(Arg.Is<string>(email => email == model.Email), Arg.Any<string>(), Arg.Any<string>());
             await _userRepositoryMock.Received(1).Create(Arg.Is<User>(user => user.Email == model.Email));
