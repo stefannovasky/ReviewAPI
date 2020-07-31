@@ -186,14 +186,11 @@ namespace ReviewApi.UnitTests.Application.Services
         [Fact]
         public async Task ShouldUpdateUserName()
         {
-            Guid userId = Guid.NewGuid();
-            User user = new User(userId);
             UpdateNameUserRequestModel model = new UpdateNameUserRequestModel() { Name = "User Name" };
-            _userRepositoryMock.GetById(Arg.Is<Guid>(id => id == userId)).Returns(user);
+            _userRepositoryMock.GetById(Arg.Is<Guid>(id => id == _fakeConfirmedInsertedUser.Id)).Returns(_fakeConfirmedInsertedUser);
 
-            Exception exception = await Record.ExceptionAsync(() => _userService.UpdateUserName(userId.ToString(), model));
+            Exception exception = await Record.ExceptionAsync(() => _userService.UpdateUserName(_fakeConfirmedInsertedUser.Id.ToString(), model));
 
-            Assert.Equal(model.Name, user.Name);
             Assert.Null(exception);
             _userRepositoryMock.Received(1).Update(Arg.Any<User>());
             await _userRepositoryMock.Received(1).Save();
@@ -271,9 +268,8 @@ namespace ReviewApi.UnitTests.Application.Services
         public async Task ShouldThrowInvalidPasswordExceptionOnTryDeleteUser()
         {
             Guid userId = Guid.NewGuid();
-            User registeredUser = new User(userId, "user name", "email@mail.com", "password");
             DeleteUserRequestModel model = new DeleteUserRequestModel() { Password = "user password", PasswordConfirmation = "user password" };
-            _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(registeredUser);
+            _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(_fakeConfirmedInsertedUser);
             _hashUtilsMock.CompareHash(Arg.Any<string>(), Arg.Any<string>()).Returns(false);
 
             Exception exception = await Record.ExceptionAsync(() => _userService.Delete(userId.ToString(), model));
@@ -285,9 +281,8 @@ namespace ReviewApi.UnitTests.Application.Services
         public async Task ShouldDeleteUser()
         {
             Guid userId = Guid.NewGuid();
-            User registeredUser = new User(userId, "user name", "email@mail.com", "password");
             DeleteUserRequestModel model = new DeleteUserRequestModel() { Password = "user password", PasswordConfirmation = "user password" };
-            _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(registeredUser);
+            _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(_fakeConfirmedInsertedUser);
             _hashUtilsMock.CompareHash(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
 
             Exception exception = await Record.ExceptionAsync(() => _userService.Delete(userId.ToString(), model));
