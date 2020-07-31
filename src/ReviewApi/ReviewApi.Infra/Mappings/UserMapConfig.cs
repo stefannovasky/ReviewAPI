@@ -34,6 +34,10 @@ namespace ReviewApi.Infra.Mappings
             builder.Property(p => p.Confirmed)
                 .HasColumnName("confirmed")
                 .HasDefaultValue(false);
+
+            builder.Property(p => p.ResetPasswordCode)
+                .HasColumnName("reset_password_code")
+                .HasMaxLength(8);
         }
     }
 }
