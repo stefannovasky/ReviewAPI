@@ -17,6 +17,7 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Null(user.ConfirmationCode);
             Assert.False(user.Confirmed);
             Assert.Equal(Guid.Empty.ToString(), user.Id.ToString());
+            Assert.Null(user.ResetPasswordCode);
         }
 
         [Fact]
@@ -32,6 +33,7 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Null(user.Password);
             Assert.Null(user.ConfirmationCode);
             Assert.False(user.Confirmed);
+            Assert.Null(user.ResetPasswordCode);
         }
 
         [Fact]
@@ -48,6 +50,7 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Equal(userEmail, user.Email);
             Assert.Equal(userPassword, user.Password);
             Assert.False(user.Confirmed);
+            Assert.Null(user.ResetPasswordCode);
             Assert.Null(user.ConfirmationCode);
         }
 
@@ -66,6 +69,7 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Equal(userEmail, user.Email);
             Assert.Equal(userPassword, user.Password);
             Assert.False(user.Confirmed);
+            Assert.Null(user.ResetPasswordCode);
             Assert.Null(user.ConfirmationCode);
         }
 
@@ -110,6 +114,31 @@ namespace ReviewApi.UnitTests.Domain.Entities
             user.UpdateName(userName);
 
             Assert.Equal(userName, user.Name);
+        }
+
+        [Fact]
+        public void ShouldInsertResetPasswordCode()
+        {
+            string code = "AAAAAAAA";
+            User user = new User();
+
+            user.UpdateResetPasswordCode(code);
+
+            Assert.Equal(code, user.ResetPasswordCode);
+        }
+
+        [Fact]
+        public void ShouldResetPassword()
+        {
+            string code = "AAAAAAAA";
+            string newPasswordHash = "asdhjaudhaiduasd"; 
+            User user = new User();
+
+            user.UpdateResetPasswordCode(code);
+            user.ResetPassword(newPasswordHash);
+
+            Assert.NotEqual(code, user.ResetPasswordCode);
+            Assert.Equal(newPasswordHash, user.Password);
         }
     }
 }
