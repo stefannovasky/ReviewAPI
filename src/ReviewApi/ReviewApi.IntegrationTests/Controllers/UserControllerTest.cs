@@ -105,5 +105,16 @@ namespace ReviewApi.IntegrationTests.Controllers
 
             Assert.Equal((int)HttpStatusCode.OK, (int)httpResponse.StatusCode);
         }
+
+        [Fact]
+        public async Task ShouldGetUserProfile()
+        {
+            Guid id = await InsertUserOnDatabase();
+            _httpClient.InsertAuthorizationTokenOnRequestHeader(_authorizationTokenHelper.CreateToken(id));
+
+            HttpResponseMessage httpResponse = await _httpClient.GetAsync("../users/profile");
+
+            Assert.Equal((int)HttpStatusCode.OK, (int)httpResponse.StatusCode);
+        }
     }
 }
