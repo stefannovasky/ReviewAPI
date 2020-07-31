@@ -174,13 +174,13 @@ namespace ReviewApi.UnitTests.Application.Services
         public async Task ShouldThrowResourceNotFoundOnTryUpdateNotExistsUserName()
         {
             Guid notExistsUserGuid = Guid.NewGuid();
-            User notExistsUser = null; 
+            User notExistsUser = null;
             UpdateNameUserRequestModel model = new UpdateNameUserRequestModel() { Name = "User Name" };
             _userRepositoryMock.GetById(Arg.Is<Guid>(id => id == notExistsUserGuid)).Returns(notExistsUser);
 
             Exception exception = await Record.ExceptionAsync(() => _userService.UpdateUserName(notExistsUserGuid.ToString(), model));
 
-            Assert.IsType<ResourceNotFoundException>(exception); 
+            Assert.IsType<ResourceNotFoundException>(exception);
         }
 
         [Fact]
@@ -203,10 +203,10 @@ namespace ReviewApi.UnitTests.Application.Services
         public async Task ShouldThrowResourceNotFoundExceptionOnTryUpdateNotExistsUserPassword()
         {
             User notExistsUser = null;
-            UpdatePasswordUserRequestModel model = new UpdatePasswordUserRequestModel() 
+            UpdatePasswordUserRequestModel model = new UpdatePasswordUserRequestModel()
             {
                 OldPassword = "old password",
-                NewPassword = "new password", 
+                NewPassword = "new password",
                 NewPasswordConfirmation = "new password"
             };
             _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(notExistsUser);
@@ -327,8 +327,45 @@ namespace ReviewApi.UnitTests.Application.Services
             Exception exception = await Record.ExceptionAsync(() => _userService.ForgotPassword(model));
 
             _randomCodeUtils.Received(1).GenerateRandomCode();
-            _userRepositoryMock.Received(1).Update(Arg.Any<User>()); 
+            _userRepositoryMock.Received(1).Update(Arg.Any<User>());
             await _userRepositoryMock.Received(1).Save();
+            Assert.Null(exception);
+        }
+
+        [Fact]
+        public async Task ShouldThrowResourceUserNotFoundExceptionOnTryResetPasswordOnNotExistsUser()
+        {
+            User notExistsUser = null;
+            ResetPasswordUserRequestModel model = new ResetPasswordUserRequestModel() { Code = "AAAAAAAA", NewPassword = "NEWPASSWORD", NewPasswordConfirmation = "NEWPASSWORD" };
+            _userRepositoryMock.GetByResetPasswordCode(Arg.Any<string>()).Returns(notExistsUser);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.ResetPassword(model));
+
+            Assert.IsType<ResourceNotFoundException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldThrowUserNotConfirmedExceptionOnTryResetPasswordWithNotConfirmedUser()
+        {
+            ResetPasswordUserRequestModel model = new ResetPasswordUserRequestModel() { Code = "AAAAAAAA", NewPassword = "NEWPASSWORD", NewPasswordConfirmation = "NEWPASSWORD" };
+            _userRepositoryMock.GetByResetPasswordCode(Arg.Any<string>()).Returns(_fakeNotConfirmedInsertedUser);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.ResetPassword(model));
+
+            Assert.IsType<UserNotConfirmedException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldResetUserPasswordWithSuccess()
+        {
+            ResetPasswordUserRequestModel model = new ResetPasswordUserRequestModel() { Code = "AAAAAAAA", NewPassword = "NEWPASSWORD", NewPasswordConfirmation = "NEWPASSWORD" };
+            _userRepositoryMock.GetByResetPasswordCode(Arg.Any<string>()).Returns(_fakeConfirmedInsertedUser);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.ResetPassword(model));
+            _hashUtilsMock.Received(1).GenerateHash(Arg.Is<string>(text => text == model.NewPassword));
+            _userRepositoryMock.Received(1).Update(Arg.Any<User>());
+            await _userRepositoryMock.Received(1).Save();
+
             Assert.Null(exception);
         }
     }
