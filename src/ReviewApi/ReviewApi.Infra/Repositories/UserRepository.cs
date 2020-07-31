@@ -48,5 +48,17 @@ namespace ReviewApi.Infra.Repositories
                 throw;
             }
         }
+
+        public async Task<User> GetByResetPasswordCode(string code)
+        {
+            try
+            {
+                return await Query().SingleOrDefaultAsync(user => user.ResetPasswordCode == code);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }
