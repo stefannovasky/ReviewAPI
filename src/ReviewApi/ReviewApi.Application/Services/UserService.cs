@@ -33,14 +33,8 @@ namespace ReviewApi.Application.Services
             await new AuthenticationUserValidator().ValidateRequestModelAndThrow(model);
 
             User user = await _userRepository.GetByEmail(model.Email);
-            if (user == null)
-            {
-                throw new ResourceNotFoundException("account not found.");
-            }
-            if (!user.Confirmed)
-            {
-                throw new UserNotConfirmedException();
-            }
+            VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
+
             if (!_hashUtils.CompareHash(model.Password, user.Password))
             {
                 throw new InvalidPasswordException(); 
@@ -115,14 +109,7 @@ namespace ReviewApi.Application.Services
             await new ForgotPasswordUserValidator().ValidateRequestModelAndThrow(model);
 
             User user = await _userRepository.GetByEmail(model.Email);
-            if (user == null)
-            {
-                throw new ResourceNotFoundException("user not found.");
-            }
-            if (!user.Confirmed)
-            {
-                throw new UserNotConfirmedException();
-            }
+            VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
 
             user.UpdateResetPasswordCode(_randomCodeUtils.GenerateRandomCode());
 
@@ -137,14 +124,7 @@ namespace ReviewApi.Application.Services
             await new ResetPasswordUserValidator().ValidateRequestModelAndThrow(model);
 
             User user = await _userRepository.GetByResetPasswordCode(model.Code);
-            if (user == null)
-            {
-                throw new ResourceNotFoundException("user not found."); 
-            }
-            if (!user.Confirmed)
-            {
-                throw new UserNotConfirmedException(); 
-            }
+            VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
 
             user.ResetPassword(_hashUtils.GenerateHash(model.NewPassword));
 
@@ -177,15 +157,24 @@ namespace ReviewApi.Application.Services
             await new UpdateNameUserValidator().ValidateRequestModelAndThrow(model);
             
             User user = await _userRepository.GetById(Guid.Parse(userId));
-            if (user == null)
-            {
-                throw new ResourceNotFoundException("user not found.");
-            }
+            VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
 
             user.UpdateName(model.Name);
 
             _userRepository.Update(user);
             await _userRepository.Save();
+        }
+
+        private void VerifyIfUserIsNullOrNotConfirmedAndThrow(User user)
+        {
+            if (user == null)
+            {
+                throw new ResourceNotFoundException("user not found.");
+            }
+            if (!user.Confirmed)
+            {
+                throw new UserNotConfirmedException();
+            }
         }
     }
 }
