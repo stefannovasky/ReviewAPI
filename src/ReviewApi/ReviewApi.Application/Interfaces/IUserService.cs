@@ -12,7 +12,6 @@ namespace ReviewApi.Application.Interfaces
         Task UpdatePassword(string userId, UpdatePasswordUserRequestModel model);
         Task Delete(string userId, DeleteUserRequestModel model);
         Task ForgotPassword(ForgotPasswordUserRequestModel model);
-        // TODO: Unit and Integration tests
         Task ResetPassword(ResetPasswordUserRequestModel model);
     }
 }
