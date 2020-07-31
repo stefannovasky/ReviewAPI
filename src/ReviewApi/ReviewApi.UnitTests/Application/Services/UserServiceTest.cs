@@ -363,5 +363,36 @@ namespace ReviewApi.UnitTests.Application.Services
 
             Assert.Null(exception);
         }
+
+        [Fact]
+        public async Task ShouldGetUserProfile()
+        {
+            _userRepositoryMock.GetById(Arg.Is<Guid>(id => id == _fakeConfirmedInsertedUser.Id)).Returns(_fakeConfirmedInsertedUser);
+
+            UserProfileResponseModel response = await _userService.GetProfile(_fakeConfirmedInsertedUser.Id.ToString());
+
+            Assert.Equal(_fakeConfirmedInsertedUser.Name, response.Name);
+            Assert.Equal(_fakeConfirmedInsertedUser.Email, response.Email);
+        }
+
+        [Fact]
+        public async Task ShouldThrowResourceNotFoundExceptionOnTryGetProfileOfNotExistsUser()
+        {
+            _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(null as User);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.GetProfile(Guid.NewGuid().ToString()));
+
+            Assert.IsType<ResourceNotFoundException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldThrowRUserNotConfirmedExceptionOnTryGetProfileOfNotConfirmedUser()
+        {
+            _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(_fakeNotConfirmedInsertedUser);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.GetProfile(Guid.NewGuid().ToString()));
+
+            Assert.IsType<UserNotConfirmedException>(exception);
+        }
     }
 }
