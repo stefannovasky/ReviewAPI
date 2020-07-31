@@ -119,6 +119,14 @@ namespace ReviewApi.Application.Services
             await _emailUtils.SendEmail(user.Email, "Reset Password", $"Reset your password with this code: {user.ResetPasswordCode}");
         }
 
+        public async Task<UserProfileResponseModel> GetProfile(string userId)
+        {
+            User user = await _userRepository.GetById(Guid.Parse(userId));
+            VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
+
+            return new UserProfileResponseModel() { Email = user.Email, Name = user.Name };
+        }
+
         public async Task ResetPassword(ResetPasswordUserRequestModel model)
         {
             await new ResetPasswordUserValidator().ValidateRequestModelAndThrow(model);

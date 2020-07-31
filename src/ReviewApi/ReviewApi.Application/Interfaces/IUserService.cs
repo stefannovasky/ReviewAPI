@@ -13,5 +13,6 @@ namespace ReviewApi.Application.Interfaces
         Task Delete(string userId, DeleteUserRequestModel model);
         Task ForgotPassword(ForgotPasswordUserRequestModel model);
         Task ResetPassword(ResetPasswordUserRequestModel model);
+        Task<UserProfileResponseModel> GetProfile(string userId);
     }
 }
