@@ -4,18 +4,18 @@ using Xunit;
 
 namespace ReviewApi.UnitTests.Shared.Utils
 {
-    public class ConfirmationCodeUtilsTest
+    public class RandomCodeUtilsTest
     {
-        private readonly IConfirmationCodeUtils _confirmationCodeUtils;
-        public ConfirmationCodeUtilsTest()
+        private readonly IRandomCodeUtils _randomCodeUtils;
+        public RandomCodeUtilsTest()
         {
-            _confirmationCodeUtils = new ConfirmationCodeUtils();
+            _randomCodeUtils = new RandomCodeUtils();
         }
 
         [Fact]
         public void ShouldGenerateRandomConfirmationCode()
         {
-            string confirmationCode = _confirmationCodeUtils.GenerateConfirmationCode();
+            string confirmationCode = _randomCodeUtils.GenerateRandomCode();
             Assert.NotNull(confirmationCode);
             Assert.Equal(8, confirmationCode.Length);
         }
