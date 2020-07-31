@@ -123,5 +123,20 @@ namespace ReviewApi.Controllers
                 return this.HandleException(exception);
             }
         }
+
+        [HttpPost]
+        [Route("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordUserRequestModel model)
+        {
+            try
+            {
+                await _userService.ResetPassword(model);
+                return Ok();
+            }
+            catch (Exception exception)
+            {
+                return this.HandleException(exception);
+            }
+        }
     }
 }
