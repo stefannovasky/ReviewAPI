@@ -94,5 +94,16 @@ namespace ReviewApi.IntegrationTests.Controllers
 
             Assert.Equal((int)HttpStatusCode.NoContent, (int)httpResponse.StatusCode);
         }
+
+        [Fact]
+        public async Task ShouldReturnOkStatusCodeOnCallForgotPassword()
+        {
+            await InsertUserOnDatabase();
+            ForgotPasswordUserRequestModel model = new ForgotPasswordUserRequestModel() { Email = "user@mail.com" };
+
+            HttpResponseMessage httpResponse = await _httpClient.PostAsync("../users/forgot-password", _createRequestHelper.CreateStringContent(model));
+
+            Assert.Equal((int)HttpStatusCode.OK, (int)httpResponse.StatusCode);
+        }
     }
 }
