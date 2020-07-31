@@ -294,5 +294,42 @@ namespace ReviewApi.UnitTests.Application.Services
 
             Assert.Null(exception);
         }
+
+        [Fact]
+        public async Task ShouldThrowResourceNotFoundExceptionOnCallForgotPasswordWithNotExistsUser()
+        {
+            User notExistsUser = null;
+            ForgotPasswordUserRequestModel model = new ForgotPasswordUserRequestModel() { Email = "user@mail.com" };
+            _userRepositoryMock.GetByEmail(Arg.Any<string>()).Returns(notExistsUser);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.ForgotPassword(model));
+
+            Assert.IsType<ResourceNotFoundException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldThrowUserNotConfirmedExceptionOnOnCallForgotPasswordWithNotConfirmedUser()
+        {
+            ForgotPasswordUserRequestModel model = new ForgotPasswordUserRequestModel() { Email = _fakeNotConfirmedInsertedUser.Email };
+            _userRepositoryMock.GetByEmail(Arg.Any<string>()).Returns(_fakeNotConfirmedInsertedUser);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.ForgotPassword(model));
+
+            Assert.IsType<UserNotConfirmedException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldCallForgotPasswordUserWithSuccess()
+        {
+            ForgotPasswordUserRequestModel model = new ForgotPasswordUserRequestModel() { Email = _fakeConfirmedInsertedUser.Email };
+            _userRepositoryMock.GetByEmail(Arg.Any<string>()).Returns(_fakeConfirmedInsertedUser);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.ForgotPassword(model));
+
+            _randomCodeUtils.Received(1).GenerateRandomCode();
+            _userRepositoryMock.Received(1).Update(Arg.Any<User>()); 
+            await _userRepositoryMock.Received(1).Save();
+            Assert.Null(exception);
+        }
     }
 }
