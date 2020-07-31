@@ -57,7 +57,7 @@ namespace ReviewApi
 
             services.AddTransient<IRedisConnector>(service => new RedisConnector(Configuration.GetConnectionString("RedisConnection")));
 
-            services.AddTransient<IConfirmationCodeUtils, ConfirmationCodeUtils>();
+            services.AddTransient<IRandomCodeUtils, RandomCodeUtils>();
             services.AddTransient<IHashUtils, HashUtils>();
             services.AddTransient<IEmailUtils, EmailUtils>();
             services.AddTransient<IJsonUtils, JsonUtils>();
