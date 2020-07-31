@@ -108,5 +108,20 @@ namespace ReviewApi.Controllers
                 return this.HandleException(exception);
             }
         }
+
+        [HttpPost]
+        [Route("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordUserRequestModel model)
+        {
+            try
+            {
+                await _userService.ForgotPassword(model);
+                return Ok(); 
+            }
+            catch (Exception exception)
+            {
+                return this.HandleException(exception);
+            }
+        }
     }
 }
