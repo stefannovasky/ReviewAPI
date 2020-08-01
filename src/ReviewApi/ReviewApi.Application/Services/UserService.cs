@@ -65,17 +65,8 @@ namespace ReviewApi.Application.Services
             await new CreateUserValidator().ValidateRequestModelAndThrow(model);
 
             User user = new User(model.Name, model.Email, model.Password);
-            User userInDatabase = await _userRepository.GetByEmail(user.Email);
-
-            bool userExists = userInDatabase != null;
-            if (userExists)
-            {
-                if (!userInDatabase.Confirmed)
-                {
-                    throw new UserNotConfirmedException();
-                }
-                throw new AlreadyExistsException("user");
-            }
+            await VerifyIfUserExistsByNameAndThrow(user.Name);
+            await VerifyIfUserExistsByEmailAndThrow(user.Email);
 
             user.UpdateConfirmationCode(_randomCodeUtils.GenerateRandomCode());
             user.UpdatePassword(_hashUtils.GenerateHash(user.Password));
@@ -182,6 +173,32 @@ namespace ReviewApi.Application.Services
             if (!user.Confirmed)
             {
                 throw new UserNotConfirmedException();
+            }
+        }
+
+        private async Task VerifyIfUserExistsByNameAndThrow(string userName)
+        {
+            User userInDatabase = await _userRepository.GetByName(userName);
+            if (userInDatabase != null)
+            {
+                if (!userInDatabase.Confirmed)
+                {
+                    throw new UserNotConfirmedException();
+                }
+                throw new AlreadyExistsException("user name");
+            }
+        }
+
+        private async Task VerifyIfUserExistsByEmailAndThrow(string userEmail)
+        {
+            User userInDatabase = await _userRepository.GetByEmail(userEmail);
+            if (userInDatabase != null)
+            {
+                if (!userInDatabase.Confirmed)
+                {
+                    throw new UserNotConfirmedException();
+                }
+                throw new AlreadyExistsException("user email");
             }
         }
     }
