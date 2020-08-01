@@ -60,9 +60,9 @@ namespace ReviewApi.Workers
             }
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            _redisConnector.Disconnect();
         }
     }
 }
