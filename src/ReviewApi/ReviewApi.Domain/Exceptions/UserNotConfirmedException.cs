@@ -4,7 +4,7 @@ namespace ReviewApi.Domain.Exceptions
 {
     public class UserNotConfirmedException : Exception
     {
-        public UserNotConfirmedException() : base("email already registered, needs to be confirmed.") 
+        public UserNotConfirmedException() : base("user already registered, needs to be confirmed.") 
         {
 
         }
