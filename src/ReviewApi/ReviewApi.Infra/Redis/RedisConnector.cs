@@ -21,5 +21,10 @@ namespace ReviewApi.Infra.Redis
                 EndPoints = { _connectionString }
             }); 
         }
+
+        public void Disconnect()
+        {
+            Connection.Close();
+        }
     }
 }
