@@ -49,6 +49,18 @@ namespace ReviewApi.Infra.Repositories
             }
         }
 
+        public async Task<User> GetByName(string name)
+        {
+            try
+            {
+                return await Query().SingleOrDefaultAsync(user => user.Name == name);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<User> GetByResetPasswordCode(string code)
         {
             try

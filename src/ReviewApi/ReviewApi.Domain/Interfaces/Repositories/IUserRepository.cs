@@ -7,6 +7,7 @@ namespace ReviewApi.Domain.Interfaces.Repositories
     {
         Task<bool> AlreadyExists(string email);
         Task<User> GetByEmail(string email);
+        Task<User> GetByName(string name);
         Task<User> GetByConfirmationCode(string code);
         Task<User> GetByResetPasswordCode(string code);
     }
