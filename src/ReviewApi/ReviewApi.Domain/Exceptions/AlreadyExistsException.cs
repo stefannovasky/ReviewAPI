@@ -4,7 +4,7 @@ namespace ReviewApi.Domain.Exceptions
 {
     public class AlreadyExistsException : Exception
     {
-        public AlreadyExistsException(string entityName) : base($"{entityName} already exists.")
+        public AlreadyExistsException(string alreadyExistsResourceName) : base($"{alreadyExistsResourceName} already exists.")
         {
 
         }
