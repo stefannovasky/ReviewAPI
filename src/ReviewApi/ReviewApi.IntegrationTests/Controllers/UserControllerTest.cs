@@ -52,7 +52,7 @@ namespace ReviewApi.IntegrationTests.Controllers
         [Fact]
         public async Task ShouldReturnCreatedAtRouteOnCallCreate()
         {
-            CreateUserRequestModel model = new CreateUserRequestModel() { Email = "useremail@mail.com", Name = "User Name", Password = "User Password" };
+            CreateUserRequestModel model = new CreateUserRequestModel() { Email = "newuseremail@mail.com", Name = "New User Name", Password = "User Password" };
             HttpResponseMessage httpResponse = await _httpClient.PostAsync("../users", _createRequestHelper.CreateStringContent(model));
 
             Assert.Equal((int)HttpStatusCode.Created, (int)httpResponse.StatusCode);
