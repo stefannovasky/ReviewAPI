@@ -49,6 +49,18 @@ namespace ReviewApi.Infra.Repositories
             }
         }
 
+        public async Task<User> GetByIdIncludingImage(Guid id)
+        {
+            try
+            {
+                return await Query().Include(user => user.Image).SingleOrDefaultAsync(user => user.Id == id);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<User> GetByName(string name)
         {
             try
