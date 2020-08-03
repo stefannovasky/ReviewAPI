@@ -139,7 +139,7 @@ namespace ReviewApi.UnitTests.Domain.Entities
         public void ShouldResetPassword()
         {
             string code = "AAAAAAAA";
-            string newPasswordHash = "asdhjaudhaiduasd"; 
+            string newPasswordHash = "asdhjaudhaiduasd";
             User user = new User();
 
             user.UpdateResetPasswordCode(code);
@@ -150,13 +150,13 @@ namespace ReviewApi.UnitTests.Domain.Entities
         }
 
         [Fact]
-        public void ShouldUpdateProfileImage()
+        public void ShouldUpdateImage()
         {
-            Image image = new Image();
-
+            Guid id = Guid.NewGuid();
             User user = new User();
+            user.UpdateImageId(id);
 
-            user.UpdateProfileImage(image);
+            Assert.Equal(id, user.ImageId);
         }
     }
 }
