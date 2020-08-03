@@ -45,5 +45,11 @@ namespace ReviewApi.Domain.Entities
             FilePath = filePath;
             UserId = userId;
         }
+
+        public void Update(string fileName, string filePath)
+        {
+            FileName = fileName;
+            FilePath = filePath;
+        }
     }
 }
