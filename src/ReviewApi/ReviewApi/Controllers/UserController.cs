@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Models.User;
@@ -12,7 +13,7 @@ namespace ReviewApi.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserService _userService; 
+        private readonly IUserService _userService;
         public UserController(IUserService userService)
         {
             _userService = userService;
@@ -64,7 +65,7 @@ namespace ReviewApi.Controllers
         [HttpPut]
         [Authorize]
         [Route("name")]
-        public async Task<IActionResult> UpdateName(UpdateNameUserRequestModel model) 
+        public async Task<IActionResult> UpdateName(UpdateNameUserRequestModel model)
         {
             try
             {
@@ -93,7 +94,7 @@ namespace ReviewApi.Controllers
             }
         }
 
-        [HttpPost] 
+        [HttpPost]
         [Authorize]
         [Route("delete")]
         public async Task<IActionResult> Delete(DeleteUserRequestModel model)
@@ -116,7 +117,7 @@ namespace ReviewApi.Controllers
             try
             {
                 await _userService.ForgotPassword(model);
-                return Ok(); 
+                return Ok();
             }
             catch (Exception exception)
             {
@@ -147,6 +148,23 @@ namespace ReviewApi.Controllers
             try
             {
                 return Ok(await _userService.GetProfile(this.GetUserIdFromToken()));
+            }
+            catch (Exception exception)
+            {
+                return this.HandleException(exception);
+            }
+        }
+
+        [HttpPut]
+        [Authorize]
+        [Route("image")]
+        public async Task<IActionResult> UpdateProfileImage(IFormFile image)
+        {
+            try
+            {
+                this.ValidateImageFileAndThrow(image);
+                await _userService.UpdateProfileImage(this.GetUserIdFromToken(), image.OpenReadStream());
+                return Ok();
             }
             catch (Exception exception)
             {
