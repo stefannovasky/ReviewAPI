@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
@@ -24,6 +25,19 @@ namespace ReviewApi.Controllers.Extensions
         {
             string id = controller.HttpContext.User.Claims.First(i => i.Type == ClaimTypes.NameIdentifier).Value;
             return id;
+        }
+
+        public static void ValidateImageFileAndThrow(this ControllerBase controller, IFormFile image)
+        {
+            if (image.Length == 0)
+            {
+                throw new FluentValidation.ValidationException("image file not informed");
+            }
+            string fileExtension = Path.GetExtension(image.FileName).ToLower();
+            if (fileExtension != ".jpg" && fileExtension != ".png" && fileExtension != ".jpeg")
+            {
+                throw new FluentValidation.ValidationException("invalid image file");
+            }
         }
     }
 }
