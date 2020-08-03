@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 using ReviewApi.Application.Models.User;
 
 namespace ReviewApi.Application.Interfaces
@@ -14,5 +15,6 @@ namespace ReviewApi.Application.Interfaces
         Task ForgotPassword(ForgotPasswordUserRequestModel model);
         Task ResetPassword(ResetPasswordUserRequestModel model);
         Task<UserProfileResponseModel> GetProfile(string userId);
+        Task UpdateProfileImage(string userId, Stream imageStream);
     }
 }

@@ -15,6 +15,8 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Null(user.Email);
             Assert.Null(user.Password);
             Assert.Null(user.ConfirmationCode);
+            Assert.Null(user.Image);
+            Assert.Equal(Guid.Empty, user.ImageId);
             Assert.False(user.Confirmed);
             Assert.Equal(Guid.Empty.ToString(), user.Id.ToString());
             Assert.Null(user.ResetPasswordCode);
@@ -34,6 +36,8 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Null(user.ConfirmationCode);
             Assert.False(user.Confirmed);
             Assert.Null(user.ResetPasswordCode);
+            Assert.Null(user.Image);
+            Assert.Equal(Guid.Empty, user.ImageId);
         }
 
         [Fact]
@@ -52,6 +56,8 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.False(user.Confirmed);
             Assert.Null(user.ResetPasswordCode);
             Assert.Null(user.ConfirmationCode);
+            Assert.Null(user.Image);
+            Assert.Equal(Guid.Empty, user.ImageId);
         }
 
         [Fact]
@@ -71,6 +77,8 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.False(user.Confirmed);
             Assert.Null(user.ResetPasswordCode);
             Assert.Null(user.ConfirmationCode);
+            Assert.Null(user.Image);
+            Assert.Equal(Guid.Empty, user.ImageId);
         }
 
         [Fact]
@@ -131,7 +139,7 @@ namespace ReviewApi.UnitTests.Domain.Entities
         public void ShouldResetPassword()
         {
             string code = "AAAAAAAA";
-            string newPasswordHash = "asdhjaudhaiduasd"; 
+            string newPasswordHash = "asdhjaudhaiduasd";
             User user = new User();
 
             user.UpdateResetPasswordCode(code);
@@ -139,6 +147,16 @@ namespace ReviewApi.UnitTests.Domain.Entities
 
             Assert.NotEqual(code, user.ResetPasswordCode);
             Assert.Equal(newPasswordHash, user.Password);
+        }
+
+        [Fact]
+        public void ShouldUpdateImage()
+        {
+            Guid id = Guid.NewGuid();
+            User user = new User();
+            user.UpdateImageId(id);
+
+            Assert.Equal(id, user.ImageId);
         }
     }
 }

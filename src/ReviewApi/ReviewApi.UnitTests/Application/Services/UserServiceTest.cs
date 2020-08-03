@@ -1,9 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using NSubstitute;
 using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Models.User;
 using ReviewApi.Application.Services;
+using ReviewApi.Domain.Dto;
 using ReviewApi.Domain.Entities;
 using ReviewApi.Domain.Exceptions;
 using ReviewApi.Domain.Interfaces.Repositories;
@@ -19,18 +21,22 @@ namespace ReviewApi.UnitTests.Application.Services
         private readonly IHashUtils _hashUtilsMock;
         private readonly IEmailUtils _emailUtilsMock;
         private readonly IUserRepository _userRepositoryMock;
+        private readonly IImageRepository _imageRepositoryMock;
         private readonly IJwtTokenUtils _jwtTokenUtilsMock;
+        private readonly IFileUploadUtils _fileUploadUtilsMock;
         private readonly User _fakeNotConfirmedInsertedUser;
         private readonly User _fakeConfirmedInsertedUser;
 
         public UserServiceTest()
         {
             _userRepositoryMock = NSubstitute.Substitute.For<IUserRepository>();
+            _imageRepositoryMock = NSubstitute.Substitute.For<IImageRepository>();
             _randomCodeUtils = NSubstitute.Substitute.For<IRandomCodeUtils>();
             _hashUtilsMock = NSubstitute.Substitute.For<IHashUtils>();
             _emailUtilsMock = NSubstitute.Substitute.For<IEmailUtils>();
             _jwtTokenUtilsMock = NSubstitute.Substitute.For<IJwtTokenUtils>();
-            _userService = new UserService(_userRepositoryMock, _randomCodeUtils, _hashUtilsMock, _emailUtilsMock, _jwtTokenUtilsMock);
+            _fileUploadUtilsMock = NSubstitute.Substitute.For<IFileUploadUtils>();
+            _userService = new UserService(_userRepositoryMock, _imageRepositoryMock, _randomCodeUtils, _hashUtilsMock, _emailUtilsMock, _jwtTokenUtilsMock, _fileUploadUtilsMock);
 
             _fakeNotConfirmedInsertedUser = new User("Fake User", "fake_user@mail.com", "fake password");
             _fakeConfirmedInsertedUser = new User("Fake User", "fake_user@mail.com", "fake password");
@@ -90,9 +96,10 @@ namespace ReviewApi.UnitTests.Application.Services
         [Fact]
         public async Task ShouldCreateUser()
         {
-            User notExistsUser = null;
             CreateUserRequestModel model = new CreateUserRequestModel() { Email = "user@mail.com", Name = "user name", Password = "user password" };
-            _userRepositoryMock.GetByEmail(Arg.Any<string>()).Returns(notExistsUser);
+            _userRepositoryMock.GetByEmail(Arg.Any<string>()).Returns(null as User);
+            _fileUploadUtilsMock.GetDefaultUserProfileImage().Returns(new MemoryStream());
+            _fileUploadUtilsMock.UploadFile(Arg.Any<Stream>()).Returns(new FileDTO() { FileName = "FILENAME", FilePath = "FILEPATH" });
 
             Exception exception = await Record.ExceptionAsync(() => _userService.Create(model));
 
@@ -100,9 +107,13 @@ namespace ReviewApi.UnitTests.Application.Services
 
             _randomCodeUtils.Received(1).GenerateRandomCode();
             _hashUtilsMock.Received(1).GenerateHash(Arg.Is<string>(text => text == model.Password));
-            await _emailUtilsMock.Received(1).SendEmail(Arg.Is<string>(email => email == model.Email), Arg.Any<string>(), Arg.Any<string>());
+            await _fileUploadUtilsMock.Received(1).UploadFile(Arg.Any<Stream>());
             await _userRepositoryMock.Received(1).Create(Arg.Is<User>(user => user.Email == model.Email));
-            await _userRepositoryMock.Received(1).Save();
+            await _userRepositoryMock.Received(2).Save();
+            _userRepositoryMock.Received(1).Update(Arg.Is<User>(user => user.Email == model.Email));
+            await _imageRepositoryMock.Received(1).Create(Arg.Any<Image>());
+            await _imageRepositoryMock.Received(1).Save();
+            await _emailUtilsMock.Received(1).SendEmail(Arg.Is<string>(email => email == model.Email), Arg.Any<string>(), Arg.Any<string>());
         }
 
         [Fact]
@@ -412,13 +423,48 @@ namespace ReviewApi.UnitTests.Application.Services
         }
 
         [Fact]
-        public async Task ShouldThrowRUserNotConfirmedExceptionOnTryGetProfileOfNotConfirmedUser()
+        public async Task ShouldThrowUserNotConfirmedExceptionOnTryGetProfileOfNotConfirmedUser()
         {
             _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(_fakeNotConfirmedInsertedUser);
 
             Exception exception = await Record.ExceptionAsync(() => _userService.GetProfile(Guid.NewGuid().ToString()));
 
             Assert.IsType<UserNotConfirmedException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldThrowResourceNotFoundExceptionOnTryUpdateProfileImageInNotExistsUser()
+        {
+            _userRepositoryMock.GetByIdIncludingImage(Arg.Any<Guid>()).Returns(null as User);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.UpdateProfileImage(Guid.NewGuid().ToString(), new MemoryStream()));
+
+            Assert.IsType<ResourceNotFoundException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldThrowUserNotConfirmedExceptionOnTryUpdateProfileImageNotConfirmedUser()
+        {
+            _userRepositoryMock.GetByIdIncludingImage(Arg.Is<Guid>(id => id == _fakeNotConfirmedInsertedUser.Id)).Returns(_fakeNotConfirmedInsertedUser);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.UpdateProfileImage(_fakeNotConfirmedInsertedUser.Id.ToString(), new MemoryStream()));
+
+            Assert.IsType<UserNotConfirmedException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldUpdateProfileImage()
+        {
+            _userRepositoryMock.GetByIdIncludingImage(Arg.Is<Guid>(id => id == _fakeConfirmedInsertedUser.Id)).Returns(_fakeConfirmedInsertedUser);
+            _fileUploadUtilsMock.UploadFile(Arg.Any<Stream>()).Returns(new FileDTO() { FileName = "FILENAME", FilePath = "FILEPATH" });
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.UpdateProfileImage(_fakeConfirmedInsertedUser.Id.ToString(), new MemoryStream()));
+
+            Assert.Null(exception);
+            await _fileUploadUtilsMock.Received(1).UploadFile(Arg.Any<Stream>());
+            _imageRepositoryMock.Received(1).Update(Arg.Any<Image>());
+            await _userRepositoryMock.Received(1).Save();
+            await _imageRepositoryMock.Received(1).Save();
         }
     }
 }

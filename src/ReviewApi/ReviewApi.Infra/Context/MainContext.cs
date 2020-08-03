@@ -20,6 +20,7 @@ namespace ReviewApi.Infra.Context
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(MainContext).Assembly);
 
             modelBuilder.ApplyConfiguration(new UserMapConfig());
+            modelBuilder.ApplyConfiguration(new ImageMapConfig());
 
             base.OnModelCreating(modelBuilder);
         }

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ReviewApi.Infra.Context;
 
 namespace ReviewApi.Infra.Migrations
 {
     [DbContext(typeof(MainContext))]
-    partial class MainContextModelSnapshot : ModelSnapshot
+    [Migration("20200802050158_CreateImageTable")]
+    partial class CreateImageTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,8 +31,9 @@ namespace ReviewApi.Infra.Migrations
                     b.Property<string>("FileName")
                         .IsRequired()
                         .HasColumnName("filename")
-                        .HasColumnType("nvarchar(41)")
-                        .HasMaxLength(41);
+                        .HasColumnType("nchar(36)")
+                        .IsFixedLength(true)
+                        .HasMaxLength(36);
 
                     b.Property<string>("FilePath")
                         .IsRequired()
