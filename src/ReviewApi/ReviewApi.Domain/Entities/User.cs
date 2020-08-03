@@ -1,4 +1,5 @@
 ﻿using System;
+using ReviewApi.Domain.Dto;
 
 namespace ReviewApi.Domain.Entities
 {
@@ -68,9 +69,9 @@ namespace ReviewApi.Domain.Entities
             ResetPasswordCode = null;
             Password = newPasswordHash;
         }
-        public void UpdateProfileImage(Image image)
+        public void UpdateImageId(Guid imageId)
         {
-            Image = image; 
+            ImageId = imageId;
         }
     }
 }
