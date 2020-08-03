@@ -1,9 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Models.User;
 using ReviewApi.Application.Validators.Extensions;
 using ReviewApi.Application.Validators.User;
+using ReviewApi.Domain.Dto;
 using ReviewApi.Domain.Entities;
 using ReviewApi.Domain.Exceptions;
 using ReviewApi.Domain.Interfaces.Repositories;
@@ -14,18 +16,22 @@ namespace ReviewApi.Application.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IImageRepository _imageRepository;
         private readonly IRandomCodeUtils _randomCodeUtils;
         private readonly IHashUtils _hashUtils;
         private readonly IEmailUtils _emailUtils;
         private readonly IJwtTokenUtils _jwtTokenUtils;
+        private readonly IFileUploadUtils _fileUploadUtils;
 
-        public UserService(IUserRepository userRepository, IRandomCodeUtils randomCodeUtils, IHashUtils hashUtils, IEmailUtils emailUtils, IJwtTokenUtils jwtTokenUtils)
+        public UserService(IUserRepository userRepository, IImageRepository imageRepository, IRandomCodeUtils randomCodeUtils, IHashUtils hashUtils, IEmailUtils emailUtils, IJwtTokenUtils jwtTokenUtils, IFileUploadUtils fileUploadUtils)
         {
             _userRepository = userRepository;
+            _imageRepository = imageRepository;
             _randomCodeUtils = randomCodeUtils;
             _hashUtils = hashUtils;
             _emailUtils = emailUtils;
             _jwtTokenUtils = jwtTokenUtils;
+            _fileUploadUtils = fileUploadUtils;
         }
 
         public async Task<AuthenticationUserResponseModel> Authenticate(AuthenticationUserRequestModel model)
@@ -37,7 +43,7 @@ namespace ReviewApi.Application.Services
 
             if (!_hashUtils.CompareHash(model.Password, user.Password))
             {
-                throw new InvalidPasswordException(); 
+                throw new InvalidPasswordException();
             }
 
             UserResponseModel userResponseModel = new UserResponseModel() { Name = user.Name };
@@ -73,6 +79,7 @@ namespace ReviewApi.Application.Services
 
             await _userRepository.Create(user);
             await _userRepository.Save();
+            await SetNewRegisteredUserProfileImage(user);
 
             await _emailUtils.SendEmail(user.Email, "Confirmation", $"Please confirm your account using this code {user.ConfirmationCode}");
         }
@@ -128,7 +135,7 @@ namespace ReviewApi.Application.Services
             user.ResetPassword(_hashUtils.GenerateHash(model.NewPassword));
 
             _userRepository.Update(user);
-            await _userRepository.Save(); 
+            await _userRepository.Save();
         }
 
         public async Task UpdatePassword(string userId, UpdatePasswordUserRequestModel model)
@@ -154,7 +161,7 @@ namespace ReviewApi.Application.Services
         public async Task UpdateUserName(string userId, UpdateNameUserRequestModel model)
         {
             await new UpdateNameUserValidator().ValidateRequestModelAndThrow(model);
-            
+
             User user = await _userRepository.GetById(Guid.Parse(userId));
             VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
 
@@ -162,6 +169,18 @@ namespace ReviewApi.Application.Services
 
             _userRepository.Update(user);
             await _userRepository.Save();
+        }
+
+        public async Task UpdateProfileImage(string userId, Stream imageStream)
+        {
+            User user = await _userRepository.GetByIdIncludingImage(Guid.Parse(userId));
+            VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
+
+            FileDTO uploadedImage = await _fileUploadUtils.UploadFile(imageStream);
+            _imageRepository.Update(new Image(user.ImageId, uploadedImage.FileName, uploadedImage.FilePath, user.Id));
+
+            await _userRepository.Save();
+            await _imageRepository.Save();
         }
 
         private void VerifyIfUserIsNullOrNotConfirmedAndThrow(User user)
@@ -200,6 +219,20 @@ namespace ReviewApi.Application.Services
                 }
                 throw new AlreadyExistsException("user email");
             }
+        }
+
+        private async Task SetNewRegisteredUserProfileImage(User registeredUser)
+        {
+            Stream userDefaultProfileImage = _fileUploadUtils.GetDefaultUserProfileImage();
+            FileDTO uploadedProfileImage = await _fileUploadUtils.UploadFile(userDefaultProfileImage);
+
+            Image image = new Image(uploadedProfileImage.FileName, uploadedProfileImage.FilePath, registeredUser.Id);
+            await _imageRepository.Create(image);
+            await _imageRepository.Save();
+
+            registeredUser.UpdateImageId(image.Id);
+            _userRepository.Update(registeredUser);
+            await _userRepository.Save();
         }
     }
 }
