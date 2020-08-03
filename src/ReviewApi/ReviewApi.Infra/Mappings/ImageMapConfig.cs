@@ -19,14 +19,17 @@ namespace ReviewApi.Infra.Mappings
 
             builder.Property(p => p.FileName)
                 .HasColumnName("filename")
-                .IsFixedLength()
-                .HasMaxLength(36)
+                .HasMaxLength(41)
                 .IsRequired();
 
             builder.Property(p => p.FilePath)
                 .HasColumnName("filepath")
                 .HasMaxLength(300)
                 .IsRequired();
+
+            builder.HasOne<User>(a => a.User)
+                .WithOne(b => b.Image)
+                .HasForeignKey<User>(b => b.ImageId);
         }
     }
 }
