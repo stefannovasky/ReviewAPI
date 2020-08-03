@@ -21,9 +21,11 @@ namespace ReviewApi
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly string _webApplicationRootPath;
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            _webApplicationRootPath = env.WebRootPath;
         }
 
         public IConfiguration Configuration { get; }
@@ -52,6 +54,7 @@ namespace ReviewApi
                 };
             });
 
+            services.AddTransient<IImageRepository, ImageRepository>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IUserService, UserService>();
 
@@ -62,6 +65,7 @@ namespace ReviewApi
             services.AddTransient<IEmailUtils, EmailUtils>();
             services.AddTransient<IJsonUtils, JsonUtils>();
             services.AddTransient<IJwtTokenUtils>(service => new JwtTokenUtils(Configuration.GetValue<string>("Secret")));
+            services.AddTransient<IFileUploadUtils>(service => new FileUploadUtils(_webApplicationRootPath));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
