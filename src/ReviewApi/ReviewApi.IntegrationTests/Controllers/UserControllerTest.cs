@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using ReviewApi.Application.Models.User;
 using ReviewApi.Domain.Entities;
@@ -38,7 +37,7 @@ namespace ReviewApi.IntegrationTests.Controllers
 
             _database = new MainContext(options);
         }
-        
+
         private async Task<Guid> InsertUserOnDatabase()
         {
             _database.Database.EnsureCreated();
@@ -48,7 +47,7 @@ namespace ReviewApi.IntegrationTests.Controllers
             await _database.SaveChangesAsync();
             return user.Id;
         }
-        
+
         [Fact]
         public async Task ShouldReturnCreatedAtRouteOnCallCreate()
         {
