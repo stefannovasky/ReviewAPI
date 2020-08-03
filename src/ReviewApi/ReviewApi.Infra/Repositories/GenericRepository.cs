@@ -84,7 +84,7 @@ namespace ReviewApi.Infra.Repositories
         {
             try
             {
-                _dbSet.Update(entity);
+                _dbContext.Update(entity);
             }
             catch (Exception)
             {
