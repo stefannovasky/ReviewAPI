@@ -254,18 +254,16 @@ namespace ReviewApi.UnitTests.Application.Services
         [Fact]
         public async Task ShouldInvalidPasswordExceptionOnTryUpdateUserPasswordWithIncorrectOldPassword()
         {
-            Guid userId = Guid.NewGuid();
-            User registeredUser = new User(userId, "user name", "user@mail.com", "user password");
             UpdatePasswordUserRequestModel model = new UpdatePasswordUserRequestModel()
             {
                 OldPassword = "incorrect password",
                 NewPassword = "new password",
                 NewPasswordConfirmation = "new password"
             };
-            _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(registeredUser);
+            _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(_fakeConfirmedInsertedUser);
             _hashUtilsMock.CompareHash(Arg.Any<string>(), Arg.Any<string>()).Returns(false);
 
-            Exception exception = await Record.ExceptionAsync(() => _userService.UpdatePassword(userId.ToString(), model));
+            Exception exception = await Record.ExceptionAsync(() => _userService.UpdatePassword(_fakeConfirmedInsertedUser.Id.ToString(), model));
 
             Assert.IsType<InvalidPasswordException>(exception);
         }
@@ -273,18 +271,16 @@ namespace ReviewApi.UnitTests.Application.Services
         [Fact]
         public async Task ShouldUpdateUserPassword()
         {
-            Guid userId = Guid.NewGuid();
-            User registeredUser = new User(userId, "user name", "user@mail.com", "user password");
             UpdatePasswordUserRequestModel model = new UpdatePasswordUserRequestModel()
             {
                 OldPassword = "new password",
                 NewPassword = "new password",
                 NewPasswordConfirmation = "new password"
             };
-            _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(registeredUser);
+            _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(_fakeConfirmedInsertedUser);
             _hashUtilsMock.CompareHash(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
 
-            Exception exception = await Record.ExceptionAsync(() => _userService.UpdatePassword(userId.ToString(), model));
+            Exception exception = await Record.ExceptionAsync(() => _userService.UpdatePassword(_fakeConfirmedInsertedUser.Id.ToString(), model));
 
             Assert.Null(exception);
             await _userRepositoryMock.Received(1).Save();
