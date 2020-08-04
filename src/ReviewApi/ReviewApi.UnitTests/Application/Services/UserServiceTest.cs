@@ -100,7 +100,7 @@ namespace ReviewApi.UnitTests.Application.Services
             CreateUserRequestModel model = new CreateUserRequestModel() { Email = "user@mail.com", Name = "user name", Password = "user password" };
             _userRepositoryMock.GetByEmail(Arg.Any<string>()).Returns(null as User);
             _fileUploadUtilsMock.GetDefaultUserProfileImage().Returns(new MemoryStream());
-            _fileUploadUtilsMock.UploadFile(Arg.Any<Stream>()).Returns(new FileDTO() { FileName = "FILENAME", FilePath = "FILEPATH" });
+            _fileUploadUtilsMock.UploadImage(Arg.Any<Stream>()).Returns(new FileDTO() { FileName = "FILENAME", FilePath = "FILEPATH" });
 
             Exception exception = await Record.ExceptionAsync(() => _userService.Create(model));
 
@@ -108,7 +108,7 @@ namespace ReviewApi.UnitTests.Application.Services
 
             _randomCodeUtils.Received(1).GenerateRandomCode();
             _hashUtilsMock.Received(1).GenerateHash(Arg.Is<string>(text => text == model.Password));
-            await _fileUploadUtilsMock.Received(1).UploadFile(Arg.Any<Stream>());
+            await _fileUploadUtilsMock.Received(1).UploadImage(Arg.Any<Stream>());
             await _userRepositoryMock.Received(1).Create(Arg.Is<User>(user => user.Email == model.Email));
             await _userRepositoryMock.Received(2).Save();
             _userRepositoryMock.Received(1).Update(Arg.Is<User>(user => user.Email == model.Email));
@@ -454,12 +454,12 @@ namespace ReviewApi.UnitTests.Application.Services
         public async Task ShouldUpdateProfileImage()
         {
             _userRepositoryMock.GetByIdIncludingImage(Arg.Is<Guid>(id => id == _fakeConfirmedInsertedUser.Id)).Returns(_fakeConfirmedInsertedUser);
-            _fileUploadUtilsMock.UploadFile(Arg.Any<Stream>()).Returns(new FileDTO() { FileName = "FILENAME", FilePath = "FILEPATH" });
+            _fileUploadUtilsMock.UploadImage(Arg.Any<Stream>()).Returns(new FileDTO() { FileName = "FILENAME", FilePath = "FILEPATH" });
 
             Exception exception = await Record.ExceptionAsync(() => _userService.UpdateProfileImage(_fakeConfirmedInsertedUser.Id.ToString(), new MemoryStream()));
 
             Assert.Null(exception);
-            await _fileUploadUtilsMock.Received(1).UploadFile(Arg.Any<Stream>());
+            await _fileUploadUtilsMock.Received(1).UploadImage(Arg.Any<Stream>());
             _imageRepositoryMock.Received(1).Update(Arg.Any<Image>());
             await _userRepositoryMock.Received(1).Save();
             await _imageRepositoryMock.Received(1).Save();
