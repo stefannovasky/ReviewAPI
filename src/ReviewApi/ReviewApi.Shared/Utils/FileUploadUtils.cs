@@ -35,7 +35,7 @@ namespace ReviewApi.Shared.Utils
             return File.OpenRead($@"{_rootPath}\\Images\\default-user-profile-image.jpg");
         }
 
-        public async Task<FileDTO> UploadFile(Stream stream)
+        public async Task<FileDTO> UploadImage(Stream imageStream)
         {
             string imagePath = @"\Upload\Images\";
             string uploadPath = $"{_rootPath}{imagePath}";
@@ -50,7 +50,7 @@ namespace ReviewApi.Shared.Utils
             string fullPath = $"{uploadPath}{filenameWithExtension}";
             using (FileStream fileStream = new FileStream(fullPath, FileMode.Create))
             {
-                await stream.CopyToAsync(fileStream);
+                await imageStream.CopyToAsync(fileStream);
             }
 
             return new FileDTO() { FileName = filenameWithExtension, FilePath = fullPath };

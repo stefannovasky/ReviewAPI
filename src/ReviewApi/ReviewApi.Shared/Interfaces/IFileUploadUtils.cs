@@ -6,7 +6,7 @@ namespace ReviewApi.Shared.Interfaces
 {
     public interface IFileUploadUtils
     {
-        Task<FileDTO> UploadFile(Stream fileStream);
+        Task<FileDTO> UploadImage(Stream imageStream);
         Stream GetDefaultUserProfileImage();
         Stream GetImage(string name);
         string GenerateImageUrl(string imageName);
