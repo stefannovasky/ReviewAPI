@@ -41,6 +41,7 @@ namespace ReviewApi.UnitTests.Application.Services
             _fakeNotConfirmedInsertedUser = new User("Fake User", "fake_user@mail.com", "fake password");
             _fakeConfirmedInsertedUser = new User("Fake User", "fake_user@mail.com", "fake password");
             _fakeConfirmedInsertedUser.Confirm();
+            _fakeConfirmedInsertedUser.AddImage(new Image("FILENAME", "FILEPATH"));
         }
 
         [Fact]
@@ -404,12 +405,13 @@ namespace ReviewApi.UnitTests.Application.Services
         [Fact]
         public async Task ShouldGetUserProfile()
         {
-            _userRepositoryMock.GetById(Arg.Is<Guid>(id => id == _fakeConfirmedInsertedUser.Id)).Returns(_fakeConfirmedInsertedUser);
+            _userRepositoryMock.GetByIdIncludingImage(Arg.Is<Guid>(id => id == _fakeConfirmedInsertedUser.Id)).Returns(_fakeConfirmedInsertedUser);
 
             UserProfileResponseModel response = await _userService.GetProfile(_fakeConfirmedInsertedUser.Id.ToString());
 
             Assert.Equal(_fakeConfirmedInsertedUser.Name, response.Name);
             Assert.Equal(_fakeConfirmedInsertedUser.Email, response.Email);
+            _fileUploadUtilsMock.Received(1).GenerateImageUrl(Arg.Any<string>());
         }
 
         [Fact]
@@ -425,7 +427,7 @@ namespace ReviewApi.UnitTests.Application.Services
         [Fact]
         public async Task ShouldThrowUserNotConfirmedExceptionOnTryGetProfileOfNotConfirmedUser()
         {
-            _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(_fakeNotConfirmedInsertedUser);
+            _userRepositoryMock.GetByIdIncludingImage(Arg.Any<Guid>()).Returns(_fakeNotConfirmedInsertedUser);
 
             Exception exception = await Record.ExceptionAsync(() => _userService.GetProfile(Guid.NewGuid().ToString()));
 
