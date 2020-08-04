@@ -73,5 +73,9 @@ namespace ReviewApi.Domain.Entities
         {
             ImageId = imageId;
         }
+        public void AddImage(Image image)
+        {
+            Image = image;
+        }
     }
 }
