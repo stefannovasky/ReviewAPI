@@ -1,3 +1,6 @@
+using System.IO;
+using System.Reflection;
+using log4net.Repository;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +16,9 @@ namespace ReviewApi
     {
         public static void Main(string[] args)
         {
+            ILoggerRepository log4netRepository = log4net.LogManager.GetRepository(Assembly.GetEntryAssembly());
+            log4net.Config.XmlConfigurator.Configure(log4netRepository, new FileInfo("log4net.config"));
+
             CreateHostBuilder(args).Build().Run();
         }
 
@@ -21,7 +27,8 @@ namespace ReviewApi
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                }).ConfigureServices(services =>
+                })
+                .ConfigureServices(services =>
                 {
                     IConfigurationRoot configs = new ConfigurationBuilder().AddJsonFile("appsettings.json", false).Build();
 
