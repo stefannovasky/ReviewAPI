@@ -29,7 +29,7 @@ namespace ReviewApi.Controllers
             }
             catch (Exception exception)
             {
-                return this.HandleException(exception);
+                return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
             }
         }
 
@@ -43,7 +43,7 @@ namespace ReviewApi.Controllers
             }
             catch (Exception exception)
             {
-                return this.HandleException(exception);
+                return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
             }
         }
 
@@ -58,7 +58,7 @@ namespace ReviewApi.Controllers
             }
             catch (Exception exception)
             {
-                return this.HandleException(exception);
+                return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
             }
         }
 
@@ -74,7 +74,7 @@ namespace ReviewApi.Controllers
             }
             catch (Exception exception)
             {
-                return this.HandleException(exception);
+                return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
             }
         }
 
@@ -90,7 +90,7 @@ namespace ReviewApi.Controllers
             }
             catch (Exception exception)
             {
-                return this.HandleException(exception);
+                return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
             }
         }
 
@@ -106,7 +106,7 @@ namespace ReviewApi.Controllers
             }
             catch (Exception exception)
             {
-                return this.HandleException(exception);
+                return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
             }
         }
 
@@ -121,7 +121,7 @@ namespace ReviewApi.Controllers
             }
             catch (Exception exception)
             {
-                return this.HandleException(exception);
+                return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
             }
         }
 
@@ -136,7 +136,7 @@ namespace ReviewApi.Controllers
             }
             catch (Exception exception)
             {
-                return this.HandleException(exception);
+                return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
             }
         }
 
@@ -151,7 +151,7 @@ namespace ReviewApi.Controllers
             }
             catch (Exception exception)
             {
-                return this.HandleException(exception);
+                return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
             }
         }
 
@@ -168,7 +168,7 @@ namespace ReviewApi.Controllers
             }
             catch (Exception exception)
             {
-                return this.HandleException(exception);
+                return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
             }
         }
     }
