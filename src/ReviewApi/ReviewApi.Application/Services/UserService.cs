@@ -119,10 +119,11 @@ namespace ReviewApi.Application.Services
 
         public async Task<UserProfileResponseModel> GetProfile(string userId)
         {
-            User user = await _userRepository.GetById(Guid.Parse(userId));
+            User user = await _userRepository.GetByIdIncludingImage(Guid.Parse(userId));
             VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
+            string imageUrl = _fileUploadUtils.GenerateImageUrl(user.Image.FileName);
 
-            return new UserProfileResponseModel() { Email = user.Email, Name = user.Name };
+            return new UserProfileResponseModel() { Email = user.Email, Name = user.Name, Image = imageUrl };
         }
 
         public async Task ResetPassword(ResetPasswordUserRequestModel model)

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using ReviewApi.Domain.Dto;
+using ReviewApi.Domain.Exceptions;
 using ReviewApi.Shared.Interfaces;
 
 namespace ReviewApi.Shared.Utils
@@ -10,10 +10,24 @@ namespace ReviewApi.Shared.Utils
     public class FileUploadUtils : IFileUploadUtils
     {
         private readonly string _rootPath;
+        private readonly string _webApplicationUrl;
 
-        public FileUploadUtils(string rootPath)
+        public FileUploadUtils(string rootPath, string webApplicationUrl)
         {
             _rootPath = rootPath;
+            _webApplicationUrl = webApplicationUrl;
+        }
+
+        public Stream GetImage(string name)
+        {
+            try
+            {
+                return File.OpenRead($"{_rootPath}\\Upload\\Images\\{name}");
+            }
+            catch (FileNotFoundException)
+            {
+                throw new ResourceNotFoundException("image not found.");
+            }
         }
 
         public Stream GetDefaultUserProfileImage()
@@ -40,6 +54,11 @@ namespace ReviewApi.Shared.Utils
             }
 
             return new FileDTO() { FileName = filenameWithExtension, FilePath = fullPath };
+        }
+
+        public string GenerateImageUrl(string imageName)
+        {
+            return $"{_webApplicationUrl}/images/{imageName}";
         }
     }
 }

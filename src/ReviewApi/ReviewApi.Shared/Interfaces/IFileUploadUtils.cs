@@ -8,5 +8,7 @@ namespace ReviewApi.Shared.Interfaces
     {
         Task<FileDTO> UploadFile(Stream fileStream);
         Stream GetDefaultUserProfileImage();
+        Stream GetImage(string name);
+        string GenerateImageUrl(string imageName);
     }
 }
