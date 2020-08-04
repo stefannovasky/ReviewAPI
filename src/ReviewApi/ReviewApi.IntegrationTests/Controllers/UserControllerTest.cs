@@ -45,6 +45,10 @@ namespace ReviewApi.IntegrationTests.Controllers
             await _database.Set<User>().AddAsync(user);
             user.Confirm();
             await _database.SaveChangesAsync();
+            Image image = new Image("FILENAME", "FILEPATH", user.Id);
+            await _database.Set<Image>().AddAsync(image);
+            user.AddImage(image);
+            await _database.SaveChangesAsync();
             return user.Id;
         }
 
