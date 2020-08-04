@@ -171,7 +171,7 @@ namespace ReviewApi.Application.Services
             User user = await _userRepository.GetByIdIncludingImage(Guid.Parse(userId));
             VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
 
-            FileDTO uploadedImage = await _fileUploadUtils.UploadFile(imageStream);
+            FileDTO uploadedImage = await _fileUploadUtils.UploadImage(imageStream);
             _imageRepository.Update(new Image(user.ImageId, uploadedImage.FileName, uploadedImage.FilePath, user.Id));
 
             await _userRepository.Save();
@@ -219,7 +219,7 @@ namespace ReviewApi.Application.Services
         private async Task SetNewRegisteredUserProfileImage(User registeredUser)
         {
             Stream userDefaultProfileImage = _fileUploadUtils.GetDefaultUserProfileImage();
-            FileDTO uploadedProfileImage = await _fileUploadUtils.UploadFile(userDefaultProfileImage);
+            FileDTO uploadedProfileImage = await _fileUploadUtils.UploadImage(userDefaultProfileImage);
 
             Image image = new Image(uploadedProfileImage.FileName, uploadedProfileImage.FilePath, registeredUser.Id);
             await _imageRepository.Create(image);
