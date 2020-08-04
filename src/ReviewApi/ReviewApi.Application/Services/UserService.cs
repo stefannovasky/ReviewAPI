@@ -89,10 +89,7 @@ namespace ReviewApi.Application.Services
             await new DeleteUserValidator().ValidateRequestModelAndThrow(model);
 
             User user = await _userRepository.GetById(Guid.Parse(userId));
-            if (user == null)
-            {
-                throw new ResourceNotFoundException("user not found.");
-            }
+            VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
             if (!_hashUtils.CompareHash(model.Password, user.Password))
             {
                 throw new InvalidPasswordException();
@@ -144,10 +141,7 @@ namespace ReviewApi.Application.Services
             await new UpdatePasswordUserValidator().ValidateRequestModelAndThrow(model);
 
             User user = await _userRepository.GetById(Guid.Parse(userId));
-            if (user == null)
-            {
-                throw new ResourceNotFoundException("user not found.");
-            }
+            VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
             if (!_hashUtils.CompareHash(model.OldPassword, user.Password))
             {
                 throw new InvalidPasswordException();
