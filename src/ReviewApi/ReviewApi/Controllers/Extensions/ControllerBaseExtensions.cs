@@ -1,16 +1,21 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Claims;
+using log4net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using ReviewApi.Domain.Exceptions;
 
 namespace ReviewApi.Controllers.Extensions
 {
     public static class ControllerBaseExtensions
     {
-        public static IActionResult HandleException(this ControllerBase controller, Exception exception)
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        public static IActionResult HandleExceptionToUserAndLogIfExceptionIsUnexpected(this ControllerBase controller, Exception exception)
         {
             if (exception is AlreadyExistsException || exception is FluentValidation.ValidationException
             || exception is UserNotConfirmedException || exception is ResourceNotFoundException || exception is InvalidPasswordException)
@@ -18,6 +23,7 @@ namespace ReviewApi.Controllers.Extensions
                 return controller.BadRequest(new { Error = new { Message = exception.Message } });
             }
 
+            log.Error(JsonConvert.SerializeObject(exception));
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
 

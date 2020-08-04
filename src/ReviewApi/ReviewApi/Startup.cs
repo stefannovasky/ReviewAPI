@@ -69,6 +69,7 @@ namespace ReviewApi
             services.AddTransient<IJsonUtils, JsonUtils>();
             services.AddTransient<IJwtTokenUtils>(service => new JwtTokenUtils(Configuration.GetValue<string>("Secret")));
             services.AddTransient<IFileUploadUtils>(service => new FileUploadUtils(_webApplicationRootPath, _webApplicationUrl));
+            services.AddTransient<ILogUtils, LogUtils>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
