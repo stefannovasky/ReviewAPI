@@ -6,7 +6,7 @@ namespace ReviewApi.Domain.Entities
     {
         public string Title { get; protected set; }
         public string Text { get; protected set; }
-        public int Start { get; protected set; }
+        public int Stars { get; protected set; }
         public Guid CreatorId { get; protected set; }
         public User Creator { get; protected set; }
         public ReviewImage Image { get; protected set; }
@@ -16,11 +16,11 @@ namespace ReviewApi.Domain.Entities
 
         }
 
-        public Review(string title, string text, int start, Guid creatorId)
+        public Review(string title, string text, int stars, Guid creatorId)
         {
             Title = title;
             Text = text;
-            Start = start;
+            Stars = stars;
             CreatorId = creatorId;
         }
 
