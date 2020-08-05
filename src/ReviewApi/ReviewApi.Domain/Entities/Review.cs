@@ -28,5 +28,12 @@ namespace ReviewApi.Domain.Entities
         {
             Image = image;
         }
+
+        public void Update(string title, string text, int stars)
+        {
+            Title = title;
+            Text = text;
+            Stars = stars;
+        }
     }
 }
