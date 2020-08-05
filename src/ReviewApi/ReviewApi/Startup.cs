@@ -60,6 +60,7 @@ namespace ReviewApi
             services.AddTransient<IImageService, ImageService>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IReviewRepository, ReviewRepository>(); 
 
             services.AddTransient<IRedisConnector>(service => new RedisConnector(Configuration.GetConnectionString("RedisConnection")));
 
