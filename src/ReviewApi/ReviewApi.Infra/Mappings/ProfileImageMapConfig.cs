@@ -4,11 +4,11 @@ using ReviewApi.Domain.Entities;
 
 namespace ReviewApi.Infra.Mappings
 {
-    public class ImageMapConfig : IEntityTypeConfiguration<Image>
+    public class ProfileImageMapConfig : IEntityTypeConfiguration<ProfileImage>
     {
-        public void Configure(EntityTypeBuilder<Image> builder)
+        public void Configure(EntityTypeBuilder<ProfileImage> builder)
         {
-            builder.ToTable("images");
+            builder.ToTable("profile_images");
 
             builder.Property(p => p.Id).HasColumnName("id");
 
@@ -28,8 +28,7 @@ namespace ReviewApi.Infra.Mappings
                 .IsRequired();
 
             builder.HasOne<User>(a => a.User)
-                .WithOne(b => b.Image)
-                .HasForeignKey<User>(b => b.ImageId);
+                .WithOne(b => b.ProfileImage);
         }
     }
 }

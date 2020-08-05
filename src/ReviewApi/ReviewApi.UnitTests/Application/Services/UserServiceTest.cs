@@ -21,7 +21,7 @@ namespace ReviewApi.UnitTests.Application.Services
         private readonly IHashUtils _hashUtilsMock;
         private readonly IEmailUtils _emailUtilsMock;
         private readonly IUserRepository _userRepositoryMock;
-        private readonly IImageRepository _imageRepositoryMock;
+        private readonly IProfileImageRepository _imageRepositoryMock;
         private readonly IJwtTokenUtils _jwtTokenUtilsMock;
         private readonly IFileUploadUtils _fileUploadUtilsMock;
         private readonly User _fakeNotConfirmedInsertedUser;
@@ -30,7 +30,7 @@ namespace ReviewApi.UnitTests.Application.Services
         public UserServiceTest()
         {
             _userRepositoryMock = NSubstitute.Substitute.For<IUserRepository>();
-            _imageRepositoryMock = NSubstitute.Substitute.For<IImageRepository>();
+            _imageRepositoryMock = NSubstitute.Substitute.For<IProfileImageRepository>();
             _randomCodeUtils = NSubstitute.Substitute.For<IRandomCodeUtils>();
             _hashUtilsMock = NSubstitute.Substitute.For<IHashUtils>();
             _emailUtilsMock = NSubstitute.Substitute.For<IEmailUtils>();
@@ -41,7 +41,7 @@ namespace ReviewApi.UnitTests.Application.Services
             _fakeNotConfirmedInsertedUser = new User("Fake User", "fake_user@mail.com", "fake password");
             _fakeConfirmedInsertedUser = new User("Fake User", "fake_user@mail.com", "fake password");
             _fakeConfirmedInsertedUser.Confirm();
-            _fakeConfirmedInsertedUser.AddImage(new Image("FILENAME", "FILEPATH"));
+            _fakeConfirmedInsertedUser.AddProfileImage(new ProfileImage("FILENAME", "FILEPATH"));
         }
 
         [Fact]
@@ -110,10 +110,7 @@ namespace ReviewApi.UnitTests.Application.Services
             _hashUtilsMock.Received(1).GenerateHash(Arg.Is<string>(text => text == model.Password));
             await _fileUploadUtilsMock.Received(1).UploadImage(Arg.Any<Stream>());
             await _userRepositoryMock.Received(1).Create(Arg.Is<User>(user => user.Email == model.Email));
-            await _userRepositoryMock.Received(2).Save();
-            _userRepositoryMock.Received(1).Update(Arg.Is<User>(user => user.Email == model.Email));
-            await _imageRepositoryMock.Received(1).Create(Arg.Any<Image>());
-            await _imageRepositoryMock.Received(1).Save();
+            await _userRepositoryMock.Received(1).Save();
             await _emailUtilsMock.Received(1).SendEmail(Arg.Is<string>(email => email == model.Email), Arg.Any<string>(), Arg.Any<string>());
         }
 
@@ -460,7 +457,7 @@ namespace ReviewApi.UnitTests.Application.Services
 
             Assert.Null(exception);
             await _fileUploadUtilsMock.Received(1).UploadImage(Arg.Any<Stream>());
-            _imageRepositoryMock.Received(1).Update(Arg.Any<Image>());
+            _imageRepositoryMock.Received(1).Update(Arg.Any<ProfileImage>());
             await _userRepositoryMock.Received(1).Save();
             await _imageRepositoryMock.Received(1).Save();
         }

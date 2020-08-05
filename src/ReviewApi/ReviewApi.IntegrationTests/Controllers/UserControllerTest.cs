@@ -38,19 +38,19 @@ namespace ReviewApi.IntegrationTests.Controllers
             _database = new MainContext(options);
         }
 
+        
         private async Task<Guid> InsertUserOnDatabase()
         {
             _database.Database.EnsureCreated();
             User user = new User("User Name", "user@mail.com", new HashUtils().GenerateHash("User password"));
+            ProfileImage image = new ProfileImage("FILENAME", "FILEPATH");
+            user.AddProfileImage(image);
             await _database.Set<User>().AddAsync(user);
             user.Confirm();
             await _database.SaveChangesAsync();
-            Image image = new Image("FILENAME", "FILEPATH", user.Id);
-            await _database.Set<Image>().AddAsync(image);
-            user.AddImage(image);
-            await _database.SaveChangesAsync();
             return user.Id;
         }
+        
 
         [Fact]
         public async Task ShouldReturnCreatedAtRouteOnCallCreate()

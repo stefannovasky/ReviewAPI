@@ -39,14 +39,9 @@ namespace ReviewApi.Infra.Mappings
                 .HasColumnName("reset_password_code")
                 .HasMaxLength(8);
 
-            builder.Property(p => p.ImageId)
-                .HasColumnName("image_id")
-                .HasMaxLength(36)
-                .HasDefaultValue(null);
-
-            builder.HasOne<Image>(a => a.Image)
+            builder.HasOne<ProfileImage>(a => a.ProfileImage)
                 .WithOne(b => b.User)
-                .HasForeignKey<Image>(b => b.UserId);
+                .HasForeignKey<ProfileImage>(b => b.UserId);
         }
     }
 }

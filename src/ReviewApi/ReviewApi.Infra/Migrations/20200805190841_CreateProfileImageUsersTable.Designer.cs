@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ReviewApi.Infra.Context;
 
 namespace ReviewApi.Infra.Migrations
 {
     [DbContext(typeof(MainContext))]
-    partial class MainContextModelSnapshot : ModelSnapshot
+    [Migration("20200805190841_CreateProfileImageUsersTable")]
+    partial class CreateProfileImageUsersTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,9 +48,6 @@ namespace ReviewApi.Infra.Migrations
                         .HasDefaultValue(null);
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.ToTable("profile_images");
                 });
@@ -89,6 +88,12 @@ namespace ReviewApi.Infra.Migrations
                         .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
+                    b.Property<Guid>("ProfileImageId")
+                        .HasColumnName("profile_image_id")
+                        .HasColumnType("uniqueidentifier")
+                        .HasMaxLength(36)
+                        .HasDefaultValue(null);
+
                     b.Property<string>("ResetPasswordCode")
                         .HasColumnName("reset_password_code")
                         .HasColumnType("nvarchar(8)")
@@ -96,14 +101,17 @@ namespace ReviewApi.Infra.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ProfileImageId")
+                        .IsUnique();
+
                     b.ToTable("users");
                 });
 
-            modelBuilder.Entity("ReviewApi.Domain.Entities.ProfileImage", b =>
+            modelBuilder.Entity("ReviewApi.Domain.Entities.User", b =>
                 {
-                    b.HasOne("ReviewApi.Domain.Entities.User", "User")
-                        .WithOne("ProfileImage")
-                        .HasForeignKey("ReviewApi.Domain.Entities.ProfileImage", "UserId")
+                    b.HasOne("ReviewApi.Domain.Entities.ProfileImage", "ProfileImage")
+                        .WithOne("User")
+                        .HasForeignKey("ReviewApi.Domain.Entities.User", "ProfileImageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

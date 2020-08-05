@@ -4,9 +4,9 @@ using ReviewApi.Infra.Context;
 
 namespace ReviewApi.Infra.Repositories
 {
-    public class ImageRepository : GenericRepository<Image>, IImageRepository
+    public class ProfileImageRepository : GenericRepository<ProfileImage>, IProfileImageRepository
     {
-        public ImageRepository(MainContext dbContext) : base(dbContext)
+        public ProfileImageRepository(MainContext dbContext) : base(dbContext)
         {
         }
     }
