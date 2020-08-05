@@ -16,14 +16,14 @@ namespace ReviewApi.Application.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly IImageRepository _imageRepository;
+        private readonly IProfileImageRepository _imageRepository;
         private readonly IRandomCodeUtils _randomCodeUtils;
         private readonly IHashUtils _hashUtils;
         private readonly IEmailUtils _emailUtils;
         private readonly IJwtTokenUtils _jwtTokenUtils;
         private readonly IFileUploadUtils _fileUploadUtils;
 
-        public UserService(IUserRepository userRepository, IImageRepository imageRepository, IRandomCodeUtils randomCodeUtils, IHashUtils hashUtils, IEmailUtils emailUtils, IJwtTokenUtils jwtTokenUtils, IFileUploadUtils fileUploadUtils)
+        public UserService(IUserRepository userRepository, IProfileImageRepository imageRepository, IRandomCodeUtils randomCodeUtils, IHashUtils hashUtils, IEmailUtils emailUtils, IJwtTokenUtils jwtTokenUtils, IFileUploadUtils fileUploadUtils)
         {
             _userRepository = userRepository;
             _imageRepository = imageRepository;
@@ -74,12 +74,17 @@ namespace ReviewApi.Application.Services
             await VerifyIfUserExistsByNameAndThrow(user.Name);
             await VerifyIfUserExistsByEmailAndThrow(user.Email);
 
+
             user.UpdateConfirmationCode(_randomCodeUtils.GenerateRandomCode());
             user.UpdatePassword(_hashUtils.GenerateHash(user.Password));
 
+            Stream userDefaultProfileImage = _fileUploadUtils.GetDefaultUserProfileImage();
+            FileDTO uploadedProfileImage = await _fileUploadUtils.UploadImage(userDefaultProfileImage);
+            ProfileImage image = new ProfileImage(uploadedProfileImage.FileName, uploadedProfileImage.FilePath);
+
+            user.AddProfileImage(image);
             await _userRepository.Create(user);
             await _userRepository.Save();
-            await SetNewRegisteredUserProfileImage(user);
 
             await _emailUtils.SendEmail(user.Email, "Confirmation", $"Please confirm your account using this code {user.ConfirmationCode}");
         }
@@ -118,7 +123,7 @@ namespace ReviewApi.Application.Services
         {
             User user = await _userRepository.GetByIdIncludingImage(Guid.Parse(userId));
             VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
-            string imageUrl = _fileUploadUtils.GenerateImageUrl(user.Image.FileName);
+            string imageUrl = _fileUploadUtils.GenerateImageUrl(user.ProfileImage.FileName);
 
             return new UserProfileResponseModel() { Email = user.Email, Name = user.Name, Image = imageUrl };
         }
@@ -172,7 +177,7 @@ namespace ReviewApi.Application.Services
             VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
 
             FileDTO uploadedImage = await _fileUploadUtils.UploadImage(imageStream);
-            _imageRepository.Update(new Image(user.ImageId, uploadedImage.FileName, uploadedImage.FilePath, user.Id));
+            _imageRepository.Update(new ProfileImage(user.ProfileImage.Id, uploadedImage.FileName, uploadedImage.FilePath, user.Id));
 
             await _userRepository.Save();
             await _imageRepository.Save();
@@ -214,20 +219,6 @@ namespace ReviewApi.Application.Services
                 }
                 throw new AlreadyExistsException("user email");
             }
-        }
-
-        private async Task SetNewRegisteredUserProfileImage(User registeredUser)
-        {
-            Stream userDefaultProfileImage = _fileUploadUtils.GetDefaultUserProfileImage();
-            FileDTO uploadedProfileImage = await _fileUploadUtils.UploadImage(userDefaultProfileImage);
-
-            Image image = new Image(uploadedProfileImage.FileName, uploadedProfileImage.FilePath, registeredUser.Id);
-            await _imageRepository.Create(image);
-            await _imageRepository.Save();
-
-            registeredUser.UpdateImageId(image.Id);
-            _userRepository.Update(registeredUser);
-            await _userRepository.Save();
         }
     }
 }

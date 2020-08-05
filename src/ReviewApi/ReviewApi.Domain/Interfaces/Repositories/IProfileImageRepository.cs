@@ -2,7 +2,7 @@
 
 namespace ReviewApi.Domain.Interfaces.Repositories
 {
-    public interface IImageRepository : IGenericRepository<Image>
+    public interface IProfileImageRepository : IGenericRepository<ProfileImage>
     {
     }
 }

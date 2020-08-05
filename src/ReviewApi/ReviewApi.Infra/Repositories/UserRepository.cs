@@ -53,7 +53,7 @@ namespace ReviewApi.Infra.Repositories
         {
             try
             {
-                return await Query().Include(user => user.Image).SingleOrDefaultAsync(user => user.Id == id);
+                return await Query().Include(user => user.ProfileImage).SingleOrDefaultAsync(user => user.Id == id);
             }
             catch (Exception)
             {

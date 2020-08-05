@@ -15,8 +15,7 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Null(user.Email);
             Assert.Null(user.Password);
             Assert.Null(user.ConfirmationCode);
-            Assert.Null(user.Image);
-            Assert.Equal(Guid.Empty, user.ImageId);
+            Assert.Null(user.ProfileImage);
             Assert.False(user.Confirmed);
             Assert.Equal(Guid.Empty.ToString(), user.Id.ToString());
             Assert.Null(user.ResetPasswordCode);
@@ -36,8 +35,7 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Null(user.ConfirmationCode);
             Assert.False(user.Confirmed);
             Assert.Null(user.ResetPasswordCode);
-            Assert.Null(user.Image);
-            Assert.Equal(Guid.Empty, user.ImageId);
+            Assert.Null(user.ProfileImage);
         }
 
         [Fact]
@@ -56,8 +54,7 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.False(user.Confirmed);
             Assert.Null(user.ResetPasswordCode);
             Assert.Null(user.ConfirmationCode);
-            Assert.Null(user.Image);
-            Assert.Equal(Guid.Empty, user.ImageId);
+            Assert.Null(user.ProfileImage);
         }
 
         [Fact]
@@ -77,8 +74,7 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.False(user.Confirmed);
             Assert.Null(user.ResetPasswordCode);
             Assert.Null(user.ConfirmationCode);
-            Assert.Null(user.Image);
-            Assert.Equal(Guid.Empty, user.ImageId);
+            Assert.Null(user.ProfileImage);
         }
 
         [Fact]
@@ -149,14 +145,16 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Equal(newPasswordHash, user.Password);
         }
 
+        
         [Fact]
         public void ShouldUpdateImage()
         {
-            Guid id = Guid.NewGuid();
+            ProfileImage image = new ProfileImage("FILENAME", "FILEPATH");
             User user = new User();
-            user.UpdateImageId(id);
+            user.AddProfileImage(image);
 
-            Assert.Equal(id, user.ImageId);
+            Assert.Equal(image.FileName, user.ProfileImage.FileName);
+            Assert.Equal(image.FilePath, user.ProfileImage.FilePath);
         }
     }
 }

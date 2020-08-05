@@ -11,8 +11,7 @@ namespace ReviewApi.Domain.Entities
         public string ConfirmationCode { get; protected set; }
         public bool Confirmed { get; protected set; }
         public string ResetPasswordCode { get; protected set; }
-        public Guid ImageId { get; protected set; }
-        public Image Image { get; protected set; }
+        public ProfileImage ProfileImage { get; protected set; }
 
         public User()
         {
@@ -69,13 +68,10 @@ namespace ReviewApi.Domain.Entities
             ResetPasswordCode = null;
             Password = newPasswordHash;
         }
-        public void UpdateImageId(Guid imageId)
+
+        public void AddProfileImage(ProfileImage image)
         {
-            ImageId = imageId;
-        }
-        public void AddImage(Image image)
-        {
-            Image = image;
+            ProfileImage = image;
         }
     }
 }

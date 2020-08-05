@@ -56,7 +56,7 @@ namespace ReviewApi
                 };
             });
 
-            services.AddTransient<IImageRepository, ImageRepository>();
+            services.AddTransient<IProfileImageRepository, ProfileImageRepository>();
             services.AddTransient<IImageService, ImageService>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IUserService, UserService>();
