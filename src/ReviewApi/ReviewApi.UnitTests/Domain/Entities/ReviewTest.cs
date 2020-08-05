@@ -46,5 +46,21 @@ namespace ReviewApi.UnitTests.Domain.Entities
             Assert.Equal(image.FileName, review.Image.FileName);
             Assert.Equal(image.FilePath, review.Image.FilePath);
         }
+
+        [Fact]
+        public void ShouldUpdate() 
+        {
+            string title = "TITLE";
+            string text = "TEXT";
+            int stars = 1;
+            
+            Review review = new Review();
+            review.Update(title, text, stars); 
+
+            Assert.Equal(title, review.Title);
+            Assert.Equal(text, review.Text);
+            Assert.Equal(stars, review.Stars);
+            Assert.Equal(Guid.Empty, review.CreatorId);
+        }
     }
 }
