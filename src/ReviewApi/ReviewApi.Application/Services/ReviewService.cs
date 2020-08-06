@@ -19,15 +19,11 @@ namespace ReviewApi.Application.Services
         private readonly IFileUploadUtils _fileUploadUtils;
         private readonly IUserRepository _userRepository;
 
-        private readonly User _fakeInsertedConfirmedUser;
-
         public ReviewService(IReviewRepository reviewRepository, IUserRepository userRepository, IFileUploadUtils fileUploadUtils)
         {
             _reviewRepository = reviewRepository;
             _userRepository = userRepository; 
             _fileUploadUtils = fileUploadUtils;
-
-            _fakeInsertedConfirmedUser = new User(Guid.NewGuid(), "User Name", "user@mail.com", "password");
         }
 
         public async Task<IdResponseModel> Create(string userId, CreateOrUpdateReviewRequestModel model)
