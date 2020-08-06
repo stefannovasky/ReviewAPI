@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Models;
@@ -32,14 +33,18 @@ namespace ReviewApi.Application.Services
             await VerifyIfUserNotExistsOrNotConfirmedAndThrow(Guid.Parse(userId));
 
             Review review = new Review(model.Title, model.Text, model.Stars, Guid.Parse(userId));
-            FileDTO uploadedImage = await _fileUploadUtils.UploadImage(model.Image);
-            ReviewImage image = new ReviewImage(uploadedImage.FileName, uploadedImage.FilePath);
-            review.AddImage(image);
+            review.AddImage(await UploadImage(model.Image));
 
             await _reviewRepository.Create(review);
             await _reviewRepository.Save();
 
             return new IdResponseModel() { Id = review.Id };
+        }
+
+        private async Task<ReviewImage> UploadImage(Stream image)
+        {
+            FileDTO uploadedImage = await _fileUploadUtils.UploadImage(image);
+            return new ReviewImage(uploadedImage.FileName, uploadedImage.FilePath);
         }
 
         private async Task VerifyIfUserNotExistsOrNotConfirmedAndThrow(Guid userId)
