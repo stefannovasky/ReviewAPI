@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Models;
@@ -39,6 +41,25 @@ namespace ReviewApi.Application.Services
             await _reviewRepository.Save();
 
             return new IdResponseModel() { Id = review.Id };
+        }
+
+        public async Task<IEnumerable<ReviewResponseModel>> GetAll(int page = 1)
+        {
+            IEnumerable<Review> reviews = await _reviewRepository.GetAll(page);
+            return reviews.Select(r => ConvertReviewToReviewResponseModel(r));
+        }
+
+        private ReviewResponseModel ConvertReviewToReviewResponseModel(Review review)
+        {
+            string reviewImageUrl = _fileUploadUtils.GenerateImageUrl(review.Image.FileName);
+            return new ReviewResponseModel()
+            {
+                Image = reviewImageUrl,
+                Creator = review.Creator.Name,
+                Stars = review.Stars,
+                Text = review.Text,
+                Title = review.Title
+            };
         }
 
         private async Task<ReviewImage> UploadImage(Stream image)
