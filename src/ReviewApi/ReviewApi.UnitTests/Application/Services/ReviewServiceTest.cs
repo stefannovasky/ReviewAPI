@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -89,6 +90,19 @@ namespace ReviewApi.UnitTests.Application.Services
             Exception exception = await Record.ExceptionAsync(() => _reviewService.Create(Guid.NewGuid().ToString(), model));
 
             Assert.IsType<UserNotConfirmedException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldGetAllReviews()
+        {
+            Review review1 = new Review("TITLE", "TEXT", 5, Guid.NewGuid()); 
+            Review review2 = new Review("TITLE", "TEXT", 5, Guid.NewGuid()); 
+            Review review3 = new Review("TITLE", "TEXT", 5, Guid.NewGuid());
+            _reviewRepositoryMock.GetAll(Arg.Any<int>()).Returns(new List<Review>() { review1, review2, review3 });
+
+            Exception exception = await Record.ExceptionAsync(() => _reviewService.GetAll());
+
+            Assert.Null(exception); 
         }
     }
 }
