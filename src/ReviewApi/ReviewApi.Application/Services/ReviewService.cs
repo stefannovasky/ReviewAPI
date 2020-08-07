@@ -54,6 +54,7 @@ namespace ReviewApi.Application.Services
             string reviewImageUrl = _fileUploadUtils.GenerateImageUrl(review.Image.FileName);
             return new ReviewResponseModel()
             {
+                Id = review.Id,
                 Image = reviewImageUrl,
                 Creator = review.Creator.Name,
                 Stars = review.Stars,
