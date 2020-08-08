@@ -21,12 +21,14 @@ namespace ReviewApi.Application.Services
         private readonly IReviewRepository _reviewRepository;
         private readonly IFileUploadUtils _fileUploadUtils;
         private readonly IUserRepository _userRepository;
+        private readonly string _webApplicationUrl;
 
-        public ReviewService(IReviewRepository reviewRepository, IUserRepository userRepository, IFileUploadUtils fileUploadUtils)
+        public ReviewService(IReviewRepository reviewRepository, IUserRepository userRepository, IFileUploadUtils fileUploadUtils, string webApplicationUrl)
         {
             _reviewRepository = reviewRepository;
             _userRepository = userRepository; 
             _fileUploadUtils = fileUploadUtils;
+            _webApplicationUrl = webApplicationUrl;
         }
 
         public async Task<IdResponseModel> Create(string userId, CreateOrUpdateReviewRequestModel model)
@@ -59,10 +61,27 @@ namespace ReviewApi.Application.Services
             await _reviewRepository.Save();
         }
 
-        public async Task<IEnumerable<ReviewResponseModel>> GetAll(int page = 1, int quantityPerPage = 14)
+        public async Task<PaginationResponseModel<ReviewResponseModel>> GetAll(int page = 1, int quantityPerPage = 14)
         {
+            int count = await _reviewRepository.Count();
             IEnumerable<Review> reviews = await _reviewRepository.GetAll(page, quantityPerPage);
-            return reviews.Select(r => ConvertReviewToReviewResponseModel(r));
+            return CreatePaginationResult(reviews, count, page, quantityPerPage);
+        }
+
+        private PaginationResponseModel<ReviewResponseModel> CreatePaginationResult(IEnumerable<Review> reviews, int totalReviewsInserteds, int actualPage, int quantityPerPage)
+        {
+            int previousPage = actualPage - 1;
+            if (previousPage == 0)
+            {
+                previousPage = 1;
+            }
+            return new PaginationResponseModel<ReviewResponseModel>()
+            {
+                Data = reviews.Select(r => ConvertReviewToReviewResponseModel(r)),
+                NextPage = $"{_webApplicationUrl}/reviews?page={actualPage + 1}&quantity={quantityPerPage}",
+                PreviousPage = $"{_webApplicationUrl}/reviews?page={previousPage}&quantity={quantityPerPage}",
+                Total = totalReviewsInserteds
+            };
         }
 
         private ReviewResponseModel ConvertReviewToReviewResponseModel(Review review)
