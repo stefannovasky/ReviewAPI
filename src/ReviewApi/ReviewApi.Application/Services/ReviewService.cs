@@ -116,5 +116,24 @@ namespace ReviewApi.Application.Services
                 throw new UserNotConfirmedException();
             }
         }
+
+        public async Task Update(string userId, string reviewId, CreateOrUpdateReviewRequestModel model)
+        {
+            await new CreateOrUpdateReviewValidator().ValidateRequestModelAndThrow(model);
+            await VerifyIfUserNotExistsOrNotConfirmedAndThrow(Guid.Parse(userId));
+            Review review = await _reviewRepository.GetById(Guid.Parse(reviewId));
+            if (review == null)
+            {
+                throw new ResourceNotFoundException("review not found.");
+            }
+            if (review.CreatorId != Guid.Parse(userId))
+            {
+                throw new ForbiddenException();
+            }
+
+            review.Update(model.Title, model.Text, model.Stars);
+            _reviewRepository.Update(review);
+            await _reviewRepository.Save();
+        }
     }
 }

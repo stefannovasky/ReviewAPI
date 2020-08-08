@@ -69,5 +69,28 @@ namespace ReviewApi.Controllers
                 return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
             }
         }
+
+        [HttpPut]
+        [Authorize]
+        [Route("{id}")]
+        public async Task<IActionResult> Update(string id, [FromForm] CreateOrUpdateReviewModel model)
+        {
+            try
+            {
+                CreateOrUpdateReviewRequestModel serviceModel = new CreateOrUpdateReviewRequestModel()
+                {
+                    Image = model.Image.OpenReadStream(),
+                    Stars = model.Stars,
+                    Text = model.Text,
+                    Title = model.Title
+                };
+                await _reviewService.Update(this.GetUserIdFromToken(), id, serviceModel);
+                return Ok();
+            }
+            catch (Exception exception)
+            {
+                return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
+            }
+        }
     }
 }
