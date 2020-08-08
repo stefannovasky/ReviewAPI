@@ -59,9 +59,9 @@ namespace ReviewApi.Application.Services
             await _reviewRepository.Save();
         }
 
-        public async Task<IEnumerable<ReviewResponseModel>> GetAll(int page = 1)
+        public async Task<IEnumerable<ReviewResponseModel>> GetAll(int page = 1, int quantityPerPage = 14)
         {
-            IEnumerable<Review> reviews = await _reviewRepository.GetAll(page);
+            IEnumerable<Review> reviews = await _reviewRepository.GetAll(page, quantityPerPage);
             return reviews.Select(r => ConvertReviewToReviewResponseModel(r));
         }
 
