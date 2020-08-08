@@ -16,9 +16,8 @@ namespace ReviewApi.Infra.Repositories
 
         }
 
-        public async Task<IEnumerable<Review>> GetAll(int page = 1)
+        public async Task<IEnumerable<Review>> GetAll(int page = 1, int quantityPerPage = 14)
         {
-            int quantityPerPage = 14;
             int skip = (page - 1) * quantityPerPage;
             return await Query()
                 .Take(quantityPerPage)
