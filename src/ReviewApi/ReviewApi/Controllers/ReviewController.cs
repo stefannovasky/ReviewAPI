@@ -42,11 +42,11 @@ namespace ReviewApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery(Name = "page")] int page = 1)
+        public async Task<IActionResult> GetAll([FromQuery(Name = "page")] int page = 1, [FromQuery(Name = "quantity")] int quantity = 14)
         {
             try
             {
-                return Ok(await _reviewService.GetAll(page));
+                return Ok(await _reviewService.GetAll(page, quantity));
             }
             catch (Exception exception)
             {
