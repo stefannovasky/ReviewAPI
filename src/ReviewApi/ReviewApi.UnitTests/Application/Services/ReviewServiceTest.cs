@@ -104,5 +104,96 @@ namespace ReviewApi.UnitTests.Application.Services
 
             Assert.Null(exception); 
         }
+
+        [Fact]
+        public async Task ShouldThrowUserResourceNotFoundExceptionOnUpdate()
+        {
+            _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(null as User);
+            CreateOrUpdateReviewRequestModel model = new CreateOrUpdateReviewRequestModel()
+            {
+                Image = new MemoryStream(),
+                Stars = 1,
+                Text = "TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT",
+                Title = "TITLE"
+            };
+
+            Exception exception = await Record.ExceptionAsync(() => _reviewService.Update(Guid.NewGuid().ToString(), "", model));
+
+            Assert.IsType<ResourceNotFoundException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldThrowUserNotConfirmedExceptionOnUpdate()
+        {
+            _userRepositoryMock.GetById(Arg.Is<Guid>(id => id == _fakeInsertedNotConfirmedUser.Id)).Returns(_fakeInsertedNotConfirmedUser);
+            CreateOrUpdateReviewRequestModel model = new CreateOrUpdateReviewRequestModel()
+            {
+                Image = new MemoryStream(),
+                Stars = 1,
+                Text = "TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT",
+                Title = "TITLE"
+            };
+
+            Exception exception = await Record.ExceptionAsync(() => _reviewService.Update(_fakeInsertedNotConfirmedUser.Id.ToString(), "", model));
+
+            Assert.IsType<UserNotConfirmedException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldThrowReviewResourceNotFoundExceptionOnUpdate()
+        {
+            _userRepositoryMock.GetById(Arg.Is<Guid>(id => id == _fakeInsertedConfirmedUser.Id)).Returns(_fakeInsertedConfirmedUser);
+            _reviewRepositoryMock.GetById(Arg.Any<Guid>()).Returns(null as Review);
+            CreateOrUpdateReviewRequestModel model = new CreateOrUpdateReviewRequestModel()
+            {
+                Image = new MemoryStream(),
+                Stars = 1,
+                Text = "TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT",
+                Title = "TITLE"
+            };
+
+            Exception exception = await Record.ExceptionAsync(() => _reviewService.Update(_fakeInsertedConfirmedUser.Id.ToString(), Guid.NewGuid().ToString(), model));
+
+            Assert.IsType<ResourceNotFoundException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldThrowForbiddenExceptionOnUpdate()
+        {
+            Guid reviewCreatorIdDifferentThanAuthenticatedUserId = Guid.NewGuid();
+            _userRepositoryMock.GetById(Arg.Is<Guid>(id => id == _fakeInsertedConfirmedUser.Id)).Returns(_fakeInsertedConfirmedUser);
+            _reviewRepositoryMock.GetById(Arg.Any<Guid>()).Returns(new Review("", "", 1, reviewCreatorIdDifferentThanAuthenticatedUserId));
+            CreateOrUpdateReviewRequestModel model = new CreateOrUpdateReviewRequestModel()
+            {
+                Image = new MemoryStream(),
+                Stars = 1,
+                Text = "TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT",
+                Title = "TITLE"
+            };
+
+            Exception exception = await Record.ExceptionAsync(() => _reviewService.Update(_fakeInsertedConfirmedUser.Id.ToString(), Guid.NewGuid().ToString(), model));
+
+            Assert.IsType<ForbiddenException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldUpdate()
+        {
+            _userRepositoryMock.GetById(Arg.Is<Guid>(id => id == _fakeInsertedConfirmedUser.Id)).Returns(_fakeInsertedConfirmedUser);
+            _reviewRepositoryMock.GetById(Arg.Any<Guid>()).Returns(new Review("", "", 1, _fakeInsertedConfirmedUser.Id));
+            CreateOrUpdateReviewRequestModel model = new CreateOrUpdateReviewRequestModel()
+            {
+                Image = new MemoryStream(),
+                Stars = 1,
+                Text = "TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT",
+                Title = "TITLE"
+            };
+
+            Exception exception = await Record.ExceptionAsync(() => _reviewService.Update(_fakeInsertedConfirmedUser.Id.ToString(), Guid.NewGuid().ToString(), model));
+
+            Assert.Null(exception);
+            _reviewRepositoryMock.Received(1).Update(Arg.Any<Review>());
+            await _reviewRepositoryMock.Received(1).Save();
+        }
     }
 }
