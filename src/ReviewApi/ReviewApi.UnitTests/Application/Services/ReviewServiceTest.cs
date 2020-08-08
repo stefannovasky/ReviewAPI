@@ -29,7 +29,7 @@ namespace ReviewApi.UnitTests.Application.Services
             _reviewRepositoryMock = NSubstitute.Substitute.For<IReviewRepository>();
             _userRepositoryMock = NSubstitute.Substitute.For<IUserRepository>();
             _fileUploadUtilsMock = NSubstitute.Substitute.For<IFileUploadUtils>();
-            _reviewService = new ReviewService(_reviewRepositoryMock, _userRepositoryMock, _fileUploadUtilsMock);
+            _reviewService = new ReviewService(_reviewRepositoryMock, _userRepositoryMock, _fileUploadUtilsMock, "webappurl");
             
             _fakeInsertedNotConfirmedUser = new User(Guid.NewGuid(), "user name", "user@mail.com", "password");
             _fakeInsertedConfirmedUser = new User(Guid.NewGuid(), "user name", "user@mail.com", "password");
