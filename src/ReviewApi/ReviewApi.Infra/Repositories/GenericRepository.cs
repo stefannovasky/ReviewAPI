@@ -31,6 +31,11 @@ namespace ReviewApi.Infra.Repositories
             }
         }
 
+        public async Task<int> Count()
+        {
+            return await Query().CountAsync();
+        }
+
         public virtual async Task Create(T entity)
         {
             try

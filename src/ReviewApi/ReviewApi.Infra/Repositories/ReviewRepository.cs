@@ -20,8 +20,8 @@ namespace ReviewApi.Infra.Repositories
         {
             int skip = (page - 1) * quantityPerPage;
             return await Query()
-                .Take(quantityPerPage)
                 .Skip(skip)
+                .Take(quantityPerPage)
                 .Include(r => r.Image)
                 .Include(r => r.Creator)
                 .ToListAsync();
