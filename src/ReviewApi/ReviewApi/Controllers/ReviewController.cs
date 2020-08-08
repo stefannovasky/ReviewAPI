@@ -53,5 +53,21 @@ namespace ReviewApi.Controllers
                 return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
             }
         }
+
+        [HttpDelete]
+        [Authorize]
+        [Route("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            try
+            {
+                await _reviewService.Delete(this.GetUserIdFromToken(), id);
+                return NoContent();
+            }
+            catch (Exception exception)
+            {
+                return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
+            }
+        }
     }
 }
