@@ -43,6 +43,22 @@ namespace ReviewApi.Application.Services
             return new IdResponseModel() { Id = review.Id };
         }
 
+        public async Task Delete(string userId, string reviewId)
+        {
+            await VerifyIfUserNotExistsOrNotConfirmedAndThrow(Guid.Parse(userId));
+            Review review = await _reviewRepository.GetById(Guid.Parse(reviewId));
+            if (review == null)
+            {
+                throw new ResourceNotFoundException("review not found.");
+            }
+            if (review.CreatorId != Guid.Parse(userId))
+            {
+                throw new ForbiddenException();
+            }
+            _reviewRepository.Delete(review);
+            await _reviewRepository.Save();
+        }
+
         public async Task<IEnumerable<ReviewResponseModel>> GetAll(int page = 1)
         {
             IEnumerable<Review> reviews = await _reviewRepository.GetAll(page);

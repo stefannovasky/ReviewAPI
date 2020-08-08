@@ -9,5 +9,6 @@ namespace ReviewApi.Application.Interfaces
     {
         Task<IdResponseModel> Create(string userId, CreateOrUpdateReviewRequestModel model);
         Task<IEnumerable<ReviewResponseModel>> GetAll(int page = 1);
+        Task Delete(string userId, string reviewId);
     }
 }
