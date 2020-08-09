@@ -11,5 +11,6 @@ namespace ReviewApi.Application.Interfaces
         Task<PaginationResponseModel<ReviewResponseModel>> GetAll(int page = 1, int quantityPerPage = 14);
         Task Delete(string userId, string reviewId);
         Task Update(string userId, string reviewId, CreateOrUpdateReviewRequestModel model);
+        Task<ReviewResponseModel> GetById(string userId, string reviewId);
     }
 }

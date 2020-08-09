@@ -66,6 +66,43 @@ namespace ReviewApi.Application.Services
             return CreatePaginationResult(reviews, count, page, quantityPerPage);
         }
 
+        public async Task Update(string userId, string reviewId, CreateOrUpdateReviewRequestModel model)
+        {
+            await new CreateOrUpdateReviewValidator().ValidateRequestModelAndThrow(model);
+
+            Guid userIdGuid = Guid.Parse(userId);
+            await VerifyIfUserNotExistsOrNotConfirmedAndThrow(userIdGuid);
+            Review review = await _reviewRepository.GetById(Guid.Parse(reviewId));
+            if (review == null)
+            {
+                throw new ResourceNotFoundException("review not found.");
+            }
+            VerifyIfAuthenticatedIsReviewCreatorAndThrow(review, userIdGuid);
+
+            review.Update(model.Title, model.Text, model.Stars);
+            _reviewRepository.Update(review);
+            await _reviewRepository.Save();
+        }
+
+        public async Task<ReviewResponseModel> GetById(string userId, string reviewId)
+        {
+            await VerifyIfUserNotExistsOrNotConfirmedAndThrow(Guid.Parse(userId));
+            Review review = await _reviewRepository.GetById(Guid.Parse(reviewId));
+            if (review == null)
+            {
+                throw new ResourceNotFoundException("review not found.");
+            }
+            return new ReviewResponseModel()
+            {
+                Id = review.Id, 
+                Creator = review.Creator.Name,
+                Image = _fileUploadUtils.GenerateImageUrl(review.Image.FileName), 
+                Stars = review.Stars, 
+                Text = review.Text, 
+                Title = review.Title
+            };
+        }
+
         private PaginationResponseModel<ReviewResponseModel> CreatePaginationResult(IEnumerable<Review> reviews, int totalReviewsInserteds, int actualPage, int quantityPerPage)
         {
             int previousPage = actualPage - 1;
@@ -113,24 +150,6 @@ namespace ReviewApi.Application.Services
             {
                 throw new UserNotConfirmedException();
             }
-        }
-
-        public async Task Update(string userId, string reviewId, CreateOrUpdateReviewRequestModel model)
-        {
-            await new CreateOrUpdateReviewValidator().ValidateRequestModelAndThrow(model);
-
-            Guid userIdGuid = Guid.Parse(userId);
-            await VerifyIfUserNotExistsOrNotConfirmedAndThrow(userIdGuid);
-            Review review = await _reviewRepository.GetById(Guid.Parse(reviewId));
-            if (review == null)
-            {
-                throw new ResourceNotFoundException("review not found.");
-            }
-            VerifyIfAuthenticatedIsReviewCreatorAndThrow(review, userIdGuid);
-
-            review.Update(model.Title, model.Text, model.Stars);
-            _reviewRepository.Update(review);
-            await _reviewRepository.Save();
         }
 
         private void VerifyIfAuthenticatedIsReviewCreatorAndThrow(Review review, Guid userId)
