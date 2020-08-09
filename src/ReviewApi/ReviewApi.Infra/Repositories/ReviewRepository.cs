@@ -26,5 +26,13 @@ namespace ReviewApi.Infra.Repositories
                 .Include(r => r.Creator)
                 .ToListAsync();
         }
+
+        public override async Task<Review> GetById(Guid id)
+        {
+            return await Query()
+                .Include(r => r.Image)
+                .Include(r => r.Creator)
+                .SingleOrDefaultAsync(r => r.Id == id);
+        }
     }
 }
