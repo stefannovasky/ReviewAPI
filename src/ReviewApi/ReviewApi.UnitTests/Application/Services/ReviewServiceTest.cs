@@ -179,8 +179,10 @@ namespace ReviewApi.UnitTests.Application.Services
         [Fact]
         public async Task ShouldUpdate()
         {
+            Guid reviewId = Guid.NewGuid();
+            Review insertedReview = new Review(reviewId, "", "", 1, _fakeInsertedConfirmedUser.Id);
             _userRepositoryMock.GetById(Arg.Is<Guid>(id => id == _fakeInsertedConfirmedUser.Id)).Returns(_fakeInsertedConfirmedUser);
-            _reviewRepositoryMock.GetById(Arg.Any<Guid>()).Returns(new Review("", "", 1, _fakeInsertedConfirmedUser.Id));
+            _reviewRepositoryMock.GetById(Arg.Any<Guid>()).Returns(insertedReview);
             CreateOrUpdateReviewRequestModel model = new CreateOrUpdateReviewRequestModel()
             {
                 Image = new MemoryStream(),
@@ -189,7 +191,7 @@ namespace ReviewApi.UnitTests.Application.Services
                 Title = "TITLE"
             };
 
-            Exception exception = await Record.ExceptionAsync(() => _reviewService.Update(_fakeInsertedConfirmedUser.Id.ToString(), Guid.NewGuid().ToString(), model));
+            Exception exception = await Record.ExceptionAsync(() => _reviewService.Update(_fakeInsertedConfirmedUser.Id.ToString(), reviewId.ToString(), model));
 
             Assert.Null(exception);
             _reviewRepositoryMock.Received(1).Update(Arg.Any<Review>());
