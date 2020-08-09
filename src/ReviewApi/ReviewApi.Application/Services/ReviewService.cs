@@ -47,16 +47,14 @@ namespace ReviewApi.Application.Services
 
         public async Task Delete(string userId, string reviewId)
         {
-            await VerifyIfUserNotExistsOrNotConfirmedAndThrow(Guid.Parse(userId));
+            Guid userIdGuid = Guid.Parse(userId);
+            await VerifyIfUserNotExistsOrNotConfirmedAndThrow(userIdGuid);
             Review review = await _reviewRepository.GetById(Guid.Parse(reviewId));
             if (review == null)
             {
                 throw new ResourceNotFoundException("review not found.");
             }
-            if (review.CreatorId != Guid.Parse(userId))
-            {
-                throw new ForbiddenException();
-            }
+            VerifyIfAuthenticatedIsReviewCreatorAndThrow(review, userIdGuid);
             _reviewRepository.Delete(review);
             await _reviewRepository.Save();
         }
@@ -120,20 +118,27 @@ namespace ReviewApi.Application.Services
         public async Task Update(string userId, string reviewId, CreateOrUpdateReviewRequestModel model)
         {
             await new CreateOrUpdateReviewValidator().ValidateRequestModelAndThrow(model);
-            await VerifyIfUserNotExistsOrNotConfirmedAndThrow(Guid.Parse(userId));
+
+            Guid userIdGuid = Guid.Parse(userId);
+            await VerifyIfUserNotExistsOrNotConfirmedAndThrow(userIdGuid);
             Review review = await _reviewRepository.GetById(Guid.Parse(reviewId));
             if (review == null)
             {
                 throw new ResourceNotFoundException("review not found.");
             }
-            if (review.CreatorId != Guid.Parse(userId))
-            {
-                throw new ForbiddenException();
-            }
+            VerifyIfAuthenticatedIsReviewCreatorAndThrow(review, userIdGuid);
 
             review.Update(model.Title, model.Text, model.Stars);
             _reviewRepository.Update(review);
             await _reviewRepository.Save();
+        }
+
+        private void VerifyIfAuthenticatedIsReviewCreatorAndThrow(Review review, Guid userId)
+        {
+            if (!review.WasCreatedAt(userId))
+            {
+                throw new ForbiddenException();
+            }
         }
     }
 }
