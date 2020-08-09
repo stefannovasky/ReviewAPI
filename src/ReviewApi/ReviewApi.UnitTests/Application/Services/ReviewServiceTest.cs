@@ -57,42 +57,6 @@ namespace ReviewApi.UnitTests.Application.Services
         }
 
         [Fact]
-        public async Task ShouldThrowResourceNotFoundExceptionOnCreate()
-        {
-            CreateOrUpdateReviewRequestModel model = new CreateOrUpdateReviewRequestModel()
-            {
-                Image = new MemoryStream(),
-                Text = "TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT ",
-                Title = "TITLE",
-                Stars = 1
-            };
-            _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(null as User);
-            _fileUploadUtilsMock.UploadImage(Arg.Any<Stream>()).Returns(new FileDTO() { FileName = "FILENAME", FilePath = "FILEPATH" });
-
-            Exception exception = await Record.ExceptionAsync(() => _reviewService.Create(Guid.NewGuid().ToString(), model));
-
-            Assert.IsType<ResourceNotFoundException>(exception);
-        }
-
-        [Fact]
-        public async Task ShouldThrowUserNotConfirmedExceptionOnCreate()
-        {
-            CreateOrUpdateReviewRequestModel model = new CreateOrUpdateReviewRequestModel()
-            {
-                Image = new MemoryStream(),
-                Text = "TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT ",
-                Title = "TITLE",
-                Stars = 1
-            };
-            _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(_fakeInsertedNotConfirmedUser);
-            _fileUploadUtilsMock.UploadImage(Arg.Any<Stream>()).Returns(new FileDTO() { FileName = "FILENAME", FilePath = "FILEPATH" });
-
-            Exception exception = await Record.ExceptionAsync(() => _reviewService.Create(Guid.NewGuid().ToString(), model));
-
-            Assert.IsType<UserNotConfirmedException>(exception);
-        }
-
-        [Fact]
         public async Task ShouldGetAllReviews()
         {
             Review review1 = new Review("TITLE", "TEXT", 5, Guid.NewGuid()); 
@@ -106,43 +70,8 @@ namespace ReviewApi.UnitTests.Application.Services
         }
 
         [Fact]
-        public async Task ShouldThrowUserResourceNotFoundExceptionOnUpdate()
-        {
-            _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(null as User);
-            CreateOrUpdateReviewRequestModel model = new CreateOrUpdateReviewRequestModel()
-            {
-                Image = new MemoryStream(),
-                Stars = 1,
-                Text = "TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT",
-                Title = "TITLE"
-            };
-
-            Exception exception = await Record.ExceptionAsync(() => _reviewService.Update(Guid.NewGuid().ToString(), "", model));
-
-            Assert.IsType<ResourceNotFoundException>(exception);
-        }
-
-        [Fact]
-        public async Task ShouldThrowUserNotConfirmedExceptionOnUpdate()
-        {
-            _userRepositoryMock.GetById(Arg.Is<Guid>(id => id == _fakeInsertedNotConfirmedUser.Id)).Returns(_fakeInsertedNotConfirmedUser);
-            CreateOrUpdateReviewRequestModel model = new CreateOrUpdateReviewRequestModel()
-            {
-                Image = new MemoryStream(),
-                Stars = 1,
-                Text = "TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT",
-                Title = "TITLE"
-            };
-
-            Exception exception = await Record.ExceptionAsync(() => _reviewService.Update(_fakeInsertedNotConfirmedUser.Id.ToString(), "", model));
-
-            Assert.IsType<UserNotConfirmedException>(exception);
-        }
-
-        [Fact]
         public async Task ShouldThrowReviewResourceNotFoundExceptionOnUpdate()
         {
-            _userRepositoryMock.GetById(Arg.Is<Guid>(id => id == _fakeInsertedConfirmedUser.Id)).Returns(_fakeInsertedConfirmedUser);
             _reviewRepositoryMock.GetById(Arg.Any<Guid>()).Returns(null as Review);
             CreateOrUpdateReviewRequestModel model = new CreateOrUpdateReviewRequestModel()
             {
@@ -161,7 +90,6 @@ namespace ReviewApi.UnitTests.Application.Services
         public async Task ShouldThrowForbiddenExceptionOnUpdate()
         {
             Guid reviewCreatorIdDifferentThanAuthenticatedUserId = Guid.NewGuid();
-            _userRepositoryMock.GetById(Arg.Is<Guid>(id => id == _fakeInsertedConfirmedUser.Id)).Returns(_fakeInsertedConfirmedUser);
             _reviewRepositoryMock.GetById(Arg.Any<Guid>()).Returns(new Review("", "", 1, reviewCreatorIdDifferentThanAuthenticatedUserId));
             CreateOrUpdateReviewRequestModel model = new CreateOrUpdateReviewRequestModel()
             {
@@ -181,7 +109,6 @@ namespace ReviewApi.UnitTests.Application.Services
         {
             Guid reviewId = Guid.NewGuid();
             Review insertedReview = new Review(reviewId, "", "", 1, _fakeInsertedConfirmedUser.Id);
-            _userRepositoryMock.GetById(Arg.Is<Guid>(id => id == _fakeInsertedConfirmedUser.Id)).Returns(_fakeInsertedConfirmedUser);
             _reviewRepositoryMock.GetById(Arg.Any<Guid>()).Returns(insertedReview);
             CreateOrUpdateReviewRequestModel model = new CreateOrUpdateReviewRequestModel()
             {
