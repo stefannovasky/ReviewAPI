@@ -92,5 +92,20 @@ namespace ReviewApi.Controllers
                 return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
             }
         }
+
+        [HttpGet]
+        [Route("{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetById(string id)
+        {
+            try
+            {
+                return Ok(await _reviewService.GetById(this.GetUserIdFromToken(), id));
+            }
+            catch (Exception exception)
+            {
+                return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
+            }
+        }
     }
 }
