@@ -16,6 +16,14 @@ namespace ReviewApi.Domain.Entities
 
         }
 
+        public Review(Guid id, string title, string text, int stars, Guid creatorId) : base(id)
+        {
+            Title = title;
+            Text = text;
+            Stars = stars;
+            CreatorId = creatorId;
+        }
+
         public Review(string title, string text, int stars, Guid creatorId)
         {
             Title = title;
@@ -34,6 +42,11 @@ namespace ReviewApi.Domain.Entities
             Title = title;
             Text = text;
             Stars = stars;
+        }
+
+        public bool WasCreatedAt(Guid userId)
+        {
+            return userId == CreatorId;
         }
     }
 }
