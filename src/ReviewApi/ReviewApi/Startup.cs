@@ -62,7 +62,7 @@ namespace ReviewApi
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IReviewRepository, ReviewRepository>(); 
             services.AddTransient<IReviewService>(service => new ReviewService(
-                service.GetRequiredService<IReviewRepository>(), service.GetRequiredService<IUserRepository>(), service.GetRequiredService<IFileUploadUtils>(), _webApplicationUrl)
+                service.GetRequiredService<IReviewRepository>(), service.GetRequiredService<IFileUploadUtils>(), _webApplicationUrl)
             );
 
             services.AddTransient<IRedisConnector>(service => new RedisConnector(Configuration.GetConnectionString("RedisConnection")));

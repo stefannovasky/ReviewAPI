@@ -20,13 +20,11 @@ namespace ReviewApi.Application.Services
     {
         private readonly IReviewRepository _reviewRepository;
         private readonly IFileUploadUtils _fileUploadUtils;
-        private readonly IUserRepository _userRepository;
         private readonly string _webApplicationUrl;
 
-        public ReviewService(IReviewRepository reviewRepository, IUserRepository userRepository, IFileUploadUtils fileUploadUtils, string webApplicationUrl)
+        public ReviewService(IReviewRepository reviewRepository, IFileUploadUtils fileUploadUtils, string webApplicationUrl)
         {
             _reviewRepository = reviewRepository;
-            _userRepository = userRepository; 
             _fileUploadUtils = fileUploadUtils;
             _webApplicationUrl = webApplicationUrl;
         }

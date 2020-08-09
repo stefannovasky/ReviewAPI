@@ -18,7 +18,6 @@ namespace ReviewApi.UnitTests.Application.Services
     public class ReviewServiceTest
     {
         private readonly IReviewRepository _reviewRepositoryMock;
-        private readonly IUserRepository _userRepositoryMock;
         private readonly IFileUploadUtils _fileUploadUtilsMock;
         private readonly IReviewService _reviewService;
         private readonly User _fakeInsertedConfirmedUser;
@@ -27,9 +26,8 @@ namespace ReviewApi.UnitTests.Application.Services
         public ReviewServiceTest()
         {
             _reviewRepositoryMock = NSubstitute.Substitute.For<IReviewRepository>();
-            _userRepositoryMock = NSubstitute.Substitute.For<IUserRepository>();
             _fileUploadUtilsMock = NSubstitute.Substitute.For<IFileUploadUtils>();
-            _reviewService = new ReviewService(_reviewRepositoryMock, _userRepositoryMock, _fileUploadUtilsMock, "webappurl");
+            _reviewService = new ReviewService(_reviewRepositoryMock, _fileUploadUtilsMock, "webappurl");
             
             _fakeInsertedNotConfirmedUser = new User(Guid.NewGuid(), "user name", "user@mail.com", "password");
             _fakeInsertedConfirmedUser = new User(Guid.NewGuid(), "user name", "user@mail.com", "password");
@@ -46,7 +44,6 @@ namespace ReviewApi.UnitTests.Application.Services
                 Title = "TITLE",
                 Stars = 1
             };
-            _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(_fakeInsertedConfirmedUser);
             _fileUploadUtilsMock.UploadImage(Arg.Any<Stream>()).Returns(new FileDTO() { FileName = "FILENAME", FilePath = "FILEPATH" });
 
             Exception exception = await Record.ExceptionAsync(() => _reviewService.Create(Guid.NewGuid().ToString(), model));
