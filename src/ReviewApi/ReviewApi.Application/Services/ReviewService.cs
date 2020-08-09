@@ -34,7 +34,6 @@ namespace ReviewApi.Application.Services
         public async Task<IdResponseModel> Create(string userId, CreateOrUpdateReviewRequestModel model)
         {
             await new CreateOrUpdateReviewValidator().ValidateRequestModelAndThrow(model);
-            await VerifyIfUserNotExistsOrNotConfirmedAndThrow(Guid.Parse(userId));
 
             Review review = new Review(model.Title, model.Text, model.Stars, Guid.Parse(userId));
             review.AddImage(await UploadImage(model.Image));
@@ -47,14 +46,12 @@ namespace ReviewApi.Application.Services
 
         public async Task Delete(string userId, string reviewId)
         {
-            Guid userIdGuid = Guid.Parse(userId);
-            await VerifyIfUserNotExistsOrNotConfirmedAndThrow(userIdGuid);
             Review review = await _reviewRepository.GetById(Guid.Parse(reviewId));
             if (review == null)
             {
                 throw new ResourceNotFoundException("review not found.");
             }
-            VerifyIfAuthenticatedIsReviewCreatorAndThrow(review, userIdGuid);
+            VerifyIfAuthenticatedIsReviewCreatorAndThrow(review, Guid.Parse(userId));
             _reviewRepository.Delete(review);
             await _reviewRepository.Save();
         }
@@ -70,14 +67,12 @@ namespace ReviewApi.Application.Services
         {
             await new CreateOrUpdateReviewValidator().ValidateRequestModelAndThrow(model);
 
-            Guid userIdGuid = Guid.Parse(userId);
-            await VerifyIfUserNotExistsOrNotConfirmedAndThrow(userIdGuid);
             Review review = await _reviewRepository.GetById(Guid.Parse(reviewId));
             if (review == null)
             {
                 throw new ResourceNotFoundException("review not found.");
             }
-            VerifyIfAuthenticatedIsReviewCreatorAndThrow(review, userIdGuid);
+            VerifyIfAuthenticatedIsReviewCreatorAndThrow(review, Guid.Parse(userId));
 
             review.Update(model.Title, model.Text, model.Stars);
             _reviewRepository.Update(review);
@@ -86,7 +81,6 @@ namespace ReviewApi.Application.Services
 
         public async Task<ReviewResponseModel> GetById(string userId, string reviewId)
         {
-            await VerifyIfUserNotExistsOrNotConfirmedAndThrow(Guid.Parse(userId));
             Review review = await _reviewRepository.GetById(Guid.Parse(reviewId));
             if (review == null)
             {
@@ -137,19 +131,6 @@ namespace ReviewApi.Application.Services
         {
             FileDTO uploadedImage = await _fileUploadUtils.UploadImage(image);
             return new ReviewImage(uploadedImage.FileName, uploadedImage.FilePath);
-        }
-
-        private async Task VerifyIfUserNotExistsOrNotConfirmedAndThrow(Guid userId)
-        {
-            User user = await _userRepository.GetById(userId);
-            if (user == null)
-            {
-                throw new ResourceNotFoundException("user not found.");
-            }
-            if (!user.Confirmed)
-            {
-                throw new UserNotConfirmedException();
-            }
         }
 
         private void VerifyIfAuthenticatedIsReviewCreatorAndThrow(Review review, Guid userId)
