@@ -22,4 +22,8 @@
     <ProjectReference Include="..\ReviewApi\ReviewApi.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Files\" />
+  </ItemGroup>
+
 </Project>
