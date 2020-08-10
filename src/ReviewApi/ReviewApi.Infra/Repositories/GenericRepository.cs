@@ -21,14 +21,7 @@ namespace ReviewApi.Infra.Repositories
 
         public virtual async Task<bool> AlreadyExists(Guid id)
         {
-            try
-            {
-                return await Query().AnyAsync(entity => entity.Id == id);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            return await Query().AnyAsync(entity => entity.Id == id);
         }
 
         public async Task<int> Count()
@@ -38,63 +31,28 @@ namespace ReviewApi.Infra.Repositories
 
         public virtual async Task Create(T entity)
         {
-            try
-            {
-                await _dbSet.AddAsync(entity);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            await _dbSet.AddAsync(entity);
         }
 
         public virtual void Delete(T entity)
         {
-            try
-            {
-                _dbSet.Attach(entity);
-                _dbSet.Remove(entity);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            _dbSet.Attach(entity);
+            _dbSet.Remove(entity);
         }
 
         public virtual async Task<T> GetById(Guid id)
         {
-            try
-            {
-                return await Query().SingleOrDefaultAsync(entity => entity.Id == id);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            return await Query().SingleOrDefaultAsync(entity => entity.Id == id);
         }
 
         public virtual async Task Save()
         {
-            try
-            {
-                await _dbContext.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            await _dbContext.SaveChangesAsync();
         }
 
         public virtual void Update(T entity)
         {
-            try
-            {
-                _dbContext.Update(entity);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            _dbContext.Update(entity);
         }
 
         protected IQueryable<T> Query() => _dbSet.AsNoTracking();
