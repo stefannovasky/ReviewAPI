@@ -3,7 +3,6 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using ReviewApi.Domain.Entities;
@@ -11,12 +10,12 @@ using ReviewApi.Infra.Context;
 using ReviewApi.IntegrationTests.CustomWebApplicationFactory;
 using ReviewApi.IntegrationTests.Extensions;
 using ReviewApi.IntegrationTests.Helpers;
-using ReviewApi.Models;
 using ReviewApi.Shared.Utils;
 using Xunit;
 
 namespace ReviewApi.IntegrationTests.Controllers
 {
+    [Collection("Sequential")]
     public class ReviewControllerTest : IClassFixture<CustomWebApplicationFactory<Startup>>
     {
         private readonly CustomWebApplicationFactory<Startup> _webApplicationFactory;
@@ -112,7 +111,7 @@ namespace ReviewApi.IntegrationTests.Controllers
         public async Task ShouldReturnOkStatusCodeOnCallGetAll()
         {
             HttpResponseMessage response = await _httpClient.GetAsync("../reviews");
-            
+
             Assert.Equal((int)HttpStatusCode.OK, (int)response.StatusCode);
         }
 
