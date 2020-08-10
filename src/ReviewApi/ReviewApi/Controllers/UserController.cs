@@ -143,11 +143,11 @@ namespace ReviewApi.Controllers
         [HttpGet]
         [Authorize]
         [Route("profile")]
-        public async Task<IActionResult> GetProfile()
+        public async Task<IActionResult> GetAuthenticatedUserProfile()
         {
             try
             {
-                return Ok(await _userService.GetProfile(this.GetUserIdFromToken()));
+                return Ok(await _userService.GetAuthenticatedUserProfile(this.GetUserIdFromToken()));
             }
             catch (Exception exception)
             {
