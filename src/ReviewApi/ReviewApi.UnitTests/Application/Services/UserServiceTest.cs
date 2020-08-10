@@ -461,5 +461,29 @@ namespace ReviewApi.UnitTests.Application.Services
             await _userRepositoryMock.Received(1).Save();
             await _imageRepositoryMock.Received(1).Save();
         }
+
+        [Fact]
+        public async Task ShouldThrowResourceNotFoundOnGetUserProfile()
+        {
+            _userRepositoryMock.GetByNameIncludingImage(Arg.Any<string>()).Returns(null as User);
+            Exception exception = await Record.ExceptionAsync(() => _userService.GetProfile("USERNAME"));
+            Assert.IsType<ResourceNotFoundException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldThrowUserNotConfirmedOnGetUserProfile()
+        {
+            _userRepositoryMock.GetByNameIncludingImage(Arg.Any<string>()).Returns(_fakeNotConfirmedInsertedUser);
+            Exception exception = await Record.ExceptionAsync(() => _userService.GetProfile(_fakeNotConfirmedInsertedUser.Name));
+            Assert.IsType<UserNotConfirmedException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldGetProfile()
+        {
+            _userRepositoryMock.GetByNameIncludingImage(Arg.Any<string>()).Returns(_fakeConfirmedInsertedUser);
+            Exception exception = await Record.ExceptionAsync(() => _userService.GetProfile(_fakeConfirmedInsertedUser.Name));
+            Assert.Null(exception);
+        }
     }
 }
