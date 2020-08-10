@@ -19,7 +19,7 @@ namespace ReviewApi.Infra.Repositories
             _dbSet = _dbContext.Set<T>();
         }
 
-        public async Task<bool> AlreadyExists(Guid id)
+        public virtual async Task<bool> AlreadyExists(Guid id)
         {
             try
             {
@@ -31,7 +31,12 @@ namespace ReviewApi.Infra.Repositories
             }
         }
 
-        public async Task Create(T entity)
+        public async Task<int> Count()
+        {
+            return await Query().CountAsync();
+        }
+
+        public virtual async Task Create(T entity)
         {
             try
             {
@@ -43,7 +48,7 @@ namespace ReviewApi.Infra.Repositories
             }
         }
 
-        public void Delete(T entity)
+        public virtual void Delete(T entity)
         {
             try
             {
@@ -56,7 +61,7 @@ namespace ReviewApi.Infra.Repositories
             }
         }
 
-        public async Task<T> GetById(Guid id)
+        public virtual async Task<T> GetById(Guid id)
         {
             try
             {
@@ -68,7 +73,7 @@ namespace ReviewApi.Infra.Repositories
             }
         }
 
-        public async Task Save()
+        public virtual async Task Save()
         {
             try
             {
@@ -80,7 +85,7 @@ namespace ReviewApi.Infra.Repositories
             }
         }
 
-        public void Update(T entity)
+        public virtual void Update(T entity)
         {
             try
             {

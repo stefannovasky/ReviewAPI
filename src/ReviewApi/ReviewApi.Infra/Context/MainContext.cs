@@ -21,6 +21,8 @@ namespace ReviewApi.Infra.Context
 
             modelBuilder.ApplyConfiguration(new UserMapConfig());
             modelBuilder.ApplyConfiguration(new ProfileImageMapConfig());
+            modelBuilder.ApplyConfiguration(new ReviewMapConfig());
+            modelBuilder.ApplyConfiguration(new ReviewImageMapConfig());
 
             base.OnModelCreating(modelBuilder);
         }

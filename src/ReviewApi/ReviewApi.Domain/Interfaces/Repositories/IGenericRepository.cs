@@ -6,6 +6,7 @@ namespace ReviewApi.Domain.Interfaces.Repositories
 {
     public interface IGenericRepository<T> where T : BaseEntity
     {
+        Task<int> Count();
         Task<T> GetById(Guid id);
         Task Create(T entity);
         void Update(T entity);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ReviewApi.Domain.Dto;
 
 namespace ReviewApi.Domain.Entities
@@ -12,6 +13,7 @@ namespace ReviewApi.Domain.Entities
         public bool Confirmed { get; protected set; }
         public string ResetPasswordCode { get; protected set; }
         public ProfileImage ProfileImage { get; protected set; }
+        public IEnumerable<Review> Reviews { get; protected set; }
 
         public User()
         {
