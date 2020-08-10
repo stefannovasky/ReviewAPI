@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Models.Review;
 using ReviewApi.Controllers.Extensions;
+using ReviewApi.Domain.Exceptions;
 using ReviewApi.Models;
 
 namespace ReviewApi.Controllers
@@ -33,7 +34,7 @@ namespace ReviewApi.Controllers
                     Text = model.Text,
                     Title = model.Title
                 };
-                return Ok(await _reviewService.Create(this.GetUserIdFromToken(), serviceModel));
+                return CreatedAtRoute("", await _reviewService.Create(this.GetUserIdFromToken(), serviceModel));
             }
             catch (Exception exception)
             {
@@ -62,6 +63,10 @@ namespace ReviewApi.Controllers
             try
             {
                 await _reviewService.Delete(this.GetUserIdFromToken(), id);
+                return NoContent();
+            }
+            catch (ResourceNotFoundException)
+            {
                 return NoContent();
             }
             catch (Exception exception)
