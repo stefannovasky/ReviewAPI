@@ -23,6 +23,7 @@ namespace ReviewApi.IntegrationTests.Controllers
         private readonly MainContext _database;
         private readonly CreateRequestHelper _createRequestHelper;
         private readonly AuthorizationTokenHelper _authorizationTokenHelper;
+        private readonly TestFileHelper _fileHelper;
         private readonly User _insertedUser;
 
         public ReviewControllerTest(CustomWebApplicationFactory<Startup> webApplicationFactory)
@@ -31,6 +32,7 @@ namespace ReviewApi.IntegrationTests.Controllers
             _httpClient = _webApplicationFactory.CreateClient(new WebApplicationFactoryClientOptions());
             _createRequestHelper = new CreateRequestHelper();
             _authorizationTokenHelper = new AuthorizationTokenHelper();
+            _fileHelper = new TestFileHelper();
 
             DbContextOptions<MainContext> options = new DbContextOptionsBuilder<MainContext>()
                 .UseInMemoryDatabase(databaseName: "TestDatabase")
@@ -75,15 +77,13 @@ namespace ReviewApi.IntegrationTests.Controllers
 
         private MultipartFormDataContent CreateReviewMultipartFormContent()
         {
-            byte[] imageFile = File.ReadAllBytes(@"D:\images\83517838_1112176775819961_5680193972090330216_n.jpg");
-
             MultipartFormDataContent form = new MultipartFormDataContent()
             {
                 { new StringContent("TITLE"), "title" },
                 { new StringContent("TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT "), "text" },
                 { new StringContent("1"), "stars" },
             };
-            form.Add(new ByteArrayContent(imageFile), "image", "imagefilename.jpg");
+            form.Add(new ByteArrayContent(_fileHelper.GetTestFileImage()), "image", "imagefilename.jpg");
             return form;
         }
 
