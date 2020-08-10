@@ -400,7 +400,7 @@ namespace ReviewApi.UnitTests.Application.Services
         {
             _userRepositoryMock.GetByIdIncludingImage(Arg.Is<Guid>(id => id == _fakeConfirmedInsertedUser.Id)).Returns(_fakeConfirmedInsertedUser);
 
-            UserProfileResponseModel response = await _userService.GetProfile(_fakeConfirmedInsertedUser.Id.ToString());
+            UserProfileResponseModel response = await _userService.GetAuthenticatedUserProfile(_fakeConfirmedInsertedUser.Id.ToString());
 
             Assert.Equal(_fakeConfirmedInsertedUser.Name, response.Name);
             Assert.Equal(_fakeConfirmedInsertedUser.Email, response.Email);
@@ -412,7 +412,7 @@ namespace ReviewApi.UnitTests.Application.Services
         {
             _userRepositoryMock.GetById(Arg.Any<Guid>()).Returns(null as User);
 
-            Exception exception = await Record.ExceptionAsync(() => _userService.GetProfile(Guid.NewGuid().ToString()));
+            Exception exception = await Record.ExceptionAsync(() => _userService.GetAuthenticatedUserProfile(Guid.NewGuid().ToString()));
 
             Assert.IsType<ResourceNotFoundException>(exception);
         }
@@ -422,7 +422,7 @@ namespace ReviewApi.UnitTests.Application.Services
         {
             _userRepositoryMock.GetByIdIncludingImage(Arg.Any<Guid>()).Returns(_fakeNotConfirmedInsertedUser);
 
-            Exception exception = await Record.ExceptionAsync(() => _userService.GetProfile(Guid.NewGuid().ToString()));
+            Exception exception = await Record.ExceptionAsync(() => _userService.GetAuthenticatedUserProfile(Guid.NewGuid().ToString()));
 
             Assert.IsType<UserNotConfirmedException>(exception);
         }
