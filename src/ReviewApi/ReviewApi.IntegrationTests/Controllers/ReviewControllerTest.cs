@@ -24,7 +24,6 @@ namespace ReviewApi.IntegrationTests.Controllers
         private readonly CreateRequestHelper _createRequestHelper;
         private readonly AuthorizationTokenHelper _authorizationTokenHelper;
         private readonly User _insertedUser;
-        private readonly Review _insertedReview;
 
         public ReviewControllerTest(CustomWebApplicationFactory<Startup> webApplicationFactory)
         {
