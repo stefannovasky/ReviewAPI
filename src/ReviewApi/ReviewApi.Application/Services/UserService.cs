@@ -119,7 +119,7 @@ namespace ReviewApi.Application.Services
             await _emailUtils.SendEmail(user.Email, "Reset Password", $"Reset your password with this code: {user.ResetPasswordCode}");
         }
 
-        public async Task<UserProfileResponseModel> GetProfile(string userId)
+        public async Task<UserProfileResponseModel> GetAuthenticatedUserProfile(string userId)
         {
             User user = await _userRepository.GetByIdIncludingImage(Guid.Parse(userId));
             VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
@@ -219,6 +219,14 @@ namespace ReviewApi.Application.Services
                 }
                 throw new AlreadyExistsException("user email");
             }
+        }
+
+        public async Task<UserProfileResponseModel> GetProfile(string userName)
+        {
+            User user = await _userRepository.GetByNameIncludingImage(userName);
+            VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
+            string imageUrl = _fileUploadUtils.GenerateImageUrl(user.ProfileImage.FileName);
+            return new UserProfileResponseModel() { Email = user.Email, Name = user.Name, Image = imageUrl };
         }
     }
 }

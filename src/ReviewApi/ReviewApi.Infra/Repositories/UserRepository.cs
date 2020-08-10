@@ -73,6 +73,11 @@ namespace ReviewApi.Infra.Repositories
             }
         }
 
+        public async Task<User> GetByNameIncludingImage(string name)
+        {
+            return await Query().Include(u => u.ProfileImage).SingleOrDefaultAsync(user => user.Name == name);
+        }
+
         public async Task<User> GetByResetPasswordCode(string code)
         {
             try
