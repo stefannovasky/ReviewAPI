@@ -10,6 +10,7 @@ using ReviewApi.Domain.Dto;
 using ReviewApi.Domain.Entities;
 using ReviewApi.Domain.Exceptions;
 using ReviewApi.Domain.Interfaces.Repositories;
+using ReviewApi.Infra.Redis.Interfaces;
 using ReviewApi.Shared.Interfaces;
 using Xunit;
 
@@ -19,6 +20,8 @@ namespace ReviewApi.UnitTests.Application.Services
     {
         private readonly IReviewRepository _reviewRepositoryMock;
         private readonly IFileUploadUtils _fileUploadUtilsMock;
+        private readonly ICacheDatabase _cacheDatabaseUtilsMock;
+        private readonly IJsonUtils _jsonUtilsMock;
         private readonly IReviewService _reviewService;
         private readonly User _fakeInsertedConfirmedUser;
         private readonly User _fakeInsertedNotConfirmedUser;
@@ -27,8 +30,10 @@ namespace ReviewApi.UnitTests.Application.Services
         {
             _reviewRepositoryMock = NSubstitute.Substitute.For<IReviewRepository>();
             _fileUploadUtilsMock = NSubstitute.Substitute.For<IFileUploadUtils>();
-            _reviewService = new ReviewService(_reviewRepositoryMock, _fileUploadUtilsMock, "webappurl");
-            
+            _cacheDatabaseUtilsMock = NSubstitute.Substitute.For<ICacheDatabase>();
+            _jsonUtilsMock = NSubstitute.Substitute.For<IJsonUtils>();
+            _reviewService = new ReviewService(_reviewRepositoryMock, _fileUploadUtilsMock, _cacheDatabaseUtilsMock, _jsonUtilsMock, "webappurl");
+
             _fakeInsertedNotConfirmedUser = new User(Guid.NewGuid(), "user name", "user@mail.com", "password");
             _fakeInsertedConfirmedUser = new User(Guid.NewGuid(), "user name", "user@mail.com", "password");
             _fakeInsertedConfirmedUser.Confirm();
@@ -56,14 +61,14 @@ namespace ReviewApi.UnitTests.Application.Services
         [Fact]
         public async Task ShouldGetAllReviews()
         {
-            Review review1 = new Review("TITLE", "TEXT", 5, Guid.NewGuid()); 
-            Review review2 = new Review("TITLE", "TEXT", 5, Guid.NewGuid()); 
+            Review review1 = new Review("TITLE", "TEXT", 5, Guid.NewGuid());
+            Review review2 = new Review("TITLE", "TEXT", 5, Guid.NewGuid());
             Review review3 = new Review("TITLE", "TEXT", 5, Guid.NewGuid());
             _reviewRepositoryMock.GetAll(Arg.Any<int>()).Returns(new List<Review>() { review1, review2, review3 });
 
             Exception exception = await Record.ExceptionAsync(() => _reviewService.GetAll());
 
-            Assert.Null(exception); 
+            Assert.Null(exception);
         }
 
         [Fact]
