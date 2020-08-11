@@ -82,6 +82,7 @@ namespace ReviewApi.Application.Services
             review.Update(model.Title, model.Text, model.Stars);
             _reviewRepository.Update(review);
             await _reviewRepository.Save();
+            await _cacheDatabase.Set(review.Id.ToString(), _jsonUtils.Serialize(review));
         }
 
         public async Task<ReviewResponseModel> GetById(string userId, string reviewId)
