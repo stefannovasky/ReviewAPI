@@ -36,7 +36,15 @@ namespace ReviewApi
         {
             AddDbContext(services);
             services.AddControllers();
+
             services.AddCors();
+
+            services.AddDistributedRedisCache(options =>
+            {
+                options.Configuration =
+                    Configuration.GetConnectionString("RedisConnection");
+                options.InstanceName = "ReviewApi";
+            });
 
             byte[] key = Encoding.UTF8.GetBytes(Configuration["Secret"]);
             services.AddAuthentication(x =>
@@ -56,13 +64,15 @@ namespace ReviewApi
                 };
             });
 
+            services.AddTransient<ICacheDatabase>(services => new CacheDatabase(Configuration.GetConnectionString("RedisConnection")));
+
             services.AddTransient<IProfileImageRepository, ProfileImageRepository>();
             services.AddTransient<IImageService, ImageService>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IReviewRepository, ReviewRepository>(); 
             services.AddTransient<IReviewService>(service => new ReviewService(
-                service.GetRequiredService<IReviewRepository>(), service.GetRequiredService<IFileUploadUtils>(), _webApplicationUrl)
+                service.GetRequiredService<IReviewRepository>(), service.GetRequiredService<IFileUploadUtils>(), service.GetRequiredService<ICacheDatabase>(), service.GetRequiredService<IJsonUtils>(), _webApplicationUrl)
             );
 
             services.AddTransient<IRedisConnector>(service => new RedisConnector(Configuration.GetConnectionString("RedisConnection")));
