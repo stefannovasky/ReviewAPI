@@ -11,13 +11,19 @@ namespace ReviewApi.Shared.Utils
         {
             return JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings()
             {
-                ContractResolver = new NonPublicPropertiesResolver()
+                ContractResolver = new NonPublicPropertiesResolver(),
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                PreserveReferencesHandling = PreserveReferencesHandling.None
             });
         }
 
         public string Serialize(object obj)
         {
-            return JsonConvert.SerializeObject(obj);
+            return JsonConvert.SerializeObject(obj, new JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                PreserveReferencesHandling = PreserveReferencesHandling.None
+            });
         }
     }
 
