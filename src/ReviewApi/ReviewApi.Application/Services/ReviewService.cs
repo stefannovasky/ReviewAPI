@@ -58,6 +58,7 @@ namespace ReviewApi.Application.Services
             VerifyIfAuthenticatedIsReviewCreatorAndThrow(review, Guid.Parse(userId));
             _reviewRepository.Delete(review);
             await _reviewRepository.Save();
+            await _cacheDatabase.Remove(review.Id.ToString());
         }
 
         public async Task<PaginationResponseModel<ReviewResponseModel>> GetAll(int page = 1, int quantityPerPage = 14)
