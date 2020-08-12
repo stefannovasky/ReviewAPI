@@ -43,7 +43,6 @@ namespace ReviewApi.Application.Services
 
             await _reviewRepository.Create(review);
             await _reviewRepository.Save();
-            await _cacheDatabase.Set(review.Id.ToString(), _jsonUtils.Serialize(review));
 
             return new IdResponseModel() { Id = review.Id };
         }
