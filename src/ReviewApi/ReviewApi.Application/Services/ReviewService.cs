@@ -12,6 +12,7 @@ using ReviewApi.Domain.Dto;
 using ReviewApi.Domain.Entities;
 using ReviewApi.Domain.Exceptions;
 using ReviewApi.Domain.Interfaces.Repositories;
+using ReviewApi.Infra.Redis.Interfaces;
 using ReviewApi.Shared.Interfaces;
 
 namespace ReviewApi.Application.Services
@@ -20,12 +21,16 @@ namespace ReviewApi.Application.Services
     {
         private readonly IReviewRepository _reviewRepository;
         private readonly IFileUploadUtils _fileUploadUtils;
+        private readonly ICacheDatabase _cacheDatabase;
+        private readonly IJsonUtils _jsonUtils;
         private readonly string _webApplicationUrl;
 
-        public ReviewService(IReviewRepository reviewRepository, IFileUploadUtils fileUploadUtils, string webApplicationUrl)
+        public ReviewService(IReviewRepository reviewRepository, IFileUploadUtils fileUploadUtils, ICacheDatabase cacheDatabase, IJsonUtils jsonUtils, string webApplicationUrl)
         {
             _reviewRepository = reviewRepository;
             _fileUploadUtils = fileUploadUtils;
+            _cacheDatabase = cacheDatabase;
+            _jsonUtils = jsonUtils;
             _webApplicationUrl = webApplicationUrl;
         }
 
@@ -52,6 +57,7 @@ namespace ReviewApi.Application.Services
             VerifyIfAuthenticatedIsReviewCreatorAndThrow(review, Guid.Parse(userId));
             _reviewRepository.Delete(review);
             await _reviewRepository.Save();
+            await _cacheDatabase.Remove(review.Id.ToString());
         }
 
         public async Task<PaginationResponseModel<ReviewResponseModel>> GetAll(int page = 1, int quantityPerPage = 14)
@@ -75,24 +81,24 @@ namespace ReviewApi.Application.Services
             review.Update(model.Title, model.Text, model.Stars);
             _reviewRepository.Update(review);
             await _reviewRepository.Save();
+            await _cacheDatabase.Set(review.Id.ToString(), _jsonUtils.Serialize(review));
         }
 
         public async Task<ReviewResponseModel> GetById(string userId, string reviewId)
         {
-            Review review = await _reviewRepository.GetById(Guid.Parse(reviewId));
-            if (review == null)
+            string reviewRegisteredOnCacheJson = await _cacheDatabase.Get(reviewId);
+            if (reviewRegisteredOnCacheJson == null)
             {
-                throw new ResourceNotFoundException("review not found.");
+                Review review = await _reviewRepository.GetById(Guid.Parse(reviewId));
+                if (review == null)
+                {
+                    throw new ResourceNotFoundException("review not found.");
+                }
+                await _cacheDatabase.Set(review.Id.ToString(), _jsonUtils.Serialize(review));
+                return ConvertReviewToReviewResponseModel(review);
             }
-            return new ReviewResponseModel()
-            {
-                Id = review.Id, 
-                Creator = review.Creator.Name,
-                Image = _fileUploadUtils.GenerateImageUrl(review.Image.FileName), 
-                Stars = review.Stars, 
-                Text = review.Text, 
-                Title = review.Title
-            };
+            Review reviewRegisteredOnCache = _jsonUtils.Deserialize<Review>(reviewRegisteredOnCacheJson);
+            return ConvertReviewToReviewResponseModel(reviewRegisteredOnCache);
         }
 
         private PaginationResponseModel<ReviewResponseModel> CreatePaginationResult(IEnumerable<Review> reviews, int totalReviewsInserteds, int actualPage, int quantityPerPage)
