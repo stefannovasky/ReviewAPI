@@ -84,7 +84,7 @@ namespace ReviewApi.Application.Services
             await _cacheDatabase.Set(review.Id.ToString(), _jsonUtils.Serialize(review));
         }
 
-        public async Task<ReviewResponseModel> GetById(string userId, string reviewId)
+        public async Task<ReviewResponseModel> GetById(string reviewId)
         {
             string reviewRegisteredOnCacheJson = await _cacheDatabase.Get(reviewId);
             if (reviewRegisteredOnCacheJson == null)
