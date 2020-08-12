@@ -87,18 +87,19 @@ namespace ReviewApi.Application.Services
         public async Task<ReviewResponseModel> GetById(string reviewId)
         {
             string reviewRegisteredOnCacheJson = await _cacheDatabase.Get(reviewId);
-            if (reviewRegisteredOnCacheJson == null)
+            if (reviewRegisteredOnCacheJson != null)
             {
-                Review review = await _reviewRepository.GetById(Guid.Parse(reviewId));
-                if (review == null)
-                {
-                    throw new ResourceNotFoundException("review not found.");
-                }
-                await _cacheDatabase.Set(review.Id.ToString(), _jsonUtils.Serialize(review));
-                return ConvertReviewToReviewResponseModel(review);
+                Review reviewRegisteredOnCache = _jsonUtils.Deserialize<Review>(reviewRegisteredOnCacheJson);
+                return ConvertReviewToReviewResponseModel(reviewRegisteredOnCache);
             }
-            Review reviewRegisteredOnCache = _jsonUtils.Deserialize<Review>(reviewRegisteredOnCacheJson);
-            return ConvertReviewToReviewResponseModel(reviewRegisteredOnCache);
+
+            Review review = await _reviewRepository.GetById(Guid.Parse(reviewId));
+            if (review == null)
+            {
+                throw new ResourceNotFoundException("review not found.");
+            }
+            await _cacheDatabase.Set(review.Id.ToString(), _jsonUtils.Serialize(review));
+            return ConvertReviewToReviewResponseModel(review);
         }
 
         private PaginationResponseModel<ReviewResponseModel> CreatePaginationResult(IEnumerable<Review> reviews, int totalReviewsInserteds, int actualPage, int quantityPerPage)
