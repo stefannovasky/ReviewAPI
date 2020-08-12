@@ -107,6 +107,31 @@ namespace ReviewApi.UnitTests.Application.Services
         }
 
         [Fact]
+        public async Task ShouldThrowForbiddenExceptionODelete()
+        {
+            Guid reviewCreatorIdDifferentThanAuthenticatedUserId = Guid.NewGuid();
+            _reviewRepositoryMock.GetById(Arg.Any<Guid>()).Returns(new Review("", "", 1, reviewCreatorIdDifferentThanAuthenticatedUserId));
+
+            Exception exception = await Record.ExceptionAsync(() => _reviewService.Delete(_fakeInsertedConfirmedUser.Id.ToString(), Guid.NewGuid().ToString()));
+
+            Assert.IsType<ForbiddenException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldDelete()
+        {
+            Guid userId = Guid.NewGuid();
+            _reviewRepositoryMock.GetById(Arg.Any<Guid>()).Returns(new Review("", "", 1, userId));
+
+            Exception exception = await Record.ExceptionAsync(() => _reviewService.Delete(userId.ToString(), Guid.NewGuid().ToString()));
+
+            Assert.Null(exception);
+            _reviewRepositoryMock.Received(1).Delete(Arg.Any<Review>());
+            await _reviewRepositoryMock.Received(1).Save();
+            await _cacheDatabaseUtilsMock.Received(1).Remove(Arg.Any<string>());
+        }
+
+        [Fact]
         public async Task ShouldUpdate()
         {
             Guid reviewId = Guid.NewGuid();
@@ -125,6 +150,8 @@ namespace ReviewApi.UnitTests.Application.Services
             Assert.Null(exception);
             _reviewRepositoryMock.Received(1).Update(Arg.Any<Review>());
             await _reviewRepositoryMock.Received(1).Save();
+            await _cacheDatabaseUtilsMock.Received(1).Set(Arg.Any<string>(), Arg.Any<string>());
+            _jsonUtilsMock.Received(1).Serialize(Arg.Any<object>());
         }
     }
 }

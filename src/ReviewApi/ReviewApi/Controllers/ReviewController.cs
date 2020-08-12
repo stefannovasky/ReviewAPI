@@ -105,7 +105,7 @@ namespace ReviewApi.Controllers
         {
             try
             {
-                return Ok(await _reviewService.GetById(this.GetUserIdFromToken(), id));
+                return Ok(await _reviewService.GetById(id));
             }
             catch (Exception exception)
             {
