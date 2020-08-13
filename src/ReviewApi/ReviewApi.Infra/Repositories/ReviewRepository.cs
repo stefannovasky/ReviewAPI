@@ -34,5 +34,15 @@ namespace ReviewApi.Infra.Repositories
                 .Include(r => r.Creator)
                 .SingleOrDefaultAsync(r => r.Id == id);
         }
+
+        public async Task<IEnumerable<Review>> Search(string text)
+        {
+            string textInLowerCase = text.ToLower();
+            return await Query()
+                .Include(r => r.Image)
+                .Include(r => r.Creator)
+                .Where(r => r.Title.Contains(textInLowerCase))
+                .ToListAsync();
+        }
     }
 }
