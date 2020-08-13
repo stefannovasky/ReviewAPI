@@ -153,5 +153,13 @@ namespace ReviewApi.UnitTests.Application.Services
             await _cacheDatabaseUtilsMock.Received(1).Set(Arg.Any<string>(), Arg.Any<string>());
             _jsonUtilsMock.Received(1).Serialize(Arg.Any<object>());
         }
+
+        [Fact]
+        public async Task ShouldReturnNullOnCallSearch()
+        {
+            IEnumerable<ReviewResponseModel> reviews = await _reviewService.Search("");
+
+            Assert.Null(reviews);
+        }
     }
 }

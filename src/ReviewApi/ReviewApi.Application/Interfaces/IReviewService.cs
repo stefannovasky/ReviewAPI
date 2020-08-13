@@ -12,5 +12,6 @@ namespace ReviewApi.Application.Interfaces
         Task Delete(string userId, string reviewId);
         Task Update(string userId, string reviewId, CreateOrUpdateReviewRequestModel model);
         Task<ReviewResponseModel> GetById(string reviewId);
+        Task<IEnumerable<ReviewResponseModel>> Search(string text);
     }
 }

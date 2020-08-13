@@ -102,6 +102,16 @@ namespace ReviewApi.Application.Services
             return ConvertReviewToReviewResponseModel(review);
         }
 
+        public async Task<IEnumerable<ReviewResponseModel>> Search(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return null;
+            }
+            IEnumerable<Review> reviews = await _reviewRepository.Search(text);
+            return reviews.ToList().Select(r => ConvertReviewToReviewResponseModel(r));
+        }
+
         private PaginationResponseModel<ReviewResponseModel> CreatePaginationResult(IEnumerable<Review> reviews, int totalReviewsInserteds, int actualPage, int quantityPerPage)
         {
             int previousPage = actualPage - 1;

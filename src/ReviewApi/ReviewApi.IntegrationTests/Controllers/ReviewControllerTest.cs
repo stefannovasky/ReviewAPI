@@ -217,5 +217,35 @@ namespace ReviewApi.IntegrationTests.Controllers
 
             Assert.Equal((int)HttpStatusCode.Unauthorized, (int)response.StatusCode);
         }
+
+        [Fact]
+        public async Task ShouldReturnUnauthorizedtOnCallSearch()
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync("../reviews/search=a");
+
+            Assert.Equal((int)HttpStatusCode.Unauthorized, (int)response.StatusCode);
+        }
+
+        [Fact]
+        public async Task ShouldReturnNoContentOnCallSearch()
+        {
+            _httpClient.InsertAuthorizationTokenOnRequestHeader(_authorizationTokenHelper.CreateToken(Guid.NewGuid()));
+
+            HttpResponseMessage response = await _httpClient.GetAsync("../reviews/search?=a");
+
+            Assert.Equal((int)HttpStatusCode.NoContent, (int)response.StatusCode);
+        }
+
+        [Fact]
+        public async Task ShouldReturnOkOnCallSearch()
+        {
+            await InsertUserOnDatabase();
+            Review insertedReview = await InsertReviewOnDatabase();
+            _httpClient.InsertAuthorizationTokenOnRequestHeader(_authorizationTokenHelper.CreateToken(Guid.NewGuid()));
+
+            HttpResponseMessage response = await _httpClient.GetAsync($"../reviews/search?={insertedReview.Title}");
+
+            Assert.Equal((int)HttpStatusCode.NoContent, (int)response.StatusCode);
+        }
     }
 }
