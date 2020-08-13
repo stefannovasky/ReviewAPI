@@ -112,5 +112,20 @@ namespace ReviewApi.Controllers
                 return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
             }
         }
+
+        [HttpGet]
+        [Authorize]
+        [Route("search")]
+        public async Task<IActionResult> Search([FromQuery] string text) 
+        {
+            try
+            {
+                return Ok(await _reviewService.Search(text));
+            }
+            catch (Exception exception)
+            {
+                return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
+            }
+        }
     }
 }
