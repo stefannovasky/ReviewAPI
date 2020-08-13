@@ -104,6 +104,10 @@ namespace ReviewApi.Application.Services
 
         public async Task<IEnumerable<ReviewResponseModel>> Search(string text)
         {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return null;
+            }
             IEnumerable<Review> reviews = await _reviewRepository.Search(text);
             return reviews.ToList().Select(r => ConvertReviewToReviewResponseModel(r));
         }
