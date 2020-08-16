@@ -43,6 +43,11 @@ namespace ReviewApi.Infra.Repositories
             return await Query().Include(u => u.ProfileImage).SingleOrDefaultAsync(user => user.Name == name);
         }
 
+        public async Task<User> GetByNameIncludingReviews(string name)
+        {
+            return await Query().Include(u => u.Reviews).ThenInclude(r => r.Image).SingleOrDefaultAsync(u => u.Name == name);
+        }
+
         public async Task<User> GetByResetPasswordCode(string code)
         {
             return await Query().SingleOrDefaultAsync(user => user.ResetPasswordCode == code);
