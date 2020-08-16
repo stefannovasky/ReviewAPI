@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
+using ReviewApi.Application.Models.Review;
 using ReviewApi.Application.Models.User;
 
 namespace ReviewApi.Application.Interfaces
@@ -17,5 +19,6 @@ namespace ReviewApi.Application.Interfaces
         Task<UserProfileResponseModel> GetAuthenticatedUserProfile(string userId);
         Task UpdateProfileImage(string userId, Stream imageStream);
         Task<UserProfileResponseModel> GetProfile(string userName);
+        Task<IEnumerable<ReviewResponseModel>> GetUserReviews(string name);
     }
 }
