@@ -186,5 +186,20 @@ namespace ReviewApi.Controllers
                 return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception); 
             }
         }
+
+        [HttpGet]
+        [Authorize]
+        [Route("{userName}/reviews")]
+        public async Task<IActionResult> GetUserReviews(string userName)
+        {
+            try
+            {
+                return Ok(await _userService.GetUserReviews(userName));
+            }
+            catch (Exception exception)
+            {
+                return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
+            }
+        }
     }
 }

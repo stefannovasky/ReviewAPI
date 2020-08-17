@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using ReviewApi.Application.Interfaces;
+using ReviewApi.Application.Models.Review;
 using ReviewApi.Application.Models.User;
 using ReviewApi.Application.Validators.Extensions;
 using ReviewApi.Application.Validators.User;
@@ -227,6 +230,25 @@ namespace ReviewApi.Application.Services
             VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
             string imageUrl = _fileUploadUtils.GenerateImageUrl(user.ProfileImage.FileName);
             return new UserProfileResponseModel() { Email = user.Email, Name = user.Name, Image = imageUrl };
+        }
+
+        public async Task<IEnumerable<ReviewResponseModel>> GetUserReviews(string name)
+        {
+            User user = await _userRepository.GetByNameIncludingReviews(name);
+            if (user == null)
+            {
+                throw new ResourceNotFoundException("user not found."); 
+            }
+
+            return user.Reviews.ToList().Select(r => new ReviewResponseModel()
+            {
+                Creator = user.Name,
+                Id = r.Id,
+                Image = _fileUploadUtils.GenerateImageUrl(r.Image.FileName),
+                Stars = r.Stars,
+                Text = r.Text,
+                Title = r.Title
+            });
         }
     }
 }
