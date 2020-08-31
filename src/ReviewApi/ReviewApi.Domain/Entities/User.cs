@@ -14,6 +14,7 @@ namespace ReviewApi.Domain.Entities
         public string ResetPasswordCode { get; protected set; }
         public ProfileImage ProfileImage { get; protected set; }
         public IEnumerable<Review> Reviews { get; protected set; }
+        public IEnumerable<Favorite> Favorites { get; protected set; }
 
         public User()
         {
