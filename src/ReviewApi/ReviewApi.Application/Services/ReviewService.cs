@@ -59,7 +59,7 @@ namespace ReviewApi.Application.Services
             await _reviewRepository.Save();
             await _cacheDatabase.Remove(review.Id.ToString());
         }
-
+        
         public async Task<PaginationResponseModel<ReviewResponseModel>> GetAll(int page = 1, int quantityPerPage = 14)
         {
             int count = await _reviewRepository.Count();
@@ -115,15 +115,12 @@ namespace ReviewApi.Application.Services
         private PaginationResponseModel<ReviewResponseModel> CreatePaginationResult(IEnumerable<Review> reviews, int totalReviewsInserteds, int actualPage, int quantityPerPage)
         {
             int previousPage = actualPage - 1;
-            if (previousPage == 0)
-            {
-                previousPage = 1;
-            }
+            string previousPageUrl = previousPage > 0 ? $"{_webApplicationUrl}/reviews?page={previousPage}&quantity={quantityPerPage}" : null;
             return new PaginationResponseModel<ReviewResponseModel>()
             {
                 Data = reviews.Select(r => ConvertReviewToReviewResponseModel(r)),
                 NextPage = $"{_webApplicationUrl}/reviews?page={actualPage + 1}&quantity={quantityPerPage}",
-                PreviousPage = $"{_webApplicationUrl}/reviews?page={previousPage}&quantity={quantityPerPage}",
+                PreviousPage = previousPageUrl,
                 Total = totalReviewsInserteds
             };
         }
