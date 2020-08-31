@@ -19,19 +19,24 @@ namespace ReviewApi.Application.Services
             _reviewRepository = reviewRepository; 
         }
 
-        public async Task<IdResponseModel> Create(string userId, string reviewId)
+        public async Task CreateOrDelete(string userId, string reviewId)
         {
             Guid userIdGuid = Guid.Parse(userId);
             Guid reviewIdGuid = Guid.Parse(reviewId);
 
-            await ThrowIfReviewNotExists(reviewIdGuid);
-            await ThrowIfReviewAlreadyExists(userIdGuid, reviewIdGuid);
-          
-            Favorite favorite = new Favorite(Guid.Parse(userId), Guid.Parse(reviewId));
-            await _favoriteRepository.Create(favorite);
-            await _favoriteRepository.Save();
+            Favorite insertedFavorite = await _favoriteRepository.GetByUserIdAndReviewId(userIdGuid, reviewIdGuid);
+            if (insertedFavorite == null)
+            {
+                await ThrowIfReviewNotExists(reviewIdGuid);
+                
+                Favorite favorite = new Favorite(Guid.Parse(userId), Guid.Parse(reviewId));
+                await _favoriteRepository.Create(favorite);
+                await _favoriteRepository.Save();
+                return; 
+            }
 
-            return new IdResponseModel() { Id = favorite.Id }; 
+            _favoriteRepository.Delete(insertedFavorite);
+            await _favoriteRepository.Save();
         }
 
         private async Task ThrowIfReviewNotExists(Guid id) 
@@ -42,12 +47,13 @@ namespace ReviewApi.Application.Services
             }
         }
 
-        private async Task ThrowIfReviewAlreadyExists(Guid userId, Guid reviewId)
+        private async Task<bool> FavoriteAlreadyExists(Guid userId, Guid reviewId)
         {
             if (await _favoriteRepository.AlreadyExists(userId, reviewId))
             {
-                throw new AlreadyExistsException("favorite");
+                return true;
             }
+            return false; 
         }
     }
 }
