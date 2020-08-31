@@ -18,5 +18,10 @@ namespace ReviewApi.Infra.Repositories
         {
             return await Query().AnyAsync(favorite => favorite.UserId == userId && favorite.ReviewId == reviewId);
         }
+
+        public async Task<Favorite> GetByUserIdAndReviewId(Guid userId, Guid reviewId)
+        {
+            return await Query().SingleOrDefaultAsync(favorite => favorite.UserId == userId && favorite.ReviewId == reviewId);
+        }
     }
 }
