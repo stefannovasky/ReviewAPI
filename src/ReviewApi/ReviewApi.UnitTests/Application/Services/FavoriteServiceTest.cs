@@ -29,22 +29,36 @@ namespace ReviewApi.UnitTests.Application.Services
         {
             _reviewRepositoryMock.AlreadyExists(Arg.Any<Guid>()).Returns(false);
 
-            Exception exception = await Record.ExceptionAsync(() => _favoriteService.Create(Guid.NewGuid().ToString(), Guid.NewGuid().ToString()));
+            Exception exception = await Record.ExceptionAsync(() => _favoriteService.CreateOrDelete(Guid.NewGuid().ToString(), Guid.NewGuid().ToString()));
 
             Assert.IsType<ResourceNotFoundException>(exception);
             Assert.Equal("review not found.", exception.Message);
         }
 
         [Fact]
-        public async Task ShouldThrowAlreadyExistsExceptionOnCreateAlreadyExistsFavorite()
+        public async Task ShouldCreateFavorite() 
         {
             _reviewRepositoryMock.AlreadyExists(Arg.Any<Guid>()).Returns(true);
-            _favoriteRepositoryMock.AlreadyExists(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(true);
+            _favoriteRepositoryMock.GetByUserIdAndReviewId(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(null as Favorite);
 
-            Exception exception = await Record.ExceptionAsync(() => _favoriteService.Create(Guid.NewGuid().ToString(), Guid.NewGuid().ToString()));
+            Exception exception = await Record.ExceptionAsync(() => _favoriteService.CreateOrDelete(Guid.NewGuid().ToString(), Guid.NewGuid().ToString()));
 
-            Assert.IsType<AlreadyExistsException>(exception);
-            Assert.Equal("favorite already exists.", exception.Message);
+            Assert.Null(exception);
+            await _favoriteRepositoryMock.Received(1).Create(Arg.Any<Favorite>());
+            await _favoriteRepositoryMock.Received(1).Save();
+        }
+
+        [Fact]
+        public async Task ShouldDeleteFavorite() 
+        {
+            _reviewRepositoryMock.AlreadyExists(Arg.Any<Guid>()).Returns(true);
+            _favoriteRepositoryMock.GetByUserIdAndReviewId(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(new Favorite());
+
+            Exception exception = await Record.ExceptionAsync(() => _favoriteService.CreateOrDelete(Guid.NewGuid().ToString(), Guid.NewGuid().ToString()));
+
+            Assert.Null(exception);
+            _favoriteRepositoryMock.Received(1).Delete(Arg.Any<Favorite>());
+            await _favoriteRepositoryMock.Received(1).Save();
         }
     }
 }

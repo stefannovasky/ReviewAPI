@@ -63,7 +63,7 @@ namespace ReviewApi.IntegrationTests.Controllers
             return review;
         }
 
-                private async Task<Favorite> InsertFavoriteOnDatabase(Guid userId, Guid reviewId)
+        private async Task<Favorite> InsertFavoriteOnDatabase(Guid userId, Guid reviewId)
         {
             Favorite favorite = new Favorite(userId, reviewId);
 
@@ -75,45 +75,45 @@ namespace ReviewApi.IntegrationTests.Controllers
         }
 
         [Fact]
-        public async Task ShouldReturnUnauthorizedOnCallCreate() 
+        public async Task ShouldReturnUnauthorizedOnCallUpdate() 
         {
-            HttpResponseMessage response = await _httpClient.PostAsync($"../reviews/{Guid.NewGuid().ToString()}/favorites", null);
+            HttpResponseMessage response = await _httpClient.PutAsync($"../reviews/{Guid.NewGuid().ToString()}/favorites", null);
 
             Assert.Equal((int)HttpStatusCode.Unauthorized, (int)response.StatusCode);
         }
 
         [Fact]
-        public async Task ShouldReturnBadRequestOnCallCreateInNotExistsReview() 
+        public async Task ShouldReturnBadRequestOnCallUpdateInNotExistsReview() 
         {
             User user = await InsertUserOnDatabase();
             _httpClient.InsertAuthorizationTokenOnRequestHeader(_authorizationTokenHelper.CreateToken(user.Id));
 
-            HttpResponseMessage response = await _httpClient.PostAsync($"../reviews/{Guid.NewGuid().ToString()}/favorites", null);
+            HttpResponseMessage response = await _httpClient.PutAsync($"../reviews/{Guid.NewGuid().ToString()}/favorites", null);
 
             Assert.Equal((int)HttpStatusCode.BadRequest, (int)response.StatusCode);
         }
 
         [Fact]
-        public async Task ShouldReturnBadRequestOnCallCreateAlreadyExistsFavorite()
+        public async Task ShouldReturnOkOnCallDeleteAlreadyExistsFavorite()
         {
             User user = await InsertUserOnDatabase();
             Review review = await InsertReviewOnDatabase();
             Favorite favorite = await InsertFavoriteOnDatabase(user.Id, review.Id);
             _httpClient.InsertAuthorizationTokenOnRequestHeader(_authorizationTokenHelper.CreateToken(user.Id));
 
-            HttpResponseMessage response = await _httpClient.PostAsync($"../reviews/{review.Id.ToString()}/favorites", null);
+            HttpResponseMessage response = await _httpClient.PutAsync($"../reviews/{review.Id.ToString()}/favorites", null);
 
-            Assert.Equal((int)HttpStatusCode.BadRequest, (int)response.StatusCode);
+            Assert.Equal((int)HttpStatusCode.OK, (int)response.StatusCode);
         }
 
         [Fact]
-        public async Task ShouldReturnOkOnCallCreate()
+        public async Task ShouldReturnOkOnCallUpdate()
         {
             User user = await InsertUserOnDatabase();
             Review review = await InsertReviewOnDatabase();
             _httpClient.InsertAuthorizationTokenOnRequestHeader(_authorizationTokenHelper.CreateToken(user.Id));
 
-            HttpResponseMessage response = await _httpClient.PostAsync($"../reviews/{review.Id.ToString()}/favorites", null);
+            HttpResponseMessage response = await _httpClient.PutAsync($"../reviews/{review.Id.ToString()}/favorites", null);
 
             Assert.Equal((int)HttpStatusCode.OK, (int)response.StatusCode);
         }
