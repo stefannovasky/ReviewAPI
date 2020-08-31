@@ -69,7 +69,9 @@ namespace ReviewApi
             services.AddTransient<IProfileImageRepository, ProfileImageRepository>();
             services.AddTransient<IImageService, ImageService>();
             services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<IFavoriteRepository, FavoriteRepository>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IFavoriteService, FavoriteService>();
             services.AddTransient<IReviewRepository, ReviewRepository>(); 
             services.AddTransient<IReviewService>(service => new ReviewService(
                 service.GetRequiredService<IReviewRepository>(), service.GetRequiredService<IFileUploadUtils>(), service.GetRequiredService<ICacheDatabase>(), service.GetRequiredService<IJsonUtils>(), _webApplicationUrl)
