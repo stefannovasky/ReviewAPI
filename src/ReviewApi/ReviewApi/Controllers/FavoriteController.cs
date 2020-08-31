@@ -17,13 +17,14 @@ namespace ReviewApi.Controllers
             _favoriteService = favoriteService;
         }
 
-        [HttpPost]
+        [HttpPut]
         [Authorize]
-        public async Task<IActionResult> Create(string reviewId)
+        public async Task<IActionResult> Update(string reviewId)
         {
             try
             {
-                return Ok(await _favoriteService.Create(this.GetUserIdFromToken(), reviewId));
+                await _favoriteService.CreateOrDelete(this.GetUserIdFromToken(), reviewId);
+                return Ok();
             }
             catch (Exception exception)
             {
