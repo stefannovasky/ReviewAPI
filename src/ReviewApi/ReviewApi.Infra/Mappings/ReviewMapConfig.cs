@@ -37,6 +37,9 @@ namespace ReviewApi.Infra.Mappings
             builder.HasOne<ReviewImage>(a => a.Image)
                .WithOne(b => b.Review)
                .HasForeignKey<ReviewImage>(b => b.ReviewId);
+            builder.HasMany<Favorite>(a => a.Favorites)
+                .WithOne(b => b.Review)
+                .HasForeignKey(b => b.ReviewId);
         }
     }
 }
