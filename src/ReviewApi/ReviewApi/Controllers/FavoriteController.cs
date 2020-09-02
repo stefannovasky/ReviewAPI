@@ -31,5 +31,19 @@ namespace ReviewApi.Controllers
                 return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
             }
         }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetAllFromReview(string reviewId, [FromQuery(Name = "page")] int page, [FromQuery(Name = "quantityPerPage")] int quantityPerPage) 
+        {
+            try
+            {
+                return Ok(await _favoriteService.GetAllFromReview(reviewId, page, quantityPerPage));
+            }
+            catch (Exception exception)
+            {
+                return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
+            }
+        }
     }
 }
