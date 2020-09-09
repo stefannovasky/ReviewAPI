@@ -6,6 +6,7 @@ using ReviewApi.Application.Services;
 using ReviewApi.Domain.Entities;
 using ReviewApi.Domain.Exceptions;
 using ReviewApi.Domain.Interfaces.Repositories;
+using ReviewApi.Shared.Interfaces;
 using Xunit;
 
 namespace ReviewApi.UnitTests.Application.Services
@@ -14,14 +15,16 @@ namespace ReviewApi.UnitTests.Application.Services
     {
         private readonly IFavoriteRepository _favoriteRepositoryMock;
         private readonly IReviewRepository _reviewRepositoryMock;
+        private readonly IFileUploadUtils _fileUploadUtils;
         private readonly IFavoriteService _favoriteService;
 
         public FavoriteServiceTest()
         {
             _favoriteRepositoryMock = NSubstitute.Substitute.For<IFavoriteRepository>();
             _reviewRepositoryMock = NSubstitute.Substitute.For<IReviewRepository>();
+            _fileUploadUtils = NSubstitute.Substitute.For<IFileUploadUtils>();
 
-            _favoriteService = new FavoriteService(_favoriteRepositoryMock, _reviewRepositoryMock);
+            _favoriteService = new FavoriteService(_favoriteRepositoryMock, _reviewRepositoryMock, _fileUploadUtils, "");
         }
 
         [Fact]
