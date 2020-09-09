@@ -26,6 +26,10 @@ namespace ReviewApi.Controllers.Extensions
             {
                 return controller.Forbid();
             }
+            else if (exception is FormatException && exception.Message.ToLower().Contains("guid"))
+            {
+                return controller.BadRequest(new { Error = new { Message = "Bad UUID format." } });
+            }
 
             log.Error(JsonConvert.SerializeObject(exception));
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);

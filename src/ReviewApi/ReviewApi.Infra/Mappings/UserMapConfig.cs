@@ -42,6 +42,11 @@ namespace ReviewApi.Infra.Mappings
             builder.HasOne<ProfileImage>(a => a.ProfileImage)
                 .WithOne(b => b.User)
                 .HasForeignKey<ProfileImage>(b => b.UserId);
+
+            builder.HasMany<Favorite>(a => a.Favorites)
+                .WithOne(b => b.User)
+                .HasForeignKey(b => b.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

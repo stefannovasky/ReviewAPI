@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ReviewApi.Domain.Entities
 {
@@ -10,6 +11,7 @@ namespace ReviewApi.Domain.Entities
         public Guid CreatorId { get; protected set; }
         public User Creator { get; protected set; }
         public ReviewImage Image { get; protected set; }
+        public IEnumerable<Favorite> Favorites { get; protected set; }
 
         public Review()
         {

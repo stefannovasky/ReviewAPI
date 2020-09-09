@@ -13,9 +13,9 @@ namespace ReviewApi.Infra.Repositories
         {
         }
 
-        public async Task<bool> AlreadyExists(string email)
+        public async Task<bool> AlreadyExists(string name)
         {
-            return await _dbSet.AnyAsync(user => user.Email == email);
+            return await _dbSet.AnyAsync(user => user.Name == name);
         }
 
         public async Task<User> GetByConfirmationCode(string code)
