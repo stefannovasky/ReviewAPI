@@ -26,7 +26,7 @@ namespace ReviewApi.Infra.Repositories
             return await Query().CountAsync(favorite => favorite.ReviewId == reviewId);
         }
 
-        public async Task<IEnumerable<Favorite>> GetByReviewId(Guid reviewId, int page, int quantityPerPage)
+        public async Task<IEnumerable<Favorite>> GetAllByReviewId(Guid reviewId, int page, int quantityPerPage)
         {
             int skip = (page - 1) * quantityPerPage;
             return await Query()
@@ -38,9 +38,26 @@ namespace ReviewApi.Infra.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Favorite>> GetAllByUserIdIncludingReview(Guid userId, int page, int quantityPerPage)
+        {
+            int skip = (page - 1) * quantityPerPage;
+            return await Query()
+                .Where(favorite => favorite.UserId == userId)
+                .Skip(skip)
+                .Take(quantityPerPage)
+                .Include(favorite => favorite.Review)
+                    .ThenInclude(review => review.Image)
+                .ToListAsync();
+        }
+
         public async Task<Favorite> GetByUserIdAndReviewId(Guid userId, Guid reviewId)
         {
             return await Query().SingleOrDefaultAsync(favorite => favorite.UserId == userId && favorite.ReviewId == reviewId);
+        }
+
+        public async Task<int> CountByUserId(Guid userId)
+        {
+            return await Query().CountAsync(favorite => favorite.UserId == userId);
         }
     }
 }
