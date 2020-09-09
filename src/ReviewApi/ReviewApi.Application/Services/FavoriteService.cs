@@ -37,7 +37,7 @@ namespace ReviewApi.Application.Services
             {
                 await ThrowIfReviewNotExists(reviewIdGuid);
 
-                Favorite favorite = new Favorite(Guid.Parse(userId), Guid.Parse(reviewId));
+                Favorite favorite = new Favorite(userIdGuid, reviewIdGuid);
                 await _favoriteRepository.Create(favorite);
                 await _favoriteRepository.Save();
                 return;
