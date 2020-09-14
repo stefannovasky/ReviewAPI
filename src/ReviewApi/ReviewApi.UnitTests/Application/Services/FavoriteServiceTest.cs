@@ -15,6 +15,7 @@ namespace ReviewApi.UnitTests.Application.Services
     {
         private readonly IFavoriteRepository _favoriteRepositoryMock;
         private readonly IReviewRepository _reviewRepositoryMock;
+        private readonly IUserRepository _userRepositoryMock;
         private readonly IFileUploadUtils _fileUploadUtils;
         private readonly IFavoriteService _favoriteService;
 
@@ -22,13 +23,14 @@ namespace ReviewApi.UnitTests.Application.Services
         {
             _favoriteRepositoryMock = NSubstitute.Substitute.For<IFavoriteRepository>();
             _reviewRepositoryMock = NSubstitute.Substitute.For<IReviewRepository>();
+            _userRepositoryMock = NSubstitute.Substitute.For<IUserRepository>();
             _fileUploadUtils = NSubstitute.Substitute.For<IFileUploadUtils>();
 
-            _favoriteService = new FavoriteService(_favoriteRepositoryMock, _reviewRepositoryMock, _fileUploadUtils, "");
+            _favoriteService = new FavoriteService(_favoriteRepositoryMock, _reviewRepositoryMock, _userRepositoryMock, _fileUploadUtils, "");
         }
 
         [Fact]
-        public async Task ShouldThrowResourceNotFoundExceptionOnCreateFavoriteInNotExistsReview() 
+        public async Task ShouldThrowResourceNotFoundExceptionOnCreateFavoriteInNotExistsReview()
         {
             _reviewRepositoryMock.AlreadyExists(Arg.Any<Guid>()).Returns(false);
 
@@ -39,7 +41,7 @@ namespace ReviewApi.UnitTests.Application.Services
         }
 
         [Fact]
-        public async Task ShouldCreateFavorite() 
+        public async Task ShouldCreateFavorite()
         {
             _reviewRepositoryMock.AlreadyExists(Arg.Any<Guid>()).Returns(true);
             _favoriteRepositoryMock.GetByUserIdAndReviewId(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(null as Favorite);
@@ -52,7 +54,7 @@ namespace ReviewApi.UnitTests.Application.Services
         }
 
         [Fact]
-        public async Task ShouldDeleteFavorite() 
+        public async Task ShouldDeleteFavorite()
         {
             _reviewRepositoryMock.AlreadyExists(Arg.Any<Guid>()).Returns(true);
             _favoriteRepositoryMock.GetByUserIdAndReviewId(Arg.Any<Guid>(), Arg.Any<Guid>()).Returns(new Favorite());
@@ -62,6 +64,16 @@ namespace ReviewApi.UnitTests.Application.Services
             Assert.Null(exception);
             _favoriteRepositoryMock.Received(1).Delete(Arg.Any<Favorite>());
             await _favoriteRepositoryMock.Received(1).Save();
+        }
+
+        [Fact]
+        public async Task ShouldThrowResourceNotFoundExceptionOnNotFindUser()
+        {
+            _userRepositoryMock.GetByName(Arg.Any<string>()).Returns(null as User);
+
+            Exception exception = await Record.ExceptionAsync(() => _favoriteService.GetAllFromUser("username", 0, 0));
+
+            Assert.IsType<ResourceNotFoundException>(exception);
         }
     }
 }

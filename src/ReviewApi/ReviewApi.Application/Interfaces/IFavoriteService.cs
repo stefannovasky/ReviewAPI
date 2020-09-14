@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using ReviewApi.Application.Models;
+using ReviewApi.Application.Models.Review;
 using ReviewApi.Application.Models.User;
 
 namespace ReviewApi.Application.Interfaces
@@ -15,5 +16,6 @@ namespace ReviewApi.Application.Interfaces
         /// <returns></returns>
         Task CreateOrDelete(string userId, string reviewId);
         Task<PaginationResponseModel<UserProfileResponseModel>> GetAllFromReview(string reviewId, int page = 1, int quantityPerPage = 14);
+        Task<PaginationResponseModel<ReviewResponseModel>> GetAllFromUser(string userName, int page = 1, int quantityPerPage = 14);
     }
 }
