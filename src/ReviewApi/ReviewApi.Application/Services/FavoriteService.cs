@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ReviewApi.Application.Converter;
 using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Models;
 using ReviewApi.Application.Models.Review;
@@ -18,15 +19,15 @@ namespace ReviewApi.Application.Services
         private readonly IFavoriteRepository _favoriteRepository;
         private readonly IReviewRepository _reviewRepository;
         private readonly IUserRepository _userRepository;
-        private readonly IFileUploadUtils _fileUploadUtils;
+        private readonly IConverter _converter;
         private readonly string _webApplicationUrl;
 
-        public FavoriteService(IFavoriteRepository favoriteRepository, IReviewRepository reviewRepository, IUserRepository userRepository, IFileUploadUtils fileUploadUtils, string webApplicationUrl)
+        public FavoriteService(IFavoriteRepository favoriteRepository, IReviewRepository reviewRepository, IUserRepository userRepository, IConverter converter, string webApplicationUrl)
         {
             _favoriteRepository = favoriteRepository;
             _reviewRepository = reviewRepository;
             _userRepository = userRepository;
-            _fileUploadUtils = fileUploadUtils;
+            _converter = converter;
             _webApplicationUrl = webApplicationUrl;
         }
 
@@ -70,7 +71,7 @@ namespace ReviewApi.Application.Services
 
             return new PaginationResponseModel<UserProfileResponseModel>()
             {
-                Data = favorites.Select(favorite => ConvertUserToUserProfileResponseModel(favorite.User)),
+                Data = favorites.Select(favorite => _converter.ConvertUserToUserProfileResponseModel(favorite.User)),
                 NextPage = $"{_webApplicationUrl}/reviews/${reviewId}/favorites?page={page + 1}&quantity={quantityPerPage}",
                 PreviousPage = previousPageUrl,
                 Total = totalReviewFavorites
@@ -101,33 +102,10 @@ namespace ReviewApi.Application.Services
 
             return new PaginationResponseModel<ReviewResponseModel>()
             {
-                Data = favorites.Select(favorite => ConvertReviewToReviewResponseModel(favorite.Review, registeredUser.Name)),
+                Data = favorites.Select(favorite => _converter.ConvertReviewToReviewResponseModel(favorite.Review, registeredUser.Name)),
                 NextPage = $"{_webApplicationUrl}/reviews/${registeredUser.Name}/favorites?page={page + 1}&quantity={quantityPerPage}",
                 PreviousPage = previousPageUrl,
                 Total = totalUserFavorites
-            };
-        }
-
-        private UserProfileResponseModel ConvertUserToUserProfileResponseModel(User user)
-        {
-            return new UserProfileResponseModel()
-            {
-                Email = user.Email,
-                Name = user.Name,
-                Image = _fileUploadUtils.GenerateImageUrl(user.ProfileImage.FileName)
-            };
-        }
-
-        private ReviewResponseModel ConvertReviewToReviewResponseModel(Review review, string userName) 
-        {
-            return new ReviewResponseModel()
-            {
-                Creator = userName,
-                Id = review.Id,
-                Image = _fileUploadUtils.GenerateImageUrl(review.Image.FileName),
-                Stars = review.Stars,
-                Text = review.Text,
-                Title = review.Title
             };
         }
 
@@ -137,15 +115,6 @@ namespace ReviewApi.Application.Services
             {
                 throw new ResourceNotFoundException("review not found.");
             }
-        }
-
-        private async Task<bool> FavoriteAlreadyExists(Guid userId, Guid reviewId)
-        {
-            if (await _favoriteRepository.AlreadyExists(userId, reviewId))
-            {
-                return true;
-            }
-            return false; 
         }
     }
 }
