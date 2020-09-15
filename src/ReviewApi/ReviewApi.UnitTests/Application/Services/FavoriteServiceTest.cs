@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using NSubstitute;
+using ReviewApi.Application.Converter;
 using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Services;
 using ReviewApi.Domain.Entities;
@@ -16,7 +17,7 @@ namespace ReviewApi.UnitTests.Application.Services
         private readonly IFavoriteRepository _favoriteRepositoryMock;
         private readonly IReviewRepository _reviewRepositoryMock;
         private readonly IUserRepository _userRepositoryMock;
-        private readonly IFileUploadUtils _fileUploadUtils;
+        private readonly IConverter _converterMock;
         private readonly IFavoriteService _favoriteService;
 
         public FavoriteServiceTest()
@@ -24,9 +25,9 @@ namespace ReviewApi.UnitTests.Application.Services
             _favoriteRepositoryMock = NSubstitute.Substitute.For<IFavoriteRepository>();
             _reviewRepositoryMock = NSubstitute.Substitute.For<IReviewRepository>();
             _userRepositoryMock = NSubstitute.Substitute.For<IUserRepository>();
-            _fileUploadUtils = NSubstitute.Substitute.For<IFileUploadUtils>();
+            _converterMock = NSubstitute.Substitute.For<IConverter>();
 
-            _favoriteService = new FavoriteService(_favoriteRepositoryMock, _reviewRepositoryMock, _userRepositoryMock, _fileUploadUtils, "");
+            _favoriteService = new FavoriteService(_favoriteRepositoryMock, _reviewRepositoryMock, _userRepositoryMock, _converterMock, "");
         }
 
         [Fact]

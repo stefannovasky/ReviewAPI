@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using NSubstitute;
+using ReviewApi.Application.Converter;
 using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Models.Review;
 using ReviewApi.Application.Services;
@@ -22,6 +23,7 @@ namespace ReviewApi.UnitTests.Application.Services
         private readonly IFileUploadUtils _fileUploadUtilsMock;
         private readonly ICacheDatabase _cacheDatabaseUtilsMock;
         private readonly IJsonUtils _jsonUtilsMock;
+        private readonly IConverter _converterMock; 
         private readonly IReviewService _reviewService;
         private readonly User _fakeInsertedConfirmedUser;
         private readonly User _fakeInsertedNotConfirmedUser;
@@ -32,7 +34,8 @@ namespace ReviewApi.UnitTests.Application.Services
             _fileUploadUtilsMock = NSubstitute.Substitute.For<IFileUploadUtils>();
             _cacheDatabaseUtilsMock = NSubstitute.Substitute.For<ICacheDatabase>();
             _jsonUtilsMock = NSubstitute.Substitute.For<IJsonUtils>();
-            _reviewService = new ReviewService(_reviewRepositoryMock, _fileUploadUtilsMock, _cacheDatabaseUtilsMock, _jsonUtilsMock, "webappurl");
+            _converterMock = NSubstitute.Substitute.For<IConverter>();
+            _reviewService = new ReviewService(_reviewRepositoryMock, _fileUploadUtilsMock, _cacheDatabaseUtilsMock, _jsonUtilsMock, _converterMock,"webappurl");
 
             _fakeInsertedNotConfirmedUser = new User(Guid.NewGuid(), "user name", "user@mail.com", "password");
             _fakeInsertedConfirmedUser = new User(Guid.NewGuid(), "user name", "user@mail.com", "password");
