@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using ReviewApi.Application.Converter;
 using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Services;
 using ReviewApi.Domain.Interfaces.Repositories;
@@ -65,7 +66,6 @@ namespace ReviewApi
             });
 
             services.AddTransient<ICacheDatabase>(services => new CacheDatabase(Configuration.GetConnectionString("RedisConnection")));
-
             services.AddTransient<IProfileImageRepository, ProfileImageRepository>();
             services.AddTransient<IImageService, ImageService>();
             services.AddTransient<IUserRepository, UserRepository>();
@@ -75,16 +75,14 @@ namespace ReviewApi
                 service.GetRequiredService<IFavoriteRepository>(),
                 service.GetRequiredService<IReviewRepository>(),
                 service.GetRequiredService<IUserRepository>(),
-                service.GetRequiredService<IFileUploadUtils>(),
+                service.GetRequiredService<IConverter>(),
                 _webApplicationUrl
             ));
             services.AddTransient<IReviewRepository, ReviewRepository>(); 
             services.AddTransient<IReviewService>(service => new ReviewService(
-                service.GetRequiredService<IReviewRepository>(), service.GetRequiredService<IFileUploadUtils>(), service.GetRequiredService<ICacheDatabase>(), service.GetRequiredService<IJsonUtils>(), _webApplicationUrl)
+                service.GetRequiredService<IReviewRepository>(), service.GetRequiredService<IFileUploadUtils>(), service.GetRequiredService<ICacheDatabase>(), service.GetRequiredService<IJsonUtils>(), service.GetRequiredService<IConverter>(), _webApplicationUrl)
             );
-
             services.AddTransient<IRedisConnector>(service => new RedisConnector(Configuration.GetConnectionString("RedisConnection")));
-
             services.AddTransient<IRandomCodeUtils, RandomCodeUtils>();
             services.AddTransient<IHashUtils, HashUtils>();
             services.AddTransient<IEmailUtils, EmailUtils>();
@@ -92,6 +90,7 @@ namespace ReviewApi
             services.AddTransient<IJwtTokenUtils>(service => new JwtTokenUtils(Configuration.GetValue<string>("Secret")));
             services.AddTransient<IFileUploadUtils>(service => new FileUploadUtils(_webApplicationRootPath, _webApplicationUrl));
             services.AddTransient<ILogUtils, LogUtils>();
+            services.AddTransient<IConverter, Converter>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
