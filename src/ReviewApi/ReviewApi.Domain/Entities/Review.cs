@@ -39,6 +39,12 @@ namespace ReviewApi.Domain.Entities
             Image = image;
         }
 
+        public void UpdateCreator(User user)
+        {
+            Creator = user;
+            CreatorId = user.Id;
+        }
+
         public void Update(string title, string text, int stars)
         {
             Title = title;

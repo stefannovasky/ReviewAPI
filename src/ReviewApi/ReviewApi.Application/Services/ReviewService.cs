@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using ReviewApi.Application.Converter;
 using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Models;
 using ReviewApi.Application.Models.Review;
@@ -23,14 +24,16 @@ namespace ReviewApi.Application.Services
         private readonly IFileUploadUtils _fileUploadUtils;
         private readonly ICacheDatabase _cacheDatabase;
         private readonly IJsonUtils _jsonUtils;
+        private readonly IConverter _converter;
         private readonly string _webApplicationUrl;
 
-        public ReviewService(IReviewRepository reviewRepository, IFileUploadUtils fileUploadUtils, ICacheDatabase cacheDatabase, IJsonUtils jsonUtils, string webApplicationUrl)
+        public ReviewService(IReviewRepository reviewRepository, IFileUploadUtils fileUploadUtils, ICacheDatabase cacheDatabase, IJsonUtils jsonUtils, IConverter converter, string webApplicationUrl)
         {
             _reviewRepository = reviewRepository;
             _fileUploadUtils = fileUploadUtils;
             _cacheDatabase = cacheDatabase;
             _jsonUtils = jsonUtils;
+            _converter = converter;
             _webApplicationUrl = webApplicationUrl;
         }
 
@@ -90,7 +93,7 @@ namespace ReviewApi.Application.Services
             if (reviewRegisteredOnCacheJson != null)
             {
                 Review reviewRegisteredOnCache = _jsonUtils.Deserialize<Review>(reviewRegisteredOnCacheJson);
-                return ConvertReviewToReviewResponseModel(reviewRegisteredOnCache);
+                return _converter.ConvertReviewToReviewResponseModel(reviewRegisteredOnCache);
             }
 
             Review review = await _reviewRepository.GetById(Guid.Parse(reviewId));
@@ -99,7 +102,7 @@ namespace ReviewApi.Application.Services
                 throw new ResourceNotFoundException("review not found.");
             }
             await _cacheDatabase.Set(review.Id.ToString(), _jsonUtils.Serialize(review));
-            return ConvertReviewToReviewResponseModel(review);
+            return _converter.ConvertReviewToReviewResponseModel(review);
         }
 
         public async Task<IEnumerable<ReviewResponseModel>> Search(string text)
@@ -109,7 +112,7 @@ namespace ReviewApi.Application.Services
                 return null;
             }
             IEnumerable<Review> reviews = await _reviewRepository.Search(text);
-            return reviews.ToList().Select(r => ConvertReviewToReviewResponseModel(r));
+            return reviews.ToList().Select(r => _converter.ConvertReviewToReviewResponseModel(r));
         }
 
         private PaginationResponseModel<ReviewResponseModel> CreatePaginationResult(IEnumerable<Review> reviews, int totalReviewsInserteds, int actualPage, int quantityPerPage)
@@ -118,24 +121,10 @@ namespace ReviewApi.Application.Services
             string previousPageUrl = previousPage > 0 ? $"{_webApplicationUrl}/reviews?page={previousPage}&quantity={quantityPerPage}" : null;
             return new PaginationResponseModel<ReviewResponseModel>()
             {
-                Data = reviews.Select(r => ConvertReviewToReviewResponseModel(r)),
+                Data = reviews.Select(r => _converter.ConvertReviewToReviewResponseModel(r)),
                 NextPage = $"{_webApplicationUrl}/reviews?page={actualPage + 1}&quantity={quantityPerPage}",
                 PreviousPage = previousPageUrl,
                 Total = totalReviewsInserteds
-            };
-        }
-
-        private ReviewResponseModel ConvertReviewToReviewResponseModel(Review review)
-        {
-            string reviewImageUrl = _fileUploadUtils.GenerateImageUrl(review.Image.FileName);
-            return new ReviewResponseModel()
-            {
-                Id = review.Id,
-                Image = reviewImageUrl,
-                Creator = review.Creator.Name,
-                Stars = review.Stars,
-                Text = review.Text,
-                Title = review.Title
             };
         }
 
