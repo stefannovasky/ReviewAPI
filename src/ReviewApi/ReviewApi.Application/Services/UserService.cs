@@ -42,7 +42,7 @@ namespace ReviewApi.Application.Services
             await new AuthenticationUserValidator().ValidateRequestModelAndThrow(model);
 
             User user = await _userRepository.GetByEmail(model.Email);
-            VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
+            ThrowIfUserIsNullOrNotConfirmed(user);
 
             if (!_hashUtils.CompareHash(model.Password, user.Password))
             {
@@ -74,8 +74,8 @@ namespace ReviewApi.Application.Services
             await new CreateUserValidator().ValidateRequestModelAndThrow(model);
 
             User user = new User(model.Name, model.Email, model.Password);
-            await VerifyIfUserExistsByNameAndThrow(user.Name);
-            await VerifyIfUserExistsByEmailAndThrow(user.Email);
+            await ThrowIfUserNameAlreadyExists(user.Name);
+            await ThrowIfUserEmailAlreadyExists(user.Email);
 
 
             user.UpdateConfirmationCode(_randomCodeUtils.GenerateRandomCode());
@@ -97,7 +97,7 @@ namespace ReviewApi.Application.Services
             await new DeleteUserValidator().ValidateRequestModelAndThrow(model);
 
             User user = await _userRepository.GetById(Guid.Parse(userId));
-            VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
+            ThrowIfUserIsNullOrNotConfirmed(user);
             if (!_hashUtils.CompareHash(model.Password, user.Password))
             {
                 throw new InvalidPasswordException();
@@ -112,7 +112,7 @@ namespace ReviewApi.Application.Services
             await new ForgotPasswordUserValidator().ValidateRequestModelAndThrow(model);
 
             User user = await _userRepository.GetByEmail(model.Email);
-            VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
+            ThrowIfUserIsNullOrNotConfirmed(user);
 
             user.UpdateResetPasswordCode(_randomCodeUtils.GenerateRandomCode());
 
@@ -125,7 +125,7 @@ namespace ReviewApi.Application.Services
         public async Task<UserProfileResponseModel> GetAuthenticatedUserProfile(string userId)
         {
             User user = await _userRepository.GetByIdIncludingImage(Guid.Parse(userId));
-            VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
+            ThrowIfUserIsNullOrNotConfirmed(user);
             string imageUrl = _fileUploadUtils.GenerateImageUrl(user.ProfileImage.FileName);
 
             return new UserProfileResponseModel() { Email = user.Email, Name = user.Name, Image = imageUrl };
@@ -136,7 +136,7 @@ namespace ReviewApi.Application.Services
             await new ResetPasswordUserValidator().ValidateRequestModelAndThrow(model);
 
             User user = await _userRepository.GetByResetPasswordCode(model.Code);
-            VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
+            ThrowIfUserIsNullOrNotConfirmed(user);
 
             user.ResetPassword(_hashUtils.GenerateHash(model.NewPassword));
 
@@ -149,7 +149,7 @@ namespace ReviewApi.Application.Services
             await new UpdatePasswordUserValidator().ValidateRequestModelAndThrow(model);
 
             User user = await _userRepository.GetById(Guid.Parse(userId));
-            VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
+            ThrowIfUserIsNullOrNotConfirmed(user);
             if (!_hashUtils.CompareHash(model.OldPassword, user.Password))
             {
                 throw new InvalidPasswordException();
@@ -166,7 +166,7 @@ namespace ReviewApi.Application.Services
             await new UpdateNameUserValidator().ValidateRequestModelAndThrow(model);
 
             User user = await _userRepository.GetById(Guid.Parse(userId));
-            VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
+            ThrowIfUserIsNullOrNotConfirmed(user);
 
             user.UpdateName(model.Name);
 
@@ -177,7 +177,7 @@ namespace ReviewApi.Application.Services
         public async Task UpdateProfileImage(string userId, Stream imageStream)
         {
             User user = await _userRepository.GetByIdIncludingImage(Guid.Parse(userId));
-            VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
+            ThrowIfUserIsNullOrNotConfirmed(user);
 
             FileDTO uploadedImage = await _fileUploadUtils.UploadImage(imageStream);
             _imageRepository.Update(new ProfileImage(user.ProfileImage.Id, uploadedImage.FileName, uploadedImage.FilePath, user.Id));
@@ -186,48 +186,10 @@ namespace ReviewApi.Application.Services
             await _imageRepository.Save();
         }
 
-        private void VerifyIfUserIsNullOrNotConfirmedAndThrow(User user)
-        {
-            if (user == null)
-            {
-                throw new ResourceNotFoundException("user not found.");
-            }
-            if (!user.Confirmed)
-            {
-                throw new UserNotConfirmedException();
-            }
-        }
-
-        private async Task VerifyIfUserExistsByNameAndThrow(string userName)
-        {
-            User userInDatabase = await _userRepository.GetByName(userName);
-            if (userInDatabase != null)
-            {
-                if (!userInDatabase.Confirmed)
-                {
-                    throw new UserNotConfirmedException();
-                }
-                throw new AlreadyExistsException("user name");
-            }
-        }
-
-        private async Task VerifyIfUserExistsByEmailAndThrow(string userEmail)
-        {
-            User userInDatabase = await _userRepository.GetByEmail(userEmail);
-            if (userInDatabase != null)
-            {
-                if (!userInDatabase.Confirmed)
-                {
-                    throw new UserNotConfirmedException();
-                }
-                throw new AlreadyExistsException("user email");
-            }
-        }
-
         public async Task<UserProfileResponseModel> GetProfile(string userName)
         {
             User user = await _userRepository.GetByNameIncludingImage(userName);
-            VerifyIfUserIsNullOrNotConfirmedAndThrow(user);
+            ThrowIfUserIsNullOrNotConfirmed(user);
             string imageUrl = _fileUploadUtils.GenerateImageUrl(user.ProfileImage.FileName);
             return new UserProfileResponseModel() { Email = user.Email, Name = user.Name, Image = imageUrl };
         }
@@ -249,6 +211,44 @@ namespace ReviewApi.Application.Services
                 Text = r.Text,
                 Title = r.Title
             });
+        }
+
+        private void ThrowIfUserIsNullOrNotConfirmed(User user)
+        {
+            if (user == null)
+            {
+                throw new ResourceNotFoundException("user not found.");
+            }
+            if (!user.Confirmed)
+            {
+                throw new UserNotConfirmedException();
+            }
+        }
+
+        private async Task ThrowIfUserNameAlreadyExists(string userName)
+        {
+            User userInDatabase = await _userRepository.GetByName(userName);
+            if (userInDatabase != null)
+            {
+                if (!userInDatabase.Confirmed)
+                {
+                    throw new UserNotConfirmedException();
+                }
+                throw new AlreadyExistsException("user name");
+            }
+        }
+
+        private async Task ThrowIfUserEmailAlreadyExists(string userEmail)
+        {
+            User userInDatabase = await _userRepository.GetByEmail(userEmail);
+            if (userInDatabase != null)
+            {
+                if (!userInDatabase.Confirmed)
+                {
+                    throw new UserNotConfirmedException();
+                }
+                throw new AlreadyExistsException("user email");
+            }
         }
     }
 }

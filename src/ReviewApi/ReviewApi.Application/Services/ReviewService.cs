@@ -57,7 +57,7 @@ namespace ReviewApi.Application.Services
             {
                 throw new ResourceNotFoundException("review not found.");
             }
-            VerifyIfAuthenticatedIsReviewCreatorAndThrow(review, Guid.Parse(userId));
+            ThrowIfAuthenticatedUserNotBeReviewCreator(review, Guid.Parse(userId));
             _reviewRepository.Delete(review);
             await _reviewRepository.Save();
             await _cacheDatabase.Remove(review.Id.ToString());
@@ -79,7 +79,7 @@ namespace ReviewApi.Application.Services
             {
                 throw new ResourceNotFoundException("review not found.");
             }
-            VerifyIfAuthenticatedIsReviewCreatorAndThrow(review, Guid.Parse(userId));
+            ThrowIfAuthenticatedUserNotBeReviewCreator(review, Guid.Parse(userId));
 
             review.Update(model.Title, model.Text, model.Stars);
             _reviewRepository.Update(review);
@@ -134,7 +134,7 @@ namespace ReviewApi.Application.Services
             return new ReviewImage(uploadedImage.FileName, uploadedImage.FilePath);
         }
 
-        private void VerifyIfAuthenticatedIsReviewCreatorAndThrow(Review review, Guid userId)
+        private void ThrowIfAuthenticatedUserNotBeReviewCreator(Review review, Guid userId)
         {
             if (!review.WasCreatedAt(userId))
             {
