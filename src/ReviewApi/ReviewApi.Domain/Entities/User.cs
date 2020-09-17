@@ -15,6 +15,7 @@ namespace ReviewApi.Domain.Entities
         public ProfileImage ProfileImage { get; protected set; }
         public IEnumerable<Review> Reviews { get; protected set; }
         public IEnumerable<Favorite> Favorites { get; protected set; }
+        public IEnumerable<Comment> Comments { get; protected set; }
 
         public User()
         {
