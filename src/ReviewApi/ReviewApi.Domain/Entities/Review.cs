@@ -12,6 +12,7 @@ namespace ReviewApi.Domain.Entities
         public User Creator { get; protected set; }
         public ReviewImage Image { get; protected set; }
         public IEnumerable<Favorite> Favorites { get; protected set; }
+        public IEnumerable<Comment> Comments { get; protected set; }
 
         public Review()
         {

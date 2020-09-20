@@ -30,7 +30,7 @@ namespace ReviewApi.Infra.Mappings
             builder.Property(p => p.ConfirmationCode)
                 .HasColumnName("confirmation_code")
                 .HasMaxLength(8);
-            
+
             builder.Property(p => p.Confirmed)
                 .HasColumnName("confirmed")
                 .HasDefaultValue(false);
@@ -44,6 +44,11 @@ namespace ReviewApi.Infra.Mappings
                 .HasForeignKey<ProfileImage>(b => b.UserId);
 
             builder.HasMany<Favorite>(a => a.Favorites)
+                .WithOne(b => b.User)
+                .HasForeignKey(b => b.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasMany<Comment>(a => a.Comments)
                 .WithOne(b => b.User)
                 .HasForeignKey(b => b.UserId)
                 .OnDelete(DeleteBehavior.NoAction);

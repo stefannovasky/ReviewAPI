@@ -11,6 +11,10 @@
     <Compile Remove="Migrations\20200813193925_CreateReviewIndex2.Designer.cs" />
     <Compile Remove="Migrations\20200813195007_CreateReviewIndex3.cs" />
     <Compile Remove="Migrations\20200813195007_CreateReviewIndex3.Designer.cs" />
+    <Compile Remove="Migrations\20200917183747_CreateCommentsTable.cs" />
+    <Compile Remove="Migrations\20200917183747_CreateCommentsTable.Designer.cs" />
+    <Compile Remove="Migrations\20200917183913_CreateCommentsTable.cs" />
+    <Compile Remove="Migrations\20200917183913_CreateCommentsTable.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
