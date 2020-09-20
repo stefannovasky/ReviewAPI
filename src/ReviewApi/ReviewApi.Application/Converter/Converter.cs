@@ -1,4 +1,5 @@
-﻿using ReviewApi.Application.Models.Review;
+﻿using ReviewApi.Application.Models.Comment;
+using ReviewApi.Application.Models.Review;
 using ReviewApi.Application.Models.User;
 using ReviewApi.Domain.Entities;
 using ReviewApi.Shared.Interfaces;
@@ -48,6 +49,21 @@ namespace ReviewApi.Application.Converter
                 Stars = review.Stars,
                 Text = review.Text,
                 Title = review.Title
+            };
+        }
+
+        public CommentResponseModel ConvertCommentToCommentResponseModel(Comment comment) 
+        {
+            return new CommentResponseModel()
+            {
+                Id = comment.Id,
+                Text = comment.Text,
+                User = new UserProfileResponseModel()
+                {
+                    Email = comment?.User.Email,
+                    Name = comment?.User.Name,
+                    Image = _fileUploadUtils.GenerateImageUrl(comment?.User?.ProfileImage.FileName)
+                }
             };
         }
     }
