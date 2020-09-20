@@ -65,6 +65,10 @@ namespace ReviewApi
                 };
             });
 
+            services.AddTransient<ICommentRepository, CommentRepository>();
+            services.AddTransient<ICommentService>(service => new CommentService(
+                service.GetRequiredService<ICommentRepository>(), service.GetRequiredService<IReviewRepository>(), service.GetRequiredService<ICacheDatabase>(), service.GetRequiredService<IJsonUtils>(), service.GetRequiredService<IConverter>(), _webApplicationUrl
+            ));
             services.AddTransient<ICacheDatabase>(services => new CacheDatabase(Configuration.GetConnectionString("RedisConnection")));
             services.AddTransient<IProfileImageRepository, ProfileImageRepository>();
             services.AddTransient<IImageService, ImageService>();
