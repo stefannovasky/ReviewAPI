@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using ReviewApi.Domain.Dto;
 using ReviewApi.Domain.Entities;
 using ReviewApi.Domain.Interfaces.Repositories;
 using ReviewApi.Infra.Context;
@@ -16,12 +17,12 @@ namespace ReviewApi.Infra.Repositories
 
         }
 
-        public async Task<IEnumerable<Review>> GetAll(int page = 1, int quantityPerPage = 14)
+        public async Task<IEnumerable<Review>> GetAll(PaginationDTO pagination)
         {
-            int skip = (page - 1) * quantityPerPage;
+            int skip = (pagination.Page - 1) * pagination.QuantityPerPage;
             return await Query()
                 .Skip(skip)
-                .Take(quantityPerPage)
+                .Take(pagination.QuantityPerPage)
                 .Include(r => r.Image)
                 .Include(r => r.Creator)
                 .ToListAsync();

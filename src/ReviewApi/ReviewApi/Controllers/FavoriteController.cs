@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReviewApi.Application.Interfaces;
 using ReviewApi.Controllers.Extensions;
+using ReviewApi.Domain.Dto;
 
 namespace ReviewApi.Controllers
 {
@@ -39,7 +40,7 @@ namespace ReviewApi.Controllers
         {
             try
             {
-                return Ok(await _favoriteService.GetAllFromReview(reviewId, page, quantityPerPage));
+                return Ok(await _favoriteService.GetAllFromReview(reviewId, new PaginationDTO(page, quantityPerPage)));
             }
             catch (Exception exception)
             {
@@ -54,7 +55,7 @@ namespace ReviewApi.Controllers
         {
             try
             {
-                return Ok(await _favoriteService.GetAllFromUser(userName, page, quantityPerPage));
+                return Ok(await _favoriteService.GetAllFromUser(userName, new PaginationDTO(page, quantityPerPage)));
             }
             catch (Exception exception)
             {

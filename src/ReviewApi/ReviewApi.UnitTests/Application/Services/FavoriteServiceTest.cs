@@ -4,6 +4,7 @@ using NSubstitute;
 using ReviewApi.Application.Converter;
 using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Services;
+using ReviewApi.Domain.Dto;
 using ReviewApi.Domain.Entities;
 using ReviewApi.Domain.Exceptions;
 using ReviewApi.Domain.Interfaces.Repositories;
@@ -72,7 +73,7 @@ namespace ReviewApi.UnitTests.Application.Services
         {
             _userRepositoryMock.GetByName(Arg.Any<string>()).Returns(null as User);
 
-            Exception exception = await Record.ExceptionAsync(() => _favoriteService.GetAllFromUser("username", 0, 0));
+            Exception exception = await Record.ExceptionAsync(() => _favoriteService.GetAllFromUser("username", new PaginationDTO(1, 10)));
 
             Assert.IsType<ResourceNotFoundException>(exception);
         }

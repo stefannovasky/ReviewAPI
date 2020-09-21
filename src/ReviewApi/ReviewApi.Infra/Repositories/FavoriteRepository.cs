@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using ReviewApi.Domain.Dto;
 using ReviewApi.Domain.Entities;
 using ReviewApi.Domain.Interfaces.Repositories;
 using ReviewApi.Infra.Context;
@@ -26,25 +27,25 @@ namespace ReviewApi.Infra.Repositories
             return await Query().CountAsync(favorite => favorite.ReviewId == reviewId);
         }
 
-        public async Task<IEnumerable<Favorite>> GetAllByReviewId(Guid reviewId, int page, int quantityPerPage)
+        public async Task<IEnumerable<Favorite>> GetAllByReviewId(Guid reviewId, PaginationDTO pagination)
         {
-            int skip = (page - 1) * quantityPerPage;
+            int skip = (pagination.Page - 1) * pagination.QuantityPerPage;
             return await Query()
                 .Where(favorite => favorite.ReviewId == reviewId)
                 .Skip(skip)
-                .Take(quantityPerPage)
+                .Take(pagination.QuantityPerPage)
                 .Include(favorite => favorite.User)
                     .ThenInclude(user => user.ProfileImage) 
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Favorite>> GetAllByUserIdIncludingReview(Guid userId, int page, int quantityPerPage)
+        public async Task<IEnumerable<Favorite>> GetAllByUserIdIncludingReview(Guid userId, PaginationDTO pagination)
         {
-            int skip = (page - 1) * quantityPerPage;
+            int skip = (pagination.Page - 1) * pagination.QuantityPerPage;
             return await Query()
                 .Where(favorite => favorite.UserId == userId)
                 .Skip(skip)
-                .Take(quantityPerPage)
+                .Take(pagination.QuantityPerPage)
                 .Include(favorite => favorite.Review)
                     .ThenInclude(review => review.Image)
                 .ToListAsync();

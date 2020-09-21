@@ -7,10 +7,10 @@ using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Models;
 using ReviewApi.Application.Models.Review;
 using ReviewApi.Application.Models.User;
+using ReviewApi.Domain.Dto;
 using ReviewApi.Domain.Entities;
 using ReviewApi.Domain.Exceptions;
 using ReviewApi.Domain.Interfaces.Repositories;
-using ReviewApi.Shared.Interfaces;
 
 namespace ReviewApi.Application.Services
 {
@@ -51,45 +51,28 @@ namespace ReviewApi.Application.Services
             await _favoriteRepository.Save();
         }
 
-        public async Task<PaginationResponseModel<UserProfileResponseModel>> GetAllFromReview(string reviewId, int page = 1, int quantityPerPage = 14)
+        public async Task<PaginationResponseModel<UserProfileResponseModel>> GetAllFromReview(string reviewId, PaginationDTO pagination)
         {
-            if (page < 1)
-            {
-                page = 1;
-            }
-            if (quantityPerPage < 1)
-            {
-                quantityPerPage = 1;
-            }
-
             Guid guidReviewId = Guid.Parse(reviewId);
-            int previousPage = page - 1;
-            string previousPageUrl = previousPage > 0 ? $"{_webApplicationUrl}/reviews?page={previousPage}&quantity={quantityPerPage}" : null;
+            int previousPage = pagination.Page - 1;
+            string previousPageUrl = previousPage > 0 ? $"{_webApplicationUrl}/reviews?page={previousPage}&quantityPerPage={pagination.QuantityPerPage}" : null;
 
             int totalReviewFavorites = await _favoriteRepository.CountByReviewId(guidReviewId);
-            IEnumerable<Favorite> favorites = await _favoriteRepository.GetAllByReviewId(guidReviewId, page, quantityPerPage);
+            IEnumerable<Favorite> favorites = await _favoriteRepository.GetAllByReviewId(guidReviewId, pagination);
 
             return new PaginationResponseModel<UserProfileResponseModel>()
             {
                 Data = favorites.Select(favorite => _converter.ConvertUserToUserProfileResponseModel(favorite.User)),
-                NextPage = $"{_webApplicationUrl}/reviews/${reviewId}/favorites?page={page + 1}&quantity={quantityPerPage}",
+                NextPage = $"{_webApplicationUrl}/reviews/${reviewId}/favorites?page={pagination.Page + 1}&quantityPerPage={pagination.QuantityPerPage}",
                 PreviousPage = previousPageUrl,
                 Total = totalReviewFavorites
             };
         }
 
-        public async Task<PaginationResponseModel<ReviewResponseModel>> GetAllFromUser(string userName, int page = 1, int quantityPerPage = 14)
+        public async Task<PaginationResponseModel<ReviewResponseModel>> GetAllFromUser(string userName, PaginationDTO pagination)
         {
-            if (page < 1)
-            {
-                page = 1;
-            }
-            if (quantityPerPage < 1)
-            {
-                quantityPerPage = 1;
-            }
-            int previousPage = page - 1;
-            string previousPageUrl = previousPage > 0 ? $"{_webApplicationUrl}/reviews?page={previousPage}&quantity={quantityPerPage}" : null;
+            int previousPage = pagination.Page - 1;
+            string previousPageUrl = previousPage > 0 ? $"{_webApplicationUrl}/reviews?page={previousPage}&quantityPerPage={pagination.QuantityPerPage}" : null;
 
             User registeredUser = await _userRepository.GetByName(userName);
             if (registeredUser == null)
@@ -98,18 +81,18 @@ namespace ReviewApi.Application.Services
             }
 
             int totalUserFavorites = await _favoriteRepository.CountByUserId(registeredUser.Id);
-            IEnumerable<Favorite> favorites = await _favoriteRepository.GetAllByUserIdIncludingReview(registeredUser.Id, page, quantityPerPage);
+            IEnumerable<Favorite> favorites = await _favoriteRepository.GetAllByUserIdIncludingReview(registeredUser.Id, pagination);
 
             return new PaginationResponseModel<ReviewResponseModel>()
             {
                 Data = favorites.Select(favorite => _converter.ConvertReviewToReviewResponseModel(favorite.Review, registeredUser.Name)),
-                NextPage = $"{_webApplicationUrl}/reviews/${registeredUser.Name}/favorites?page={page + 1}&quantity={quantityPerPage}",
+                NextPage = $"{_webApplicationUrl}/reviews/${registeredUser.Name}/favorites?page={pagination.Page + 1}&quantityPerPage={pagination.QuantityPerPage}",
                 PreviousPage = previousPageUrl,
                 Total = totalUserFavorites
             };
         }
 
-        private async Task ThrowIfReviewNotExists(Guid id) 
+        private async Task ThrowIfReviewNotExists(Guid id)
         {
             if (!await _reviewRepository.AlreadyExists(id))
             {

@@ -53,7 +53,7 @@ namespace ReviewApi.Domain.Entities
             Stars = stars;
         }
 
-        public bool WasCreatedAt(Guid userId)
+        public bool WasCreatedBy(Guid userId)
         {
             return userId == CreatorId;
         }

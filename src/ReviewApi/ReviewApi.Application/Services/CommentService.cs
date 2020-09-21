@@ -8,6 +8,7 @@ using ReviewApi.Application.Models;
 using ReviewApi.Application.Models.Comment;
 using ReviewApi.Application.Validators.Comment;
 using ReviewApi.Application.Validators.Extensions;
+using ReviewApi.Domain.Dto;
 using ReviewApi.Domain.Entities;
 using ReviewApi.Domain.Exceptions;
 using ReviewApi.Domain.Interfaces.Repositories;
@@ -74,16 +75,8 @@ namespace ReviewApi.Application.Services
             await _cacheDatabase.Remove(commentId);
         }
 
-        public async Task<PaginationResponseModel<CommentResponseModel>> GetAllFromReview(string reviewId, int page = 1, int quantityPerPage = 14)
+        public async Task<PaginationResponseModel<CommentResponseModel>> GetAllFromReview(string reviewId, PaginationDTO pagination)
         {
-            if (page < 1)
-            {
-                page = 1;
-            }
-            if (quantityPerPage < 1)
-            {
-                quantityPerPage = 1;
-            }
             Guid reviewIdGuid = Guid.Parse(reviewId);
 
             await ThrowIfReviewNotExists(reviewIdGuid);
@@ -91,18 +84,18 @@ namespace ReviewApi.Application.Services
             int totalInsertedsCommentsInReview = await _commentRepository.CountFromReview(reviewIdGuid);
 
             IEnumerable<Comment> comments;
-            string commentsRegisteredOnCacheJson = await _cacheDatabase.Get($"comments?reviewId={reviewId}&page={page}&quantityPerPage={quantityPerPage}");
+            string commentsRegisteredOnCacheJson = await _cacheDatabase.Get($"reviews/{reviewId}/comments?page={pagination.Page}&quantityPerPage={pagination.QuantityPerPage}");
             if (commentsRegisteredOnCacheJson != null)
             {
                 comments = _jsonUtils.Deserialize<IEnumerable<Comment>>(commentsRegisteredOnCacheJson);
-                return CreatePaginationResult(comments, totalInsertedsCommentsInReview, reviewId, page, quantityPerPage);
+                return CreatePaginationResult(comments, totalInsertedsCommentsInReview, reviewId, pagination);
             }
-            comments = await _commentRepository.GetAllFromReview(reviewIdGuid, page, quantityPerPage);
+            comments = await _commentRepository.GetAllFromReview(reviewIdGuid, pagination);
             if (comments.Count() > 0)
             {
-                await _cacheDatabase.Set($"comments?reviewId={reviewId}&page={page}&quantityPerPage={quantityPerPage}", _jsonUtils.Serialize(comments));
+                await _cacheDatabase.Set($"reviews/{reviewId}/comments?page={pagination.Page}&quantityPerPage={pagination.QuantityPerPage}", _jsonUtils.Serialize(comments));
             }
-            return CreatePaginationResult(comments, totalInsertedsCommentsInReview, reviewId, page, quantityPerPage);
+            return CreatePaginationResult(comments, totalInsertedsCommentsInReview, reviewId, pagination);
         }
 
         public async Task<CommentResponseModel> GetById(string commentId)
@@ -171,14 +164,14 @@ namespace ReviewApi.Application.Services
             }
         }
 
-        private PaginationResponseModel<CommentResponseModel> CreatePaginationResult(IEnumerable<Comment> comments, int totalCommentsInserteds, string reviewId, int actualPage, int quantityPerPage)
+        private PaginationResponseModel<CommentResponseModel> CreatePaginationResult(IEnumerable<Comment> comments, int totalCommentsInserteds, string reviewId, PaginationDTO pagination)
         {
-            int previousPage = actualPage - 1;
-            string previousPageUrl = previousPage > 0 ? $"{_webApplicationUrl}/reviews/{reviewId}/comments?page={previousPage}&quantity={quantityPerPage}" : null;
+            int previousPage = pagination.Page - 1;
+            string previousPageUrl = previousPage > 0 ? $"{_webApplicationUrl}/reviews/{reviewId}/comments?page={previousPage}&quantity={pagination.QuantityPerPage}" : null;
             return new PaginationResponseModel<CommentResponseModel>()
             {
                 Data = comments.Select(comment => _converter.ConvertCommentToCommentResponseModel(comment)),
-                NextPage = $"{_webApplicationUrl}/reviews/{reviewId}/comments?page={actualPage + 1}&quantity={quantityPerPage}",
+                NextPage = $"{_webApplicationUrl}/reviews/{reviewId}/comments?page={pagination.Page + 1}&quantityPerPage={pagination.QuantityPerPage}",
                 PreviousPage = previousPageUrl,
                 Total = totalCommentsInserteds
             };

@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using ReviewApi.Application.Interfaces;
-using ReviewApi.Domain.Interfaces.Repositories;
 using ReviewApi.Shared.Interfaces;
 
 namespace ReviewApi.Application.Services

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Models.Review;
 using ReviewApi.Controllers.Extensions;
+using ReviewApi.Domain.Dto;
 using ReviewApi.Domain.Exceptions;
 using ReviewApi.Models;
 
@@ -43,11 +44,11 @@ namespace ReviewApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery(Name = "page")] int page = 1, [FromQuery(Name = "quantity")] int quantity = 14)
+        public async Task<IActionResult> GetAll([FromQuery(Name = "page")] int page, [FromQuery(Name = "quantityPerPage")] int quantityPerPage)
         {
             try
             {
-                return Ok(await _reviewService.GetAll(page, quantity));
+                return Ok(await _reviewService.GetAll(new PaginationDTO(page, quantityPerPage)));
             }
             catch (Exception exception)
             {

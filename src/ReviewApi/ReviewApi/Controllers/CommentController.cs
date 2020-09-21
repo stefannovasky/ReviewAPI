@@ -6,6 +6,7 @@ using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Models;
 using ReviewApi.Application.Models.Comment;
 using ReviewApi.Controllers.Extensions;
+using ReviewApi.Domain.Dto;
 using ReviewApi.Domain.Exceptions;
 
 namespace ReviewApi.Controllers
@@ -39,11 +40,11 @@ namespace ReviewApi.Controllers
         [Authorize]
         [HttpGet]
         [Route("reviews/{reviewId}/comments")]
-        public async Task<IActionResult> GetAllFromReview(string reviewId, [FromQuery(Name = "page")] int page, [FromQuery(Name = "quantityPerPage")] int quantityPerPage = 14)
+        public async Task<IActionResult> GetAllFromReview(string reviewId, [FromQuery(Name = "page")] int page, [FromQuery(Name = "quantityPerPage")] int quantityPerPage)
         {
             try
             {
-                return Ok(await _commentService.GetAllFromReview(reviewId, page, quantityPerPage));
+                return Ok(await _commentService.GetAllFromReview(reviewId, new PaginationDTO(page, quantityPerPage)));
             }
             catch (Exception exception)
             {
