@@ -153,8 +153,7 @@ namespace ReviewApi.UnitTests.Application.Services
             Assert.Null(exception);
             _reviewRepositoryMock.Received(1).Update(Arg.Any<Review>());
             await _reviewRepositoryMock.Received(1).Save();
-            await _cacheDatabaseUtilsMock.Received(1).Set(Arg.Any<string>(), Arg.Any<string>());
-            _jsonUtilsMock.Received(1).Serialize(Arg.Any<object>());
+            await _cacheDatabaseUtilsMock.Received(1).Remove(Arg.Any<string>());
         }
 
         [Fact]
