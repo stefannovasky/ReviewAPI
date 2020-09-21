@@ -142,7 +142,7 @@ namespace ReviewApi.Application.Services
             registeredComment.UpdateText(model.Text);
             _commentRepository.Update(registeredComment);
             await _commentRepository.Save();
-            await _cacheDatabase.Set(commentId, _jsonUtils.Serialize(registeredComment));
+            await _cacheDatabase.Remove(commentId);
         }
 
         private void ThrowIfAuthenticatedUserNotIsCommentCreator(Comment comment, Guid userId)

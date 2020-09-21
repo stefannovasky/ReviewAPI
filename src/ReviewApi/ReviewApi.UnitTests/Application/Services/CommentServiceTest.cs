@@ -233,7 +233,7 @@ namespace ReviewApi.UnitTests.Application.Services
             Assert.Null(exception);
             _commentRepositoryMock.Received(1).Update(Arg.Any<Comment>());
             await _commentRepositoryMock.Received(1).Save();
-            await _cacheDatabaseMock.Received(1).Set(Arg.Any<string>(), Arg.Any<string>());
+            await _cacheDatabaseMock.Received(1).Remove(Arg.Any<string>());
         }
 
         [Fact]
@@ -249,7 +249,7 @@ namespace ReviewApi.UnitTests.Application.Services
             Assert.Null(exception);
             _commentRepositoryMock.Received(1).Update(Arg.Any<Comment>());
             await _commentRepositoryMock.Received(1).Save();
-            await _cacheDatabaseMock.Received(1).Set(Arg.Any<string>(), Arg.Any<string>());
+            await _cacheDatabaseMock.Received(1).Remove(Arg.Any<string>());
         }
     }
 }
