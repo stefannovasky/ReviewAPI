@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using ReviewApi.Domain.Dto;
 using ReviewApi.Domain.Entities;
 using ReviewApi.Domain.Interfaces.Repositories;
 using ReviewApi.Infra.Context;
@@ -21,12 +22,12 @@ namespace ReviewApi.Infra.Repositories
             return await Query().Where(comment => comment.ReviewId == reviewId).CountAsync();
         }
 
-        public async Task<IEnumerable<Comment>> GetAllFromReview(Guid reviewId, int page, int quantityPerPage)
+        public async Task<IEnumerable<Comment>> GetAllFromReview(Guid reviewId, PaginationDTO pagination)
         {
-            int skip = (page - 1) * quantityPerPage;
+            int skip = (pagination.Page - 1) * pagination.QuantityPerPage;
             return await Query()
                 .Where(comment => comment.ReviewId == reviewId)
-                .Take(quantityPerPage)
+                .Take(pagination.QuantityPerPage)
                 .Skip(skip)
                 .Include(comment => comment.User)
                     .ThenInclude(user => user.ProfileImage)

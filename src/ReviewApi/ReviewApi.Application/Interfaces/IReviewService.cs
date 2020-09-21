@@ -2,13 +2,14 @@
 using System.Threading.Tasks;
 using ReviewApi.Application.Models;
 using ReviewApi.Application.Models.Review;
+using ReviewApi.Domain.Dto;
 
 namespace ReviewApi.Application.Interfaces
 {
     public interface IReviewService
     {
         Task<IdResponseModel> Create(string userId, CreateOrUpdateReviewRequestModel model);
-        Task<PaginationResponseModel<ReviewResponseModel>> GetAll(int page = 1, int quantityPerPage = 14);
+        Task<PaginationResponseModel<ReviewResponseModel>> GetAll(PaginationDTO pagination);
         Task Delete(string userId, string reviewId);
         Task Update(string userId, string reviewId, CreateOrUpdateReviewRequestModel model);
         Task<ReviewResponseModel> GetById(string reviewId);

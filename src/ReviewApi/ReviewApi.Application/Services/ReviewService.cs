@@ -63,11 +63,11 @@ namespace ReviewApi.Application.Services
             await _cacheDatabase.Remove(review.Id.ToString());
         }
         
-        public async Task<PaginationResponseModel<ReviewResponseModel>> GetAll(int page = 1, int quantityPerPage = 14)
+        public async Task<PaginationResponseModel<ReviewResponseModel>> GetAll(PaginationDTO pagination)
         {
             int count = await _reviewRepository.Count();
-            IEnumerable<Review> reviews = await _reviewRepository.GetAll(page, quantityPerPage);
-            return CreatePaginationResult(reviews, count, page, quantityPerPage);
+            IEnumerable<Review> reviews = await _reviewRepository.GetAll(pagination);
+            return CreatePaginationResult(reviews, count, pagination);
         }
 
         public async Task Update(string userId, string reviewId, CreateOrUpdateReviewRequestModel model)
@@ -115,14 +115,14 @@ namespace ReviewApi.Application.Services
             return reviews.ToList().Select(r => _converter.ConvertReviewToReviewResponseModel(r));
         }
 
-        private PaginationResponseModel<ReviewResponseModel> CreatePaginationResult(IEnumerable<Review> reviews, int totalReviewsInserteds, int actualPage, int quantityPerPage)
+        private PaginationResponseModel<ReviewResponseModel> CreatePaginationResult(IEnumerable<Review> reviews, int totalReviewsInserteds, PaginationDTO pagination)
         {
-            int previousPage = actualPage - 1;
-            string previousPageUrl = previousPage > 0 ? $"{_webApplicationUrl}/reviews?page={previousPage}&quantity={quantityPerPage}" : null;
+            int previousPage = pagination.Page - 1;
+            string previousPageUrl = previousPage > 0 ? $"{_webApplicationUrl}/reviews?page={previousPage}&quantityPerPage={pagination.QuantityPerPage}" : null;
             return new PaginationResponseModel<ReviewResponseModel>()
             {
                 Data = reviews.Select(r => _converter.ConvertReviewToReviewResponseModel(r)),
-                NextPage = $"{_webApplicationUrl}/reviews?page={actualPage + 1}&quantity={quantityPerPage}",
+                NextPage = $"{_webApplicationUrl}/reviews?page={pagination.Page + 1}&quantityPerPage={pagination.QuantityPerPage}",
                 PreviousPage = previousPageUrl,
                 Total = totalReviewsInserteds
             };
@@ -136,7 +136,7 @@ namespace ReviewApi.Application.Services
 
         private void ThrowIfAuthenticatedUserNotBeReviewCreator(Review review, Guid userId)
         {
-            if (!review.WasCreatedAt(userId))
+            if (!review.WasCreatedBy(userId))
             {
                 throw new ForbiddenException();
             }

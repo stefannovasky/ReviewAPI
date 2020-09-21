@@ -6,6 +6,7 @@ using ReviewApi.Application.Converter;
 using ReviewApi.Application.Interfaces;
 using ReviewApi.Application.Models.Comment;
 using ReviewApi.Application.Services;
+using ReviewApi.Domain.Dto;
 using ReviewApi.Domain.Entities;
 using ReviewApi.Domain.Exceptions;
 using ReviewApi.Domain.Interfaces.Repositories;
@@ -73,7 +74,7 @@ namespace ReviewApi.UnitTests.Application.Services
             _cacheDatabaseMock.Get(Arg.Any<string>()).Returns(null as string);
             _reviewRepositoryMock.AlreadyExists(Arg.Any<Guid>()).Returns(false);
 
-            Exception exception = await Record.ExceptionAsync(() => _commentService.GetAllFromReview(Guid.NewGuid().ToString(), 1, 1));
+            Exception exception = await Record.ExceptionAsync(() => _commentService.GetAllFromReview(Guid.NewGuid().ToString(), new PaginationDTO(1, 10)));
 
             Assert.IsType<ResourceNotFoundException>(exception);
         }
@@ -87,7 +88,7 @@ namespace ReviewApi.UnitTests.Application.Services
             _reviewRepositoryMock.AlreadyExists(Arg.Any<Guid>()).Returns(true);
             _commentRepositoryMock.CountFromReview(Arg.Any<Guid>()).Returns(1);
 
-            Exception exception = await Record.ExceptionAsync(() => _commentService.GetAllFromReview(Guid.NewGuid().ToString(), 1, 1));
+            Exception exception = await Record.ExceptionAsync(() => _commentService.GetAllFromReview(Guid.NewGuid().ToString(), new PaginationDTO(1, 10)));
 
             Assert.Null(exception);
         }
@@ -99,9 +100,9 @@ namespace ReviewApi.UnitTests.Application.Services
             _cacheDatabaseMock.Get(Arg.Any<string>()).Returns(null as string);
             _reviewRepositoryMock.AlreadyExists(Arg.Any<Guid>()).Returns(true);
             _commentRepositoryMock.CountFromReview(Arg.Any<Guid>()).Returns(1);
-            _commentRepositoryMock.GetAllFromReview(Arg.Any<Guid>(), 1, 1).Returns(insertedsComments);
+            _commentRepositoryMock.GetAllFromReview(Arg.Any<Guid>(), Arg.Any<PaginationDTO>()).Returns(insertedsComments);
 
-            Exception exception = await Record.ExceptionAsync(() => _commentService.GetAllFromReview(Guid.NewGuid().ToString(), 1, 1));
+            Exception exception = await Record.ExceptionAsync(() => _commentService.GetAllFromReview(Guid.NewGuid().ToString(), new PaginationDTO(1, 10)));
 
             Assert.Null(exception);
             await _cacheDatabaseMock.Received(1).Set(Arg.Any<string>(), Arg.Any<string>());

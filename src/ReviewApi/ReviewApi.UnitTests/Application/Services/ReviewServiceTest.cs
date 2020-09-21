@@ -67,9 +67,9 @@ namespace ReviewApi.UnitTests.Application.Services
             Review review1 = new Review("TITLE", "TEXT", 5, Guid.NewGuid());
             Review review2 = new Review("TITLE", "TEXT", 5, Guid.NewGuid());
             Review review3 = new Review("TITLE", "TEXT", 5, Guid.NewGuid());
-            _reviewRepositoryMock.GetAll(Arg.Any<int>()).Returns(new List<Review>() { review1, review2, review3 });
+            _reviewRepositoryMock.GetAll(Arg.Any<PaginationDTO>()).Returns(new List<Review>() { review1, review2, review3 });
 
-            Exception exception = await Record.ExceptionAsync(() => _reviewService.GetAll());
+            Exception exception = await Record.ExceptionAsync(() => _reviewService.GetAll(new PaginationDTO(1, 10)));
 
             Assert.Null(exception);
         }

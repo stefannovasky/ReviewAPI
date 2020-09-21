@@ -2,6 +2,7 @@
 using ReviewApi.Application.Models;
 using ReviewApi.Application.Models.Review;
 using ReviewApi.Application.Models.User;
+using ReviewApi.Domain.Dto;
 
 namespace ReviewApi.Application.Interfaces
 {
@@ -15,7 +16,7 @@ namespace ReviewApi.Application.Interfaces
         /// <param name="reviewId"></param>
         /// <returns></returns>
         Task CreateOrDelete(string userId, string reviewId);
-        Task<PaginationResponseModel<UserProfileResponseModel>> GetAllFromReview(string reviewId, int page = 1, int quantityPerPage = 14);
-        Task<PaginationResponseModel<ReviewResponseModel>> GetAllFromUser(string userName, int page = 1, int quantityPerPage = 14);
+        Task<PaginationResponseModel<UserProfileResponseModel>> GetAllFromReview(string reviewId, PaginationDTO pagination);
+        Task<PaginationResponseModel<ReviewResponseModel>> GetAllFromUser(string userName, PaginationDTO pagination);
     }
 }
