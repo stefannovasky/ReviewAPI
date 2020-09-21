@@ -65,8 +65,23 @@ namespace ReviewApi.Application.Services
         
         public async Task<PaginationResponseModel<ReviewResponseModel>> GetAll(PaginationDTO pagination)
         {
+            IEnumerable<Review> reviews;
             int count = await _reviewRepository.Count();
-            IEnumerable<Review> reviews = await _reviewRepository.GetAll(pagination);
+
+            string reviewsInsertedOnCacheJson = await _cacheDatabase.Get($"reviews?page={pagination.Page}&quantityPerPage={pagination.QuantityPerPage}");
+            if (reviewsInsertedOnCacheJson != null)
+            {
+                reviews = _jsonUtils.Deserialize<IEnumerable<Review>>(reviewsInsertedOnCacheJson);
+            }
+            else
+            {
+                reviews = await _reviewRepository.GetAll(pagination);
+                if (reviews.Count() > 0)
+                {
+                    await _cacheDatabase.Set($"reviews?page={pagination.Page}&quantityPerPage={pagination.QuantityPerPage}", _jsonUtils.Serialize(reviews));
+                }
+            }
+
             return CreatePaginationResult(reviews, count, pagination);
         }
 
@@ -84,25 +99,27 @@ namespace ReviewApi.Application.Services
             review.Update(model.Title, model.Text, model.Stars);
             _reviewRepository.Update(review);
             await _reviewRepository.Save();
-            await _cacheDatabase.Set(review.Id.ToString(), _jsonUtils.Serialize(review));
+            await _cacheDatabase.Remove(reviewId);
         }
 
         public async Task<ReviewResponseModel> GetById(string reviewId)
         {
+            Review registeredReview;
             string reviewRegisteredOnCacheJson = await _cacheDatabase.Get(reviewId);
             if (reviewRegisteredOnCacheJson != null)
             {
-                Review reviewRegisteredOnCache = _jsonUtils.Deserialize<Review>(reviewRegisteredOnCacheJson);
-                return _converter.ConvertReviewToReviewResponseModel(reviewRegisteredOnCache);
+                registeredReview = _jsonUtils.Deserialize<Review>(reviewRegisteredOnCacheJson);
             }
-
-            Review review = await _reviewRepository.GetById(Guid.Parse(reviewId));
-            if (review == null)
+            else
             {
-                throw new ResourceNotFoundException("review not found.");
+                registeredReview = await _reviewRepository.GetById(Guid.Parse(reviewId));
+                if (registeredReview == null)
+                {
+                    throw new ResourceNotFoundException("review not found.");
+                }
+                await _cacheDatabase.Set(registeredReview.Id.ToString(), _jsonUtils.Serialize(registeredReview));
             }
-            await _cacheDatabase.Set(review.Id.ToString(), _jsonUtils.Serialize(review));
-            return _converter.ConvertReviewToReviewResponseModel(review);
+            return _converter.ConvertReviewToReviewResponseModel(registeredReview);
         }
 
         public async Task<IEnumerable<ReviewResponseModel>> Search(string text)
