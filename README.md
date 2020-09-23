@@ -17,13 +17,13 @@
 - Redis
 
 # :running: Running
-**1. Clone this repository:**
+1. Clone this repository:
     `git clone https://github.com/stefannovasky/ReviewAPI.git`
-**2. Configure:** 
+2. Configure:
     Configure SQL Server, Redis and Smtp Server connection on src/ReviewApi/ReviewApi/appsettings.json 
-**3. Start Redis Server on the terminal:**
+3. Start Redis Server on the terminal:
     `redis-server`
-**4. Start the application on the terminal**
+4. Start the application on the terminal
     `dotnet run --project ./src/ReviewApi/ReviewApi/ReviewApi.csproj`
 
 # :rocket: Features
