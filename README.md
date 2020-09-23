@@ -41,8 +41,8 @@
 - authenticated user can create a revision
 - the authenticated user can update his revision
 - the authenticated user can delete his revision
-- authenticated user may prefer a review 
-- authenticated user can remove bookmark from a review
+- authenticated user can favorite a review 
+- authenticated user can remove favorite from a review
 - authenticated user can comment on a revision
 - the authenticated user can update his/her comment 
 - the authenticated user can delete his/her comment 
