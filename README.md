@@ -34,16 +34,16 @@
 - the authenticated user can update his name, password and profile picture
 - the authenticated user can see my profile 
 - the authenticated user can see the profile of other users
-- authenticated user can see other users' favorite opinions
-- the user can list opinions
-- the authenticated user can see their opinions
+- authenticated user can see other users' favorite analysis
+- the user can list analysis
+- the authenticated user can see their analysis
 - the authenticated user can see their favorite opinions
-- the authenticated user can create a revision
-- the authenticated user can update his revision
-- the authenticated user can delete his revision
-- the authenticated user can favorite a review 
-- the authenticated user can remove favorite from a review
-- the authenticated user can comment on a revision
+- the authenticated user can create an analysis
+- the authenticated user can update his analysis
+- the authenticated user can delete his analysis
+- the authenticated user can favorite an analysis 
+- the authenticated user can remove favorite from an analysis
+- the authenticated user can comment on an analysis
 - the authenticated user can update his/her comment 
 - the authenticated user can delete his/her comment 
 
