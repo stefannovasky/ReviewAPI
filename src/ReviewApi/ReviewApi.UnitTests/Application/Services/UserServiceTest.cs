@@ -485,5 +485,25 @@ namespace ReviewApi.UnitTests.Application.Services
             Exception exception = await Record.ExceptionAsync(() => _userService.GetProfile(_fakeConfirmedInsertedUser.Name));
             Assert.Null(exception);
         }
+
+        [Fact]
+        public async Task ShouldThrowResourceNotFoundExceptionOnRefreshToken() 
+        {
+            _userRepositoryMock.AlreadyExists(Arg.Any<Guid>()).Returns(false);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.RefreshToken(Guid.NewGuid().ToString()));
+
+            Assert.IsType<ResourceNotFoundException>(exception);
+        }
+
+        [Fact]
+        public async Task ShouldRefreshToken() 
+        {
+            _userRepositoryMock.AlreadyExists(Arg.Any<Guid>()).Returns(true);
+
+            Exception exception = await Record.ExceptionAsync(() => _userService.RefreshToken(Guid.NewGuid().ToString()));
+
+            Assert.Null(exception);
+        }
     }
 }
