@@ -20,7 +20,7 @@
 1. Clone this repository:
     `git clone https://github.com/stefannovasky/ReviewAPI.git && cd ReviewAPI`
 2. Configure:
-    Configure SQL Server, Redis and Smtp Server connection on file: `src/ReviewApi/ReviewApi/appsettings`.json 
+    Configure SQL Server, Redis and Smtp Server connection on file: `src/ReviewApi/ReviewApi/appsettings.json`
 3. Start Redis Server on the terminal:
     `redis-server`
 4. Start the application on the terminal
