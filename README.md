@@ -18,9 +18,9 @@
 
 # :running: Running
 1. Clone this repository:
-    `git clone https://github.com/stefannovasky/ReviewAPI.git`
+    `git clone https://github.com/stefannovasky/ReviewAPI.git && cd ReviewAPI`
 2. Configure:
-    Configure SQL Server, Redis and Smtp Server connection on src/ReviewApi/ReviewApi/appsettings.json 
+    Configure SQL Server, Redis and Smtp Server connection on file: `src/ReviewApi/ReviewApi/appsettings`.json 
 3. Start Redis Server on the terminal:
     `redis-server`
 4. Start the application on the terminal
@@ -36,14 +36,14 @@
 - the authenticated user can see the profile of other users
 - authenticated user can see other users' favorite opinions
 - the user can list opinions
-- authenticated user can see their opinions
-- authenticated user can see their favorite opinions
-- authenticated user can create a revision
+- the authenticated user can see their opinions
+- the authenticated user can see their favorite opinions
+- the authenticated user can create a revision
 - the authenticated user can update his revision
 - the authenticated user can delete his revision
-- authenticated user can favorite a review 
-- authenticated user can remove favorite from a review
-- authenticated user can comment on a revision
+- the authenticated user can favorite a review 
+- the authenticated user can remove favorite from a review
+- the authenticated user can comment on a revision
 - the authenticated user can update his/her comment 
 - the authenticated user can delete his/her comment 
 
