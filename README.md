@@ -3,14 +3,14 @@
 
 [author-link]:https://img.shields.io/badge/Author-Stefan%20Novasky-brightgreen
 [license-link]:https://img.shields.io/badge/License-MIT-green
-[star-link]:https://img.shields.io/github/stars/stefannovasky/ReviewApi?color=lightgray
+[star-link]:https://img.shields.io/github/stars/stefannovasky/ReviewApi?color=green
 
 [![author][author-link]](https://github.com/stefannovasky)
 [![license][license-link]](https://github.com/stefannovasky/ReviewAPI/blob/master/LICENSE)
 [![license][star-link]](https://github.com/stefannovasky/ReviewAPI)
 
 
-# :computer: Tecnologies 
+# :computer: Technologies 
 - ASP .NET Core 3.1
 - SQL Server
 - Entity Framework Core
