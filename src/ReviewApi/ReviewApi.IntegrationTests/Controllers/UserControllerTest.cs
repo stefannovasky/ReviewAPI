@@ -119,5 +119,16 @@ namespace ReviewApi.IntegrationTests.Controllers
 
             Assert.Equal((int)HttpStatusCode.OK, (int)httpResponse.StatusCode);
         }
+
+        [Fact]
+        public async Task ShouldRefreshToken()
+        {
+            Guid userId = await InsertUserOnDatabase();
+            _httpClient.InsertAuthorizationTokenOnRequestHeader(_authorizationTokenHelper.CreateToken(userId));
+
+            HttpResponseMessage httpResponse = await _httpClient.GetAsync("../users/token/refresh");
+
+            Assert.Equal((int)HttpStatusCode.OK, (int)httpResponse.StatusCode);
+        }
     }
 }
