@@ -20,5 +20,6 @@ namespace ReviewApi.Application.Interfaces
         Task UpdateProfileImage(string userId, Stream imageStream);
         Task<UserProfileResponseModel> GetProfile(string userName);
         Task<IEnumerable<ReviewResponseModel>> GetUserReviews(string name);
+        Task<TokenResponseModel> RefreshToken(string userId);
     }
 }
