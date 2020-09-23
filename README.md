@@ -16,6 +16,10 @@
 - Entity Framework Core
 - Redis
 
+# :running: Running
+**1. Clone this repository:**
+    `git clone https://github.com/stefannovasky/ReviewAPI.git`
+
 # :rocket: Features
 - register user
 - authenticate the user
@@ -36,10 +40,6 @@
 - authenticated user can comment on a revision
 - the authenticated user can update his/her comment 
 - the authenticated user can delete his/her comment 
-
-# :running: Running
-**1. Clone this repository:**
-    `git clone https://github.com/stefannovasky/ReviewAPI.git`
 
 **2. Configure:** 
     Configure SQL Server, Redis and Smtp Server connection on src/ReviewApi/ReviewApi/appsettings.json 
