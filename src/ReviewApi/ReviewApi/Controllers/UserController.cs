@@ -183,7 +183,7 @@ namespace ReviewApi.Controllers
             }
             catch (Exception exception)
             {
-                return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception); 
+                return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
             }
         }
 
@@ -195,6 +195,21 @@ namespace ReviewApi.Controllers
             try
             {
                 return Ok(await _userService.GetUserReviews(userName));
+            }
+            catch (Exception exception)
+            {
+                return this.HandleExceptionToUserAndLogIfExceptionIsUnexpected(exception);
+            }
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("token/refresh")]
+        public async Task<IActionResult> RefreshToken()
+        {
+            try
+            {
+                return Ok(await _userService.RefreshToken(this.GetUserIdFromToken()));
             }
             catch (Exception exception)
             {

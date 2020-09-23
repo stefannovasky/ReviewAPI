@@ -213,6 +213,17 @@ namespace ReviewApi.Application.Services
             });
         }
 
+        public async Task<TokenResponseModel> RefreshToken(string userId)
+        {
+            if (!await _userRepository.AlreadyExists(Guid.Parse(userId)))
+            {
+                throw new ResourceNotFoundException("user not found.");
+            }
+
+            string token = _jwtTokenUtils.GenerateToken(userId);
+            return new TokenResponseModel { Token = token };
+        }
+
         private void ThrowIfUserIsNullOrNotConfirmed(User user)
         {
             if (user == null)
