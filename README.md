@@ -19,6 +19,10 @@
 # :running: Running
 **1. Clone this repository:**
     `git clone https://github.com/stefannovasky/ReviewAPI.git`
+**2. Configure:** 
+    Configure SQL Server, Redis and Smtp Server connection on src/ReviewApi/ReviewApi/appsettings.json 
+**3. Run:** 
+    `dotnet run --project ./src/ReviewApi/ReviewApi/ReviewApi.csproj`
 
 # :rocket: Features
 - register user
@@ -41,11 +45,8 @@
 - the authenticated user can update his/her comment 
 - the authenticated user can delete his/her comment 
 
-**2. Configure:** 
-    Configure SQL Server, Redis and Smtp Server connection on src/ReviewApi/ReviewApi/appsettings.json 
-
-**3. Run:** 
-    `dotnet run --project ./src/ReviewApi/ReviewApi/ReviewApi.csproj`
+# :memo: Documentation
+Run the application and access the route: */swagger/index.html*
 
 # :tada: Contributing
 If you want to contribute please fork the repository and get your hands dirty, and make the changes as you'd like and submit the Pull Request.
