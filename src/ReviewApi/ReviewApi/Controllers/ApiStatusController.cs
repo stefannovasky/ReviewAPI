@@ -6,6 +6,7 @@ namespace ReviewApi.Controllers
     [ApiController]
     public class ApiStatusController : ControllerBase
     {
+        [HttpGet]
         public IActionResult Get() => Ok();
     }
 }
