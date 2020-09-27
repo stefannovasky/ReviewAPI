@@ -21,7 +21,7 @@ namespace ReviewApi.Infra.Redis
 
         public async Task Set(string key, string jsonValue, int expirationTimeInSeconds = 300)
         {
-            await _cacheDatabase.StringSetAsync(key, jsonValue, TimeSpan.FromSeconds(300));
+            await _cacheDatabase.StringSetAsync(key, jsonValue, TimeSpan.FromSeconds(expirationTimeInSeconds));
         }
 
         public async Task<string> Get(string key)
